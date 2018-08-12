@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <item
+        android:id="@+id/action_posts"
+        android:icon="@drawable/round_home_black_24dp"
+        android:title="" />
+
+    <!--<item-->
+        <!--android:id="@+id/action_upcoming_events"-->
+        <!--android:icon="@drawable/ic_event_note_black_24dp"-->
+        <!--android:visible="false"/>-->
+
+    <item
+        android:id="@+id/action_heirarchy"
+        android:icon="@drawable/ic_supervisor_account_black_24dp"
+        android:title="" />
+
+    <item android:id="@+id/action_contact"
+        android:title=""
+        android:icon="@drawable/ic_call_black_24dp"/>
+
+ <!--   <item
+        android:id="@+id/action_posts"
+        android:icon="@drawable/home_bottomnav"
+        android:title="@string/title_posts" />
+
+    <item
+        android:id="@+id/action_upcoming_events"
+        android:icon="@drawable/star_bottomnav"
+        android:title="@string/title_upcmngevents" />
+
+    <item
+        android:id="@+id/action_heirarchy"
+        android:icon="@drawable/members_bottomnav"
+        android:title="@string/title_hierarchy" />
+
+    <item android:id="@+id/action_contact"
+        android:title="@string/title_contact"
+        android:icon="@drawable/contact_bottomnav"/> -->
+
+</menu>

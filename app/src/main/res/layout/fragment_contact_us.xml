@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:paddingBottom="32dp"
+        tools:context=".fragment.homepage.ContactUsFragment">
+
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="@+id/constraintLayout2"
+            app:layout_constraintHorizontal_bias="0.0"
+            card_view:cardUseCompatPadding="true"
+            card_view:cardCornerRadius="4dp"
+            android:elevation="8dp"
+            app:layout_constraintStart_toStartOf="@+id/constraintLayout2"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/image_view_contact_us_call_prexec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:srcCompat="@drawable/ic_call_black_24dp"
+                    card_view:layout_constraintBottom_toBottomOf="parent"
+                    card_view:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_view_contact_us_prexec_pic"
+                    android:layout_width="68dp"
+                    android:layout_height="68dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    card_view:layout_constraintStart_toStartOf="parent"
+                    card_view:layout_constraintTop_toTopOf="parent"
+                    card_view:srcCompat="@android:drawable/ic_menu_gallery" />
+
+                <TextView
+                    android:id="@+id/text_view_contact_us_name"
+                    android:layout_width="0dp"
+                    android:layout_height="29dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/contact_us_member_2_name"
+                    android:textAlignment="viewStart"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="@+id/text_view_contact_us_title"
+                    app:layout_constraintTop_toBottomOf="@+id/text_view_contact_us_title"
+                    card_view:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_title" />
+
+                <ImageView
+                    android:id="@+id/image_view_contact_us_available_prexec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_view_available"
+                    app:layout_constraintStart_toEndOf="@+id/text_view_available"
+                    app:layout_constraintTop_toTopOf="@+id/text_view_available"
+                    app:srcCompat="@drawable/ic_check_circle_green_24dp" />
+
+                <TextView
+                    android:id="@+id/text_view_available"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Available in Campus"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    card_view:layout_constraintBottom_toBottomOf="parent"
+                    card_view:layout_constraintStart_toStartOf="@+id/image_view_contact_us_prexec_pic"
+                    card_view:layout_constraintTop_toBottomOf="@+id/text_view_contact_us_name" />
+
+                <TextView
+                    android:id="@+id/text_view_contact_us_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/contact_us_member_2_title"
+                    android:textAlignment="viewStart"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    card_view:layout_constraintEnd_toEndOf="parent"
+                    card_view:layout_constraintStart_toEndOf="@+id/image_view_contact_us_prexec_pic" />
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/constraintLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            card_view:cardUseCompatPadding="true"
+            android:layout_marginTop="32dp"
+            card_view:cardCornerRadius="4dp"
+            android:elevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView7">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/image_view_contact_us_call_membchair"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:srcCompat="@drawable/ic_call_black_24dp"
+                    card_view:layout_constraintBottom_toBottomOf="parent"
+                    card_view:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_view_contact_us_memb_chair_pic"
+                    android:layout_width="68dp"
+                    android:layout_height="68dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    card_view:layout_constraintStart_toStartOf="parent"
+                    card_view:layout_constraintTop_toTopOf="parent"
+                    card_view:srcCompat="@android:drawable/ic_menu_gallery" />
+
+                <ImageView
+                    android:id="@+id/image_view_contact_us_memb_chair"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView24"
+                    app:layout_constraintStart_toEndOf="@+id/textView24"
+                    app:layout_constraintTop_toTopOf="@+id/textView24"
+                    app:srcCompat="@drawable/ic_cancel_grey_24dp" />
+
+                <TextView
+                    android:id="@+id/textView24"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Available In Campus"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    card_view:layout_constraintBottom_toBottomOf="parent"
+                    card_view:layout_constraintStart_toStartOf="@+id/image_view_contact_us_memb_chair_pic"
+                    card_view:layout_constraintTop_toBottomOf="@+id/textView19" />
+
+                <TextView
+                    android:id="@+id/textView19"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/contact_us_member_1_name"
+                    android:textAlignment="viewStart"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="@+id/textView18"
+                    app:layout_constraintStart_toStartOf="@+id/textView18"
+                    app:layout_constraintTop_toBottomOf="@+id/textView18" />
+
+                <TextView
+                    android:id="@+id/textView18"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/contact_us_member_1_title"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    card_view:layout_constraintEnd_toEndOf="parent"
+                    card_view:layout_constraintStart_toEndOf="@+id/image_view_contact_us_memb_chair_pic" />
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acmw_whatsapp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/whatsapp_acmw"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView7"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acm_whatsapp"
+            app:layout_constraintStart_toStartOf="@+id/text_view_contact_us_acm_whatsapp" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acm_whatsapp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/whatsapp_acm"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acmw_youtube"
+            app:layout_constraintStart_toEndOf="@+id/imageView7"
+            app:layout_constraintTop_toTopOf="@+id/imageView7" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acmw_youtube"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acmw_youtube"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acm_youtube"
+            app:layout_constraintStart_toStartOf="@+id/text_view_contact_us_acm_youtube" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acm_youtube"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acm_youtube"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acmw_insta"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toTopOf="@+id/imageView6" />
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintStart_toStartOf="@+id/image_view_contact_us_web"
+            app:layout_constraintTop_toBottomOf="@+id/image_view_contact_us_web"
+            app:srcCompat="@drawable/whatsappcontactus" />
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintStart_toStartOf="@+id/instagram_button"
+            app:layout_constraintTop_toBottomOf="@+id/instagram_button"
+            app:srcCompat="@drawable/youtube_icon" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acm_mail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:text="@string/mail_id_acm"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acmw_web"
+            app:layout_constraintStart_toEndOf="@+id/image_view_contact_us_web"
+            app:layout_constraintTop_toTopOf="@+id/image_view_contact_us_web" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acmw_insta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acmw_insta"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/instagram_button"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acm_insta"
+            app:layout_constraintStart_toStartOf="@+id/text_view_contact_us_acm_insta" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acmw_fb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acmw_fb"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/facebook_button"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acm_fb"
+            app:layout_constraintStart_toStartOf="@+id/text_view_contact_us_acm_fb" />
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="0dp"
+            android:layout_height="203dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/contact_us_top"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/facebook_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/facebook_icon"
+            app:layout_constraintStart_toStartOf="@+id/imageView5"
+            app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acm_fb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acm_fb"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/imageView5"
+            app:layout_constraintStart_toEndOf="@+id/facebook_button"
+            app:layout_constraintTop_toTopOf="@+id/facebook_button" />
+
+        <ImageView
+            android:id="@+id/instagram_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/instagram_icon"
+            app:layout_constraintStart_toStartOf="@+id/facebook_button"
+            app:layout_constraintTop_toBottomOf="@+id/facebook_button" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acm_insta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acm_insta"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acm_fb"
+            app:layout_constraintStart_toEndOf="@+id/instagram_button"
+            app:layout_constraintTop_toTopOf="@+id/instagram_button" />
+
+        <ImageView
+            android:id="@+id/gmail_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/web"
+            app:layout_constraintStart_toStartOf="@+id/imageView6"
+            app:layout_constraintTop_toBottomOf="@+id/imageView6" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acmw_mail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/mail_id_acmw"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_view_contact_us_web"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acm_mail"
+            app:layout_constraintStart_toStartOf="@+id/text_view_contact_us_acm_mail" />
+
+        <ImageView
+            android:id="@+id/image_view_contact_us_web"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/gmail_icon"
+            app:layout_constraintStart_toStartOf="@+id/gmail_button"
+            app:layout_constraintTop_toBottomOf="@+id/gmail_button" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acm_web"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acm_website"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acmw_youtube"
+            app:layout_constraintStart_toEndOf="@+id/gmail_button"
+            app:layout_constraintTop_toTopOf="@+id/gmail_button" />
+
+        <TextView
+            android:id="@+id/text_view_contact_us_acmw_web"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/link_acmw_website"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/gmail_button"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_contact_us_acm_web"
+            app:layout_constraintStart_toStartOf="@+id/text_view_contact_us_acm_web" />
+    </android.support.constraint.ConstraintLayout>
+
+</ScrollView>
