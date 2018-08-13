@@ -26,10 +26,14 @@ import retrofit2.Response;
 
 public class OTPVerificationFragment extends Fragment implements
         View.OnClickListener,
-        Callback<Member>{
-    private static final int MAX_TRIES=10;
+        Callback<Member> {
+
+    private static int max_tries=10;
+    private static String failureCountKey = "Failure Count Key";
+    private static String stateKeyVerifyNewSap = "Verify new Sap Key";
 
     HomeActivity callback;
+
     TextView textViewOTPRecpientDetails;
     TextView textViewOTPRecipientMsg;
     EditText editTextOTP;
@@ -38,21 +42,23 @@ public class OTPVerificationFragment extends Fragment implements
     Button buttonNewSap;
     ProgressBar progressBar;
     String otp;
+
     String sap;
     NewMember newMember;
-
-    int statusCode;
+    int mode;
     boolean verifyOTPSelected;
     boolean verifyNewSap;
     private int failureCount=0;
+
     private OTPVerificationResultListener resultListener;
+
     public OTPVerificationFragment() {
         // Required empty public constructor
     }
 
-    public static OTPVerificationFragment newInstance(int statusCode) {
+    public static OTPVerificationFragment newInstance(int mode) {
         OTPVerificationFragment fragment = new OTPVerificationFragment();
-        fragment.statusCode = statusCode;
+        fragment.mode = mode;
         return fragment;
     }
 
@@ -65,7 +71,7 @@ public class OTPVerificationFragment extends Fragment implements
                 callback  = (HomeActivity)context;
             } else
                 throw new IllegalStateException(context.toString() + " must implement " +
-                        "OnVerificationResult Listener");
+                        "OnVerificationResultListener");
         }
         else {
             throw new IllegalStateException("context must be instance of HomeActivity");
@@ -76,7 +82,9 @@ public class OTPVerificationFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(savedInstanceState!=null) {
-            statusCode = savedInstanceState.getInt(getString(R.string.otp_verification_status_code));
+            mode = savedInstanceState.getInt(getString(R.string.otp_verification_status_code));
+            failureCount = savedInstanceState.getInt(failureCountKey);
+            verifyNewSap = savedInstanceState.getBoolean(stateKeyVerifyNewSap);
         }
     }
 
@@ -94,8 +102,18 @@ public class OTPVerificationFragment extends Fragment implements
         textViewOTPRecipientMsg = view.findViewById(R.id.text_view_otp_recipient_msg);
         progressBar = view.findViewById(R.id.progress_bar_otp);
 
-
-        if(statusCode == getResources().getInteger(R.integer.verify_new_entered_sap)) {
+        Bundle args = getArguments();
+        if(mode != getResources().getInteger(R.integer.verify_new_entered_sap)) {
+            if(args == null) {
+                if(savedInstanceState != null) {
+                    args = savedInstanceState;
+                }
+                else {
+                    throw new IllegalStateException("Arguments of OTPVerification fragment must not be null");
+                }
+            }
+        }
+        else { //if code = verify_new_entered_sap
             textViewOTPRecipientMsg.setVisibility(View.INVISIBLE);
             textViewOTPRecpientDetails.setVisibility(View.INVISIBLE);
             editTextSap.setVisibility(View.VISIBLE);
@@ -103,15 +121,9 @@ public class OTPVerificationFragment extends Fragment implements
 
             verifyOTPSelected = true;
         }
-        else {
-            Bundle args=getArguments();
-            if(args==null) {
-                throw new IllegalStateException("Arguments of OTPVerification fragment must not be null");
-            }
-        }
 
-        if(statusCode == getResources().getInteger(R.integer.code_verify_button_not_clicked)) {
-            newMember = getArguments().getParcelable(getString(R.string.new_member_key));
+        if(mode == getResources().getInteger(R.integer.code_verify_button_not_clicked)) {
+            newMember = args.getParcelable(getString(R.string.new_member_key));
             if(newMember ==  null) {
                 throw new IllegalStateException("newMember must not be null");
             }
@@ -121,7 +133,7 @@ public class OTPVerificationFragment extends Fragment implements
             callback.getMembershipClient().getMember(newMember.getRecipientSap())
                     .enqueue(this);
         }
-        else if(statusCode == getResources().getInteger((R.integer.verify_stored_sap))){
+        else if(mode == getResources().getInteger((R.integer.verify_stored_sap))){
             sap = getArguments().getString(getString(R.string.new_member_sap_key));
             if(sap == null) {
                 throw new IllegalStateException("sap must not be null");
@@ -136,8 +148,20 @@ public class OTPVerificationFragment extends Fragment implements
         return view;
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callback = null;
+        resultListener = null;
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putInt(getString(R.string.otp_verification_status_code),statusCode);
+        savedInstanceState.putInt(getString(R.string.otp_verification_status_code),mode);
+        savedInstanceState.putInt(failureCountKey,failureCount);
+        savedInstanceState.putBoolean(stateKeyVerifyNewSap,verifyNewSap);
+
+        savedInstanceState.putParcelable(getString(R.string.new_member_key),newMember);
     }
 
     @Override
@@ -176,10 +200,6 @@ public class OTPVerificationFragment extends Fragment implements
     }
 
 
-
-
-
-
     @Override
     public void onResponse(Call<Member> call, Response<Member> response) {
         Member recepient = response.body();
@@ -204,7 +224,8 @@ public class OTPVerificationFragment extends Fragment implements
     @Override
     public void onFailure(Call<Member> call, Throwable t) {
         t.printStackTrace();
-        Toast.makeText(getContext(),"Failed to fetch recipient",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(),"Failed to fetch recipient details. Please check your connection",
+                Toast.LENGTH_SHORT).show();
         showProgress(false);
     }
 
@@ -217,18 +238,16 @@ public class OTPVerificationFragment extends Fragment implements
         }
         else {
             failureCount++;
-            if(failureCount==MAX_TRIES) {
-                msg="Maximum Tries exceeded Please Contact ACM Membership Team";
+            if(failureCount==max_tries) {
+                msg="Maximum Tries exceeded Please Contact ACM Team for your OTP";
                 resultListener.onMaxTriesExceed(this);
             }
             else
-                msg="Failed to verify "+(MAX_TRIES-failureCount)+" tries left";
+                msg="Invalid OTP. "+(max_tries-failureCount)+" tries left";
         }
         System.out.println(msg);
         Toast.makeText(getContext(),msg,Toast.LENGTH_LONG).show();
     }
-
-
 
     void showProgress(boolean show) {
         progressBar.setVisibility(show?View.VISIBLE:View.INVISIBLE);

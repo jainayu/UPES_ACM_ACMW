@@ -110,10 +110,15 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        callback = null;
+    }
+
+    @Override
     public void onClick(View view) {
         InputMethodManager inputManager = (InputMethodManager)
                 getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
 
