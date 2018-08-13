@@ -3,7 +3,6 @@ package org.upesacm.acmacmw.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -208,7 +207,7 @@ public class HomeActivity extends AppCompatActivity implements
         else if(item.getItemId()== R.id.action_new_member_registration) {
                 /* *****************Open the new member registration fragment here *************** */
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, MemberRegistrationFragment.newInstance(membershipClient, toolbar),
+                        .replace(R.id.frame_layout, new MemberRegistrationFragment(),
                                 getString(R.string.fragment_tag_new_member_registration))
                         .commit();
             setDrawerEnabled(false);
@@ -278,9 +277,9 @@ public class HomeActivity extends AppCompatActivity implements
         toolbar.setTitle(title);
     }
 
-    public void startOTPVerificationPage(NewMember newMember) {
+    public void startOTPVerificationPage(int mode,NewMember newMember) {
         OTPVerificationFragment fragment;
-        if(newMember!=null) {
+        if(mode == getResources().getInteger(R.integer.verify_new_member)) {
             SharedPreferences preferences=getSharedPreferences(getString(R.string.preference_file_key),
                     Context.MODE_PRIVATE);
             SharedPreferences.Editor editor=preferences.edit();
@@ -288,13 +287,21 @@ public class HomeActivity extends AppCompatActivity implements
             editor.putString(getString(R.string.new_member_sap_key),newMember.getSapId());
             editor.commit();
 
-            fragment= OTPVerificationFragment.newInstance(membershipClient, newMember.getSapId());
+            fragment= OTPVerificationFragment
+                    .newInstance(mode); //verify otp not clicked
             Bundle bundle = new Bundle();
             bundle.putParcelable(getString(R.string.new_member_key), newMember);
             fragment.setArguments(bundle);
         }
+        else if(mode == getResources().getInteger(R.integer.verify_new_entered_sap)) {
+            fragment= OTPVerificationFragment
+                    .newInstance(mode); //verify otp clicked
+            Bundle bundle = new Bundle();
+            bundle.putString(getString(R.string.new_member_sap_key), newMemberSap);
+            fragment.setArguments(bundle);
+        }
         else {
-            fragment= OTPVerificationFragment.newInstance(membershipClient,newMemberSap);
+            throw new IllegalStateException("undefined mode for OTP Verifiaction Fragment");
         }
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout,fragment,"otp_verifiction");
@@ -498,6 +505,10 @@ public class HomeActivity extends AppCompatActivity implements
         return database;
     }
 
+    public MembershipClient getMembershipClient() {return membershipClient;}
+
+    public Toolbar getToolbar() {return toolbar;}
+
 
 
     /* $$$$$$$$$$$$$$$$$$$$$$$$ Callbacks of LoginDialogFragment $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ */
@@ -553,14 +564,14 @@ public class HomeActivity extends AppCompatActivity implements
 
             /* *****************Open the new member registration fragment here *************** */
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.frame_layout, MemberRegistrationFragment.newInstance(membershipClient, toolbar),
+            ft.replace(R.id.frame_layout, new MemberRegistrationFragment(),
                     getString(R.string.fragment_tag_new_member_registration));
             ft.commit();
 
             /* ******************************************************************************/
         }
         else {
-            startOTPVerificationPage(null);
+            startOTPVerificationPage(getResources().getInteger(R.integer.verify_stored_sap),null);
         }
         setDrawerEnabled(false);
     }
@@ -601,18 +612,19 @@ public class HomeActivity extends AppCompatActivity implements
                     +"<b>Membership Type : "+newMember.getMembershipType()+"<br/>";
             OTPSender sender=new OTPSender();
             sender.execute(mailBody,recipientEmail,"OTP Details");
-            startOTPVerificationPage(newMember);
+            startOTPVerificationPage(getResources().getInteger(R.integer.verify_new_member),newMember);
         }
         else {
             if (resultCode == RecipientsFragment.NEW_MEMBER_ALREADY_PRESENT) {
                 msg = getString(R.string.msg_new_member_already_registered);
             } else if (resultCode == RecipientsFragment.ALREADY_PART_OF_ACM) {
                 msg = getString(R.string.msg_already_acm_member);
-            } else
+            } else if (resultCode == RecipientsFragment.FAILED_TO_FETCH_RECEPIENTS) {
+                msg = "Failed to fetch recipients. Please check your connection";
+            }
                 msg = "Data save Failed. Please check your connection";
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, MemberRegistrationFragment.newInstance(membershipClient,
-                            toolbar),getString(R.string.fragment_tag_new_member_registration))
+                    .replace(R.id.frame_layout,new MemberRegistrationFragment(),getString(R.string.fragment_tag_new_member_registration))
                     .commit();
         }
 
@@ -621,21 +633,20 @@ public class HomeActivity extends AppCompatActivity implements
 
     /* ********************** Callback from MemberRegistrationFragment ************************ */
     @Override
-    public void onRegistrationDataAvailable(final NewMember newMember) {
-        RecipientsFragment fragment = RecipientsFragment.newInstance(database,membershipClient,
-                newMember);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout,fragment,getString(R.string.fragment_tag_recipients))
-                .commit();
+    public void onRegistrationDataAvailable(final int statusCode,final NewMember newMember) {
+        if(statusCode == getResources().getInteger(R.integer.verify_new_member)) {
+            RecipientsFragment fragment = RecipientsFragment.newInstance(newMember);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, fragment, getString(R.string.fragment_tag_recipients))
+                    .commit();
+        }
+        else {
+            OTPVerificationFragment fragment = OTPVerificationFragment.newInstance(statusCode);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout,fragment, getString(R.string.fragment_tag_otp_verification))
+                    .commit();
+        }
 
-    }
-
-    @Override
-    public void onVerifyOTPClicked() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, OTPVerificationFragment.newInstance(membershipClient,null),
-                        getString(R.string.fragment_tag_otp_verification))
-                .commit();
     }
     /* ******************************************************************************************/
 
@@ -936,47 +947,6 @@ public class HomeActivity extends AppCompatActivity implements
                                                 Toast.makeText(HomeActivity.this, "unable to create trial member", Toast.LENGTH_LONG).show();
                                             }
                                         });
-                        //    }
-                       /*     else {
-                                //This code is to check if use has signed in from a different account and
-                                   //upadate the database accordingly
-
-                                DatabaseReference trialMemberReference = database.getReference("postsTrialLogin/" +
-                                                trialMember.getSap());
-                                TrialMember tempTrial=response.body();
-                                if(tempTrial.isVerified()) {
-                                    if (!trialMember.getEmail().equals(tempTrial.getEmail())) {
-                                        HomeActivity.this.trialMember = trialMember;
-                                        trialMemberReference.setValue(trialMember);
-                                    }
-                                    else {
-                                        HomeActivity.this.trialMember = tempTrial;
-                                    }
-                                    SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preference_file_key),
-                                            Context.MODE_PRIVATE).edit();
-                                    editor.putString(getString(R.string.trial_member_sap), sap);
-                                    editor.commit();
-                                    for (HomeActivityStateChangeListener listener : stateChangeListeners) {
-                                        listener.onTrialMemberStateChange(HomeActivity.this.trialMember);
-                                        customizeNavigationDrawer(HomeActivity.STATE_TRIAL_MEMBER_SIGNED_IN);
-                                    }
-                                    Toast.makeText(HomeActivity.this, "trial member already present", Toast.LENGTH_LONG).show();
-                                    onBackPressed();
-
-                                    HomeActivity.this.getSupportActionBar().show();
-                                    HomeActivity.this.setDrawerEnabled(true);
-                                }
-                                else {
-                                    TrialMemberOTPVerificationFragment fragment = TrialMemberOTPVerificationFragment
-                                            .newInstance(tempTrial);
-                                    getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.frame_layout,fragment,
-                                                    getString(R.string.fragment_tag_trial_otp_verification))
-                                            .commit();
-                                    HomeActivity.this.getSupportActionBar().show();
-                                    HomeActivity.this.setDrawerEnabled(true);
-                                }
-                            } */
 
                         }
 

@@ -21,6 +21,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
@@ -36,37 +37,39 @@ import retrofit2.Response;
 public class MemberRegistrationFragment extends Fragment implements View.OnClickListener {
 
 
-    MembershipClient membershipClient;
-    Toolbar toolbar;
+    HomeActivity callback;
+
     EditText editTextName,editTextSap,editTextContact,editTextEmail,
             editTextYear,editTextBranch,editTextWhatsappNo,editTextDob,editTextCurrentAddress;
     RadioGroup radioGroupMembership;
     Button buttonRegister;
     Button buttonVerifyOTP;
-    NewMember newMember;
-    RegistrationResultListener resultListener;
     View contentHolder;
     ProgressBar progressBar;
+
+    NewMember newMember;
+    RegistrationResultListener resultListener;
+
     public MemberRegistrationFragment() {
         // Required empty public constructor
-    }
-    public static MemberRegistrationFragment newInstance(MembershipClient membershipClient,
-                                                         Toolbar toolbar) {
-        MemberRegistrationFragment fragment = new MemberRegistrationFragment();
-        fragment.membershipClient=membershipClient;
-        fragment.toolbar=toolbar;
-        return fragment;
     }
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof RegistrationResultListener) {
-            resultListener=(RegistrationResultListener)context;
-            super.onAttach(context);
+        if(context instanceof HomeActivity) {
+            callback = (HomeActivity)context;
+            if(context instanceof RegistrationResultListener) {
+                resultListener=(RegistrationResultListener)context;
+                super.onAttach(context);
+            }
+            else
+                throw new IllegalStateException(context.toString()+" must implement " +
+                        "RegistrationCompleteListener");
         }
-        else
-            throw new IllegalStateException(context.toString()+" must implement " +
-                    "RegistrationCompleteListener");
+        else {
+            throw new IllegalStateException("context must be instance of HomeActivity");
+        }
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -102,7 +105,7 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
 
     @Override
     public void onResume() {
-        toolbar.setTitle("New Member Registration");
+        callback.getToolbar().setTitle("New Member Registration");
         super.onResume();
     }
 
@@ -125,7 +128,8 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 contentHolder.setVisibility(View.INVISIBLE);
                                 progressBar.setVisibility(View.VISIBLE);
-                                resultListener.onRegistrationDataAvailable(newMember);
+                                resultListener.onRegistrationDataAvailable(getResources().getInteger(R.integer.verify_new_member),
+                                        newMember);
                                 resetRegistrationPage();
                             }
                         })
@@ -139,7 +143,7 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
             }
         }
         else {
-            resultListener.onVerifyOTPClicked();
+            resultListener.onRegistrationDataAvailable(getResources().getInteger(R.integer.verify_new_entered_sap),newMember);
             resetRegistrationPage();
         }
     }
@@ -253,7 +257,6 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
     }
 
     public interface RegistrationResultListener {
-        void onRegistrationDataAvailable(NewMember newMember);
-        void onVerifyOTPClicked();
+        void onRegistrationDataAvailable(int resultCode,NewMember newMember);
     }
 }

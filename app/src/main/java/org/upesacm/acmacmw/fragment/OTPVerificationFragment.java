@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
@@ -26,7 +27,9 @@ import retrofit2.Response;
 public class OTPVerificationFragment extends Fragment implements
         View.OnClickListener,
         Callback<Member>{
-    static final int MAX_TRIES=10;
+    private static final int MAX_TRIES=10;
+
+    HomeActivity callback;
     TextView textViewOTPRecpientDetails;
     TextView textViewOTPRecipientMsg;
     EditText editTextOTP;
@@ -36,33 +39,45 @@ public class OTPVerificationFragment extends Fragment implements
     ProgressBar progressBar;
     String otp;
     String sap;
-    MembershipClient membershipClient;
     NewMember newMember;
 
-    boolean verifyNewSap;
+    int statusCode;
     boolean verifyOTPSelected;
+    boolean verifyNewSap;
     private int failureCount=0;
     private OTPVerificationResultListener resultListener;
     public OTPVerificationFragment() {
         // Required empty public constructor
     }
 
-    public static OTPVerificationFragment newInstance(MembershipClient membershipClient,String sap) {
+    public static OTPVerificationFragment newInstance(int statusCode) {
         OTPVerificationFragment fragment = new OTPVerificationFragment();
-        fragment.membershipClient=membershipClient;
-        fragment.sap=sap;
+        fragment.statusCode = statusCode;
         return fragment;
     }
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof OTPVerificationResultListener) {
-            super.onAttach(context);
-            resultListener=(OTPVerificationResultListener)context;
+        if (context instanceof HomeActivity) {
+            if (context instanceof OTPVerificationResultListener) {
+                super.onAttach(context);
+                resultListener = (OTPVerificationResultListener) context;
+                callback  = (HomeActivity)context;
+            } else
+                throw new IllegalStateException(context.toString() + " must implement " +
+                        "OnVerificationResult Listener");
         }
-        else
-            throw new IllegalStateException(context.toString()+" must implement " +
-                    "OnVerificationResult Listener");
+        else {
+            throw new IllegalStateException("context must be instance of HomeActivity");
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null) {
+            statusCode = savedInstanceState.getInt(getString(R.string.otp_verification_status_code));
+        }
     }
 
     @Override
@@ -79,23 +94,38 @@ public class OTPVerificationFragment extends Fragment implements
         textViewOTPRecipientMsg = view.findViewById(R.id.text_view_otp_recipient_msg);
         progressBar = view.findViewById(R.id.progress_bar_otp);
 
-        Bundle args=getArguments();
 
-        if(args!=null) {
-            newMember = getArguments().getParcelable(getString(R.string.new_member_key));
-            showProgress(true);
-            membershipClient.getMember(newMember.getRecipientSap())
-                    .enqueue(this);
-        }
-        else if(sap==null) {
-            verifyOTPSelected = true;
+        if(statusCode == getResources().getInteger(R.integer.verify_new_entered_sap)) {
             textViewOTPRecipientMsg.setVisibility(View.INVISIBLE);
             textViewOTPRecpientDetails.setVisibility(View.INVISIBLE);
             editTextSap.setVisibility(View.VISIBLE);
             buttonNewSap.setVisibility(View.INVISIBLE);
+
+            verifyOTPSelected = true;
         }
         else {
-            System.out.println("fetching new data");
+            Bundle args=getArguments();
+            if(args==null) {
+                throw new IllegalStateException("Arguments of OTPVerification fragment must not be null");
+            }
+        }
+
+        if(statusCode == getResources().getInteger(R.integer.code_verify_button_not_clicked)) {
+            newMember = getArguments().getParcelable(getString(R.string.new_member_key));
+            if(newMember ==  null) {
+                throw new IllegalStateException("newMember must not be null");
+            }
+
+            showProgress(true);
+            //Get the details of the Recepients here
+            callback.getMembershipClient().getMember(newMember.getRecipientSap())
+                    .enqueue(this);
+        }
+        else if(statusCode == getResources().getInteger((R.integer.verify_stored_sap))){
+            sap = getArguments().getString(getString(R.string.new_member_sap_key));
+            if(sap == null) {
+                throw new IllegalStateException("sap must not be null");
+            }
             fetchNewMemberData(sap);
         }
 
@@ -104,6 +134,10 @@ public class OTPVerificationFragment extends Fragment implements
 
 
         return view;
+    }
+
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt(getString(R.string.otp_verification_status_code),statusCode);
     }
 
     @Override
@@ -205,7 +239,7 @@ public class OTPVerificationFragment extends Fragment implements
 
     void fetchNewMemberData(final String sap) {
         showProgress(true);
-        membershipClient.getNewMemberData(sap)
+        callback.getMembershipClient().getNewMemberData(sap)
                 .enqueue( new Callback<NewMember>(){
                     @Override
                     public void onResponse (Call < NewMember > call, Response < NewMember > response){
@@ -220,7 +254,7 @@ public class OTPVerificationFragment extends Fragment implements
                                 verify();
                             }
                             else {
-                                membershipClient.getMember(newMember.getRecipientSap())
+                                callback.getMembershipClient().getMember(newMember.getRecipientSap())
                                         .enqueue(OTPVerificationFragment.this);
                             }
                         }

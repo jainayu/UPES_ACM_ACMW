@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.adapter.PostsRecyclerViewAdapter;
 import org.upesacm.acmacmw.adapter.RecepientsAdapter;
 import org.upesacm.acmacmw.model.Member;
@@ -39,10 +40,10 @@ public class RecipientsFragment extends Fragment implements
     public static final int DATA_SAVE_SUCCESSFUL=2;
     public static final int DATA_SAVE_FAILED=3;
     public static final int ALREADY_PART_OF_ACM=4;
+    public static final int FAILED_TO_FETCH_RECEPIENTS=5;
 
-    FirebaseDatabase database;
+    HomeActivity callback;
     RecyclerView recyclerViewRecepients;
-    MembershipClient membershipClient;
     RecepientsAdapter recepientsAdapter;
     ProgressBar progressBar;
     FragmentInteractionListener listener;
@@ -52,11 +53,8 @@ public class RecipientsFragment extends Fragment implements
     }
 
 
-    public static RecipientsFragment newInstance(FirebaseDatabase database, MembershipClient membershipClient,
-                                          NewMember newMember) {
+    public static RecipientsFragment newInstance(NewMember newMember) {
         RecipientsFragment fragment = new RecipientsFragment();
-        fragment.database=database;
-        fragment.membershipClient = membershipClient;
         fragment.newMember = newMember;
         if(newMember == null)
             throw new IllegalArgumentException("newMember cannot be null");
@@ -65,14 +63,28 @@ public class RecipientsFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof FragmentInteractionListener) {
-            super.onAttach(context);
-            listener=(FragmentInteractionListener)context;
+        if(context instanceof HomeActivity) {
+            if (context instanceof FragmentInteractionListener) {
+                super.onAttach(context);
+                callback = (HomeActivity)context;
+                listener = (FragmentInteractionListener) context;
+            } else
+                throw new IllegalStateException(context.toString() + " must implement " +
+                        "FragmentInteractionListener");
         }
-        else
-            throw new IllegalStateException(context.toString()+" must implement " +
-                    "FragmentInteractionListener");
+        else {
+            throw new IllegalStateException("context must be instance of HomeActivity");
+        }
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null) {
+            newMember = savedInstanceState.getParcelable(getString(R.string.new_member_key));
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -84,7 +96,7 @@ public class RecipientsFragment extends Fragment implements
         progressBar = view.findViewById(R.id.progress_bar_recepients);
 
         Toast.makeText(getContext(),"fetching recipients",Toast.LENGTH_SHORT).show();
-        membershipClient.getOTPRecipients()
+        callback.getMembershipClient().getOTPRecipients()
                 .enqueue(new Callback<HashMap<String, String>>() {
                     @Override
                     public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
@@ -94,7 +106,7 @@ public class RecipientsFragment extends Fragment implements
                         for(String key:hashMap.keySet()) {
                             recepients.add(hashMap.get(key));
                         }
-                        recepientsAdapter = new RecepientsAdapter(recepients,database,RecipientsFragment.this);
+                        recepientsAdapter = new RecepientsAdapter(recepients,callback.getDatabase(),RecipientsFragment.this);
                         recyclerViewRecepients.setAdapter(recepientsAdapter);
 
                         progressBar.setVisibility(View.INVISIBLE);
@@ -103,12 +115,23 @@ public class RecipientsFragment extends Fragment implements
                     @Override
                     public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
                         t.printStackTrace();
-                        Toast.makeText(getContext(),"Failed to fetch recepients",Toast.LENGTH_SHORT).show();
+                        listener.onNewMemberDataSave(FAILED_TO_FETCH_RECEPIENTS,null);
                     }
                 });
 
         progressBar.setVisibility(View.VISIBLE);
         return view;
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callback = null;
+        listener = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelable(getString(R.string.new_member_key),newMember);
     }
 
     @Override
@@ -132,7 +155,7 @@ public class RecipientsFragment extends Fragment implements
 
         newMember = completeNewMember;
 
-        Call<NewMember> call = membershipClient.getNewMemberData(newMember.getSapId());
+        Call<NewMember> call = callback.getMembershipClient().getNewMemberData(newMember.getSapId());
                             call.enqueue(this);
     }
 
@@ -140,12 +163,12 @@ public class RecipientsFragment extends Fragment implements
     public void onResponse(Call<NewMember> call, Response<NewMember> response) {
         NewMember nm=response.body();
         if(nm==null) {
-            Call<Member> memberCall=membershipClient.getMember(newMember.getSapId());
+            Call<Member> memberCall=callback.getMembershipClient().getMember(newMember.getSapId());
             memberCall.enqueue(new Callback<Member>() {
                 @Override
                 public void onResponse(Call<Member> call, Response<Member> response) {
                     if(response.body()==null) {
-                        membershipClient.saveNewMemberData(newMember.getSapId(), newMember)
+                        callback.getMembershipClient().saveNewMemberData(newMember.getSapId(), newMember)
                                 .enqueue(new Callback<NewMember>() {
                                     @Override
                                     public void onResponse(Call<NewMember> call, Response<NewMember> response) {
@@ -183,6 +206,7 @@ public class RecipientsFragment extends Fragment implements
     @Override
     public void onFailure(Call<NewMember> call, Throwable t) {
         System.out.println("Failed to authenticate");
+        t.printStackTrace();
         listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
     }
 
