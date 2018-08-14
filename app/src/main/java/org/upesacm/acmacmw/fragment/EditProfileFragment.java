@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.upesacm.acmacmw.BuildConfig;
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
@@ -32,11 +35,17 @@ import retrofit2.Response;
 public class EditProfileFragment extends Fragment
         implements View.OnClickListener, Callback<Member> {
 
+    private static final String TAG = "EditProfileFragment";
+    private static final String MEMBER_PARCEL_KEY = "member parcel key";
+
     public static final int SUCESSFULLY_SAVED_NEW_DATA=1;
     public static final int ACTION_CANCELLED_BY_USER=2;
     public static final int FAILED_TO_SAVE_NEW_DATA=3;
 
-    MembershipClient membershipClient;
+    HomeActivity callback;
+    PasswordChangeDialogFragment passchangeFrag;
+    FragmentInteractionListener listener;
+
     Member member;
     EditText editTextName;
     EditText editTextContact;
@@ -49,31 +58,48 @@ public class EditProfileFragment extends Fragment
     Button buttonSave;
     Button buttonCancel;
     Button buttonPassChange;
-    PasswordChangeDialogFragment passchangeFrag;
-    FragmentInteractionListener listener;
+
 
     public EditProfileFragment() {
         // Required empty public constructor
     }
 
-    public static EditProfileFragment newInstance(MembershipClient membershipClient,Member member) {
+    public static EditProfileFragment newInstance(Member member) {
         if(member == null)
-            throw new IllegalStateException("Cannot access without login");
+            throw new IllegalStateException("Member instance passed to member cannot be null");
         EditProfileFragment fragment=new EditProfileFragment();
-        fragment.membershipClient = membershipClient;
-        fragment.member = member;
+        Bundle args = new Bundle();
+        args.putParcelable(MEMBER_PARCEL_KEY,member);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof FragmentInteractionListener) {
-            listener=(FragmentInteractionListener)context;
-            super.onAttach(context);
+        if(context instanceof HomeActivity) {
+            if (context instanceof FragmentInteractionListener) {
+                callback = (HomeActivity)context;
+                listener = (FragmentInteractionListener) context;
+                super.onAttach(context);
+            } else {
+                throw new IllegalStateException(context.toString() + " must implement" +
+                        "FragmentInteraction Listener");
+            }
         }
         else {
-            throw new IllegalStateException(context.toString()+" must implement" +
-                    "FragmentInteraction Listener");
+            throw new IllegalStateException("context must be HomeActivity");
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(savedInstanceState==null) {
+            this.member = getArguments().getParcelable(MEMBER_PARCEL_KEY); // retrieve the member
+        }
+        else {
+            this.member = savedInstanceState.getParcelable(getString(R.string.member_parcel_key));
         }
     }
 
@@ -81,6 +107,7 @@ public class EditProfileFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_edit_profile, container, false);
         editTextName = view.findViewById(R.id.edit_text_edit_name);
         editTextContact = view.findViewById(R.id.edit_text_edit_contact);
@@ -113,7 +140,21 @@ public class EditProfileFragment extends Fragment
         buttonCancel.setOnClickListener(this);
         buttonSave.setOnClickListener(this);
         buttonPassChange.setOnClickListener(this);
+
+
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        callback = null;
+        listener = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelable(getString(R.string.member_parcel_key),member);
     }
 
     @Override
@@ -126,7 +167,7 @@ public class EditProfileFragment extends Fragment
         if(view.getId() == R.id.button_edit_save) {
             member = modifyMember();
             if(member!=null) {
-                membershipClient.createMember(member.getSap(), member)
+                callback.getMembershipClient().createMember(member.getSap(), member)
                         .enqueue(this);
             }
         }
@@ -134,14 +175,15 @@ public class EditProfileFragment extends Fragment
             listener.onDataEditResult(this,ACTION_CANCELLED_BY_USER,member);
         }
         else if(view.getId() == R.id.button_edit_passchange) {
-            passchangeFrag = PasswordChangeDialogFragment.newInstance(membershipClient,member);
+            passchangeFrag = PasswordChangeDialogFragment.newInstance(callback.getMembershipClient(),member);
             passchangeFrag.show(getChildFragmentManager(),getString(R.string.dialog_fragment_tag_pass_change));
         }
     }
 
     @Override
     public void onResponse(Call<Member> call, Response<Member> response) {
-        System.out.println(response.message());
+        if(BuildConfig.DEBUG)
+            Log.i(TAG, response.message());
         listener.onDataEditResult(this,SUCESSFULLY_SAVED_NEW_DATA,member);
     }
 
@@ -208,7 +250,7 @@ public class EditProfileFragment extends Fragment
     }
 
     public interface FragmentInteractionListener {
-        void onDataEditResult(EditProfileFragment fragment,int resultcode,Member member);
+        void onDataEditResult(EditProfileFragment fragment,int resultCode,Member member);
     }
 
 }
