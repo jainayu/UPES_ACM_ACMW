@@ -37,6 +37,7 @@
     <string name="new_member_sap_key">new member sap</string>
     <string name="otp_verification_status_code">check if verify otp button was clicked</string>
     <string name="new_member_key">new member key</string>
+    <string name="member_parcel_key">member parcel key</string>
     <string name="logged_in_member_key">logged in member key</string>
     <string name="trial_member_sap">Trial membe sap</string>
     <string name="logged_in_member_details_key">logged in member details</string>

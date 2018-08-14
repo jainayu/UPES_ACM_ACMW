@@ -283,6 +283,8 @@ public class OTPVerificationFragment extends Fragment implements
                     @Override
                     public void onFailure (Call < NewMember > call, Throwable t){
                         System.out.println("failed to fetch unconfirmed member data");
+                        Toast.makeText(getContext(),"Failed to fetch New Member details. " +
+                                "Please check you connection",Toast.LENGTH_SHORT);
                         t.printStackTrace();
                         showProgress(false);
                     }

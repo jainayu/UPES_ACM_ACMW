@@ -21,7 +21,7 @@ import org.upesacm.acmacmw.model.Member;
 public class UserProfileFragment extends Fragment implements
         View.OnClickListener{
 
-    FragmentInteractioListener listener;
+    FragmentInteractionListener listener;
 
     ImageView imageViewProfilePic;
     TextView textViewName;
@@ -57,13 +57,21 @@ public class UserProfileFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof FragmentInteractioListener) {
-            listener=(FragmentInteractioListener)context;
+        if(context instanceof FragmentInteractionListener) {
+            listener=(FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else
             throw new IllegalStateException(context.toString()+" must implement" +
                     "UserProfileFragment.FragmentInteractionListener");
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null) {
+            member = savedInstanceState.getParcelable(getString(R.string.member_parcel_key));
+        }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -108,6 +116,16 @@ public class UserProfileFragment extends Fragment implements
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelable(getString(R.string.member_parcel_key),member);
+    }
+    @Override
     public void onClick(View view) {
         if(view.getId() == R.id.fab_profile_logout) {
             listener.onSignOutClicked(this);
@@ -117,7 +135,7 @@ public class UserProfileFragment extends Fragment implements
         }
     }
 
-    public interface FragmentInteractioListener {
+    public interface FragmentInteractionListener {
         void onSignOutClicked(UserProfileFragment fragment);
         void onEditClicked(UserProfileFragment fragment);
     }

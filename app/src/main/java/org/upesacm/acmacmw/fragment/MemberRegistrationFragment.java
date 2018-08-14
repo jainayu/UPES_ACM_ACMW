@@ -71,6 +71,12 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
         }
 
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,6 +106,11 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
        buttonVerifyOTP = view.findViewById(R.id.button_registration_verify_otp);
        buttonRegister.setOnClickListener(this);
        buttonVerifyOTP.setOnClickListener(this);
+
+       Bundle args = getArguments();
+       if(args!=null) {
+           setRegistrationPage((NewMember)args.getParcelable(getString(R.string.new_member_key)));
+       }
        return view;
     }
 
@@ -256,9 +267,22 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
         editTextWhatsappNo.setText("");
         editTextYear.setText("");
         editTextBranch.setText("");
+        editTextCurrentAddress.setText("");
 
         contentHolder.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    void setRegistrationPage(NewMember newMember) {
+        editTextEmail.setText(newMember.getEmail());
+        editTextName.setText(newMember.getFullName());
+        editTextSap.setText(newMember.getSapId());
+        editTextBranch.setText(newMember.getBranch());
+        editTextContact.setText(newMember.getPhoneNo());
+        editTextWhatsappNo.setText(newMember.getWhatsappNo());
+        editTextYear.setText(newMember.getYear());
+        editTextBranch.setText(newMember.getBranch());
+        editTextCurrentAddress.setText(newMember.getCurrentAddress());
     }
 
     public interface RegistrationResultListener {

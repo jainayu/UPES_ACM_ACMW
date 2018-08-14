@@ -40,14 +40,17 @@ public class RecipientsFragment extends Fragment implements
     public static final int DATA_SAVE_SUCCESSFUL=2;
     public static final int DATA_SAVE_FAILED=3;
     public static final int ALREADY_PART_OF_ACM=4;
-    public static final int FAILED_TO_FETCH_RECEPIENTS=5;
+    public static final int FAILED_TO_FETCH_RECIPIENTS=5;
 
     HomeActivity callback;
+    FragmentInteractionListener listener;
+
     RecyclerView recyclerViewRecepients;
     RecepientsAdapter recepientsAdapter;
     ProgressBar progressBar;
-    FragmentInteractionListener listener;
     NewMember newMember;
+
+
     public RecipientsFragment() {
         // Required empty public constructor
     }
@@ -115,7 +118,7 @@ public class RecipientsFragment extends Fragment implements
                     @Override
                     public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
                         t.printStackTrace();
-                        listener.onNewMemberDataSave(FAILED_TO_FETCH_RECEPIENTS,null);
+                        listener.onNewMemberDataSave(FAILED_TO_FETCH_RECIPIENTS,null);
                     }
                 });
 
@@ -193,7 +196,7 @@ public class RecipientsFragment extends Fragment implements
 
                 @Override
                 public void onFailure(Call<Member> call, Throwable t) {
-                    Toast.makeText(RecipientsFragment.this.getContext(),"Failed",Toast.LENGTH_SHORT);
+                    t.printStackTrace();
                     listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
                 }
             });

@@ -75,7 +75,7 @@ public class HomeActivity extends AppCompatActivity implements
         OTPVerificationFragment.OTPVerificationResultListener,
         ImageUploadFragment.UploadResultListener,
         View.OnClickListener,
-        UserProfileFragment.FragmentInteractioListener,
+        UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
         GoogleSignInFragment.GoogleSignInListener,
@@ -619,12 +619,17 @@ public class HomeActivity extends AppCompatActivity implements
                 msg = getString(R.string.msg_new_member_already_registered);
             } else if (resultCode == RecipientsFragment.ALREADY_PART_OF_ACM) {
                 msg = getString(R.string.msg_already_acm_member);
-            } else if (resultCode == RecipientsFragment.FAILED_TO_FETCH_RECEPIENTS) {
+            } else if (resultCode == RecipientsFragment.FAILED_TO_FETCH_RECIPIENTS) {
                 msg = "Failed to fetch recipients. Please check your connection";
             }
                 msg = "Data save Failed. Please check your connection";
+            Bundle args = new Bundle();
+            args.putParcelable(getString(R.string.new_member_key),newMember);
+
+            Fragment fragment = new MemberRegistrationFragment();
+            fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout,new MemberRegistrationFragment(),getString(R.string.fragment_tag_new_member_registration))
+                    .replace(R.id.frame_layout,fragment,getString(R.string.fragment_tag_new_member_registration))
                     .commit();
         }
 
