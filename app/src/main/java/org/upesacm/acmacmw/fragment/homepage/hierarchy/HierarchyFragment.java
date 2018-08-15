@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage;
+package org.upesacm.acmacmw.fragment.homepage.hierarchy;
 
 
 import android.graphics.Typeface;
@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.adapter.PagerAdapter;
+import org.upesacm.acmacmw.adapter.hierarchy.PagerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

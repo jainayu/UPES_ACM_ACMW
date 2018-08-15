@@ -38,17 +38,17 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.asynctask.OTPSender;
 import org.upesacm.acmacmw.fragment.AboutFragment;
 import org.upesacm.acmacmw.fragment.AlumniFragment;
-import org.upesacm.acmacmw.fragment.EditProfileFragment;
-import org.upesacm.acmacmw.fragment.GoogleSignInFragment;
+import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
+import org.upesacm.acmacmw.fragment.member.trail.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.HomePageFragment;
-import org.upesacm.acmacmw.fragment.ImageUploadFragment;
-import org.upesacm.acmacmw.fragment.LoginDialogFragment;
-import org.upesacm.acmacmw.fragment.MemberRegistrationFragment;
-import org.upesacm.acmacmw.fragment.OTPVerificationFragment;
-import org.upesacm.acmacmw.fragment.PasswordChangeDialogFragment;
-import org.upesacm.acmacmw.fragment.RecipientsFragment;
-import org.upesacm.acmacmw.fragment.TrialMemberOTPVerificationFragment;
-import org.upesacm.acmacmw.fragment.UserProfileFragment;
+import org.upesacm.acmacmw.fragment.homepage.post.ImageUploadFragment;
+import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
+import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
+import org.upesacm.acmacmw.fragment.member.registration.OTPVerificationFragment;
+import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
+import org.upesacm.acmacmw.fragment.member.registration.RecipientsFragment;
+import org.upesacm.acmacmw.fragment.member.trail.TrialMemberOTPVerificationFragment;
+import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
 import org.upesacm.acmacmw.model.EmailMsg;
 import org.upesacm.acmacmw.model.Member;
@@ -837,7 +837,7 @@ public class HomeActivity extends AppCompatActivity implements
                 .commit();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame_layout, EditProfileFragment.newInstance(membershipClient,signedInMember),
+        ft.replace(R.id.frame_layout, EditProfileFragment.newInstance(signedInMember),
                 getString(R.string.fragment_tag_edit_profile));
         ft.commit();
     }

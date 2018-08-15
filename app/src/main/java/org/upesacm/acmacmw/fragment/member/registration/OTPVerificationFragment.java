@@ -1,8 +1,7 @@
-package org.upesacm.acmacmw.fragment;
+package org.upesacm.acmacmw.fragment.member.registration;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,6 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
-import org.upesacm.acmacmw.retrofit.MembershipClient;
 
 import retrofit2.Call;
 import retrofit2.Callback;

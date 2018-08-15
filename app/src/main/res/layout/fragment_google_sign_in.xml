@@ -7,7 +7,7 @@
 <android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".fragment.GoogleSignInFragment">
+    tools:context=".fragment.member.trail.GoogleSignInFragment">
 
     <EditText
         android:id="@+id/edit_text_trial_sap"

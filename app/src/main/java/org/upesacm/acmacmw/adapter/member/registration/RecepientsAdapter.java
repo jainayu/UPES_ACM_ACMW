@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.adapter;
+package org.upesacm.acmacmw.adapter.member.registration;
 
 import android.os.Parcelable;
 import android.support.annotation.NonNull;

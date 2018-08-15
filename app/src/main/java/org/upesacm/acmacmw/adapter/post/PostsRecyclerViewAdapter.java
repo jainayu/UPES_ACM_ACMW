@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.adapter;
+package org.upesacm.acmacmw.adapter.post;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -22,7 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.fragment.LoginDialogFragment;
+import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.model.TrialMember;

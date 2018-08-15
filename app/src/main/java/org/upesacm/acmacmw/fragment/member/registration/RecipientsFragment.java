@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment;
+package org.upesacm.acmacmw.fragment.member.registration;
 
 
 import android.content.Context;
@@ -12,15 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.adapter.PostsRecyclerViewAdapter;
-import org.upesacm.acmacmw.adapter.RecepientsAdapter;
+import org.upesacm.acmacmw.adapter.member.registration.RecepientsAdapter;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
-import org.upesacm.acmacmw.retrofit.MembershipClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;

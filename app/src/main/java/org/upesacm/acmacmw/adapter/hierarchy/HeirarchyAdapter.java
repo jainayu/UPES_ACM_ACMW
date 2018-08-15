@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.adapter;
+package org.upesacm.acmacmw.adapter.hierarchy;
 
 import android.content.ComponentName;
 import android.content.Context;

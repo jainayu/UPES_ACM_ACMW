@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment;
+package org.upesacm.acmacmw.fragment.member.profile;
 
 
 import android.content.Context;
@@ -17,7 +17,6 @@ import android.widget.Toast;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
-import org.upesacm.acmacmw.util.MemberIDGenerator;
 
 import retrofit2.Call;
 import retrofit2.Callback;

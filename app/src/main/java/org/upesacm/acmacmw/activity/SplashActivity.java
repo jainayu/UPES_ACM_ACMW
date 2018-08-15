@@ -7,11 +7,7 @@ import  android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.GoogleSignInFragment;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 

@@ -1,14 +1,11 @@
-package org.upesacm.acmacmw.adapter;
+package org.upesacm.acmacmw.adapter.hierarchy;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.google.firebase.database.FirebaseDatabase;
-
-import org.upesacm.acmacmw.fragment.homepage.AcmFragment;
-import org.upesacm.acmacmw.fragment.homepage.AcmWFragment;
+import org.upesacm.acmacmw.fragment.homepage.hierarchy.AcmFragment;
+import org.upesacm.acmacmw.fragment.homepage.hierarchy.AcmWFragment;
 
 public class PagerAdapter extends FragmentPagerAdapter {
 

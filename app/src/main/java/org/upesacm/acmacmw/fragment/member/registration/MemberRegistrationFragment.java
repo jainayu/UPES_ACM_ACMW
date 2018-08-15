@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment;
+package org.upesacm.acmacmw.fragment.member.registration;
 
 
 import android.app.AlertDialog;

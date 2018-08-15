@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment;
+package org.upesacm.acmacmw.fragment.member.profile;
 
 
 import android.content.Context;
@@ -19,9 +19,6 @@ import org.upesacm.acmacmw.BuildConfig;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
-import org.upesacm.acmacmw.model.NewMember;
-import org.upesacm.acmacmw.retrofit.MembershipClient;
-import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
 import java.util.regex.Pattern;
 

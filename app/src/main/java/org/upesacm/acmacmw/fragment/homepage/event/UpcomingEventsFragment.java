@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage;
+package org.upesacm.acmacmw.fragment.homepage.event;
 
 
 import android.os.Bundle;

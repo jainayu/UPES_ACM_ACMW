@@ -19,9 +19,9 @@ import android.view.ViewGroup;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.fragment.homepage.ContactUsFragment;
-import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
-import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
+import org.upesacm.acmacmw.fragment.homepage.contactus.ContactUsFragment;
+import org.upesacm.acmacmw.fragment.homepage.hierarchy.HierarchyFragment;
+import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
 
 import java.lang.reflect.Field;
 

@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
 
 import java.util.ArrayList;
 import java.util.List;

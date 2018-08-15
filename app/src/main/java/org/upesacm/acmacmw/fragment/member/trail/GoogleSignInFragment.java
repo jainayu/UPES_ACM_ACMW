@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment;
+package org.upesacm.acmacmw.fragment.member.trail;
 
 
 import android.content.Context;

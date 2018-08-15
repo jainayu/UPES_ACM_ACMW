@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage;
+package org.upesacm.acmacmw.fragment.homepage.hierarchy;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,7 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.adapter.HeirarchyAdapter;
+import org.upesacm.acmacmw.adapter.hierarchy.HeirarchyAdapter;
 import org.upesacm.acmacmw.model.HeirarchyModel;
 
 import java.util.ArrayList;

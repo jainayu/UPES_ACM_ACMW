@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage;
+package org.upesacm.acmacmw.fragment.homepage.post;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -32,7 +32,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.firebase.FirebaseApiNotAvailableException;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,9 +40,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.adapter.PostsRecyclerViewAdapter;
-import org.upesacm.acmacmw.fragment.ImageUploadFragment;
-import org.upesacm.acmacmw.fragment.LoginDialogFragment;
+import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
+import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
 import org.upesacm.acmacmw.listener.OnLoadMoreListener;
 import org.upesacm.acmacmw.model.Member;
