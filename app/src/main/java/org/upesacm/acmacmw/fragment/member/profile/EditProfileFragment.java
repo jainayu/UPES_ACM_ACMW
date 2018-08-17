@@ -229,6 +229,7 @@ public class EditProfileFragment extends Fragment
                                     .setMembershipType(member.getMembershipType())
                                     .setPassword((passchangeFrag == null) ? member.getPassword() :
                                             passchangeFrag.getNewPass())
+                                    .setRecipientSap(member.getRecepientSap())
                                     .build();
                             return modifiedMember;
                         } else

@@ -87,19 +87,22 @@ public class HomeActivity extends AppCompatActivity implements
     private static final int STATE_MEMBER_SIGNED_IN=1;
     private static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
     private static final int STATE_DEFAULT=3;
+
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
     private NavigationView navigationView;
+
     private Retrofit retrofit;
     private HomePageClient homePageClient;
     private MembershipClient membershipClient;
+    private View headerLayout;
+
     private Member signedInMember;
     private TrialMember trialMember;
-    private View headerLayout;
     private String newMemberSap;
-    private FirebaseDatabase database = FirebaseDatabase.getInstance();
 
+    private FirebaseDatabase database;
     private ArrayList<HomeActivityStateChangeListener> stateChangeListeners;
 
     @Override
@@ -108,6 +111,9 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_home_main);
         toolbar = findViewById(R.id.my_toolbar);
         drawerLayout=findViewById(R.id.drawer_layout);
+        navigationView=findViewById(R.id.nav_view);
+
+
         database = FirebaseDatabase.getInstance();
         retrofit=new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -115,7 +121,7 @@ public class HomeActivity extends AppCompatActivity implements
                 .build();
         homePageClient =retrofit.create(HomePageClient.class);
         membershipClient=retrofit.create(MembershipClient.class);
-        navigationView=findViewById(R.id.nav_view);
+
         stateChangeListeners=new ArrayList<>();
 
         /* *************************Setting the the action bar *****************************/
@@ -882,7 +888,22 @@ public class HomeActivity extends AppCompatActivity implements
     public void onPasswordChange(PasswordChangeDialogFragment fragment, int resultCode) {
         String msg;
         if(resultCode== PasswordChangeDialogFragment.PASSWORD_SUCCESSSFULLY_CHANGED) {
-            Member modifiedMember = new Member.Builder().buildFrom(signedInMember);
+            Member modifiedMember = new Member.Builder()
+                    .setSAPId(signedInMember.getSap())
+                    .setPassword(fragment.getNewPass())
+                    .setYear(signedInMember.getYear())
+                    .setBranch(signedInMember.getBranch())
+                    .setName(signedInMember.getName())
+                    .setContact(signedInMember.getContact())
+                    .setmemberId(signedInMember.getMemberId())
+                    .setCurrentAdd(signedInMember.getCurrentAdd())
+                    .setDob(signedInMember.getDob())
+                    .setEmail(signedInMember.getEmail())
+                    .setMembershipType(signedInMember.getMembershipType())
+                    .setWhatsappNo(signedInMember.getWhatsappNo())
+                    .setPremium(signedInMember.isPremium())
+                    .setRecipientSap(signedInMember.getRecepientSap())
+                    .build();
             signedInMember = modifiedMember;
             msg="Password Successfully Changed";
         }

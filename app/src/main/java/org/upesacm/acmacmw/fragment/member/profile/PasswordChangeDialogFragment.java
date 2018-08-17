@@ -108,6 +108,8 @@ public class PasswordChangeDialogFragment extends DialogFragment
                             .setDob(member.getDob())
                             .setCurrentAdd(member.getCurrentAdd())
                             .setPremium(member.isPremium())
+                            .setRecipientSap(member.getRecepientSap())
+                            .setMembershipType(member.getMembershipType())
                             .build();
 
                             membershipClient.createMember(member.getSap(), member)

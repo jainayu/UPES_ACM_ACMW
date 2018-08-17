@@ -19,4 +19,6 @@
     <color name="acm_color2">#F50057</color>
     <color name="transparent_white">#e7e7e6</color>
 
+    <color name="transparent">#00ffffff</color>
+
 </resources>
