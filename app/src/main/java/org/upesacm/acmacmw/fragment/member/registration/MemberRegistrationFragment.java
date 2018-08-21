@@ -274,15 +274,17 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
     }
 
     void setRegistrationPage(NewMember newMember) {
-        editTextEmail.setText(newMember.getEmail());
-        editTextName.setText(newMember.getFullName());
-        editTextSap.setText(newMember.getSapId());
-        editTextBranch.setText(newMember.getBranch());
-        editTextContact.setText(newMember.getPhoneNo());
-        editTextWhatsappNo.setText(newMember.getWhatsappNo());
-        editTextYear.setText(newMember.getYear());
-        editTextBranch.setText(newMember.getBranch());
-        editTextCurrentAddress.setText(newMember.getCurrentAddress());
+        if(newMember!=null) {
+            editTextEmail.setText(newMember.getEmail());
+            editTextName.setText(newMember.getFullName());
+            editTextSap.setText(newMember.getSapId());
+            editTextBranch.setText(newMember.getBranch());
+            editTextContact.setText(newMember.getPhoneNo());
+            editTextWhatsappNo.setText(newMember.getWhatsappNo());
+            editTextYear.setText(newMember.getYear());
+            editTextBranch.setText(newMember.getBranch());
+            editTextCurrentAddress.setText(newMember.getCurrentAddress());
+        }
     }
 
     public interface RegistrationResultListener {

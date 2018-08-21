@@ -114,7 +114,7 @@ public class RecipientsFragment extends Fragment implements
                     @Override
                     public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
                         t.printStackTrace();
-                        listener.onNewMemberDataSave(FAILED_TO_FETCH_RECIPIENTS,null);
+                        listener.onNewMemberDataSave(FAILED_TO_FETCH_RECIPIENTS,newMember);
                     }
                 });
 
