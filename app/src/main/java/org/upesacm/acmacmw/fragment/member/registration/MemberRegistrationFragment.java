@@ -158,7 +158,7 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
                         .show();
             }
         }
-        else {
+        else { //verify otp button pressed
             resultListener.onRegistrationDataAvailable(getResources().getInteger(R.integer.verify_new_entered_sap),newMember);
             resetRegistrationPage();
         }

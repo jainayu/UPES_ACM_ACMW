@@ -2,16 +2,19 @@ package org.upesacm.acmacmw.fragment.member.registration;
 
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.upesacm.acmacmw.BuildConfig;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.adapter.member.registration.RecepientsAdapter;
@@ -31,6 +34,7 @@ import retrofit2.Response;
 public class RecipientsFragment extends Fragment implements
         Callback<NewMember>,
         RecepientsAdapter.InteractionListener {
+    private static String TAG = "fragment.member.registration.RecipientsFragment";
 
     public static final int NEW_MEMBER_ALREADY_PRESENT=1;
     public static final int DATA_SAVE_SUCCESSFUL=2;
@@ -173,15 +177,26 @@ public class RecipientsFragment extends Fragment implements
                                     public void onResponse(Call<NewMember> call, Response<NewMember> response) {
                                         if(response.code()==200) {
                                             //MemberRegistrationFragment.this.saveSignUpInfoLocally();
-                                            listener.onNewMemberDataSave(DATA_SAVE_SUCCESSFUL,newMember);
+                                            if(listener!=null)
+                                                listener.onNewMemberDataSave(DATA_SAVE_SUCCESSFUL, newMember);
+                                            else
+                                                if(BuildConfig.DEBUG)
+                                                    Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                                                            "could compelete");
                                         }
                                         else {
-                                            listener.onNewMemberDataSave(DATA_SAVE_FAILED, newMember);
+                                            if(listener!=null)
+                                                listener.onNewMemberDataSave(DATA_SAVE_FAILED, newMember);
+                                            else
+                                                if(BuildConfig.DEBUG)
+                                                    Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                                                            "could compelete");
                                         }
                                     }
                                     @Override
                                     public void onFailure(Call<NewMember> call, Throwable t) {
                                         listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
+
                                     }
                                 });
                     }

@@ -120,7 +120,7 @@ public class OTPVerificationFragment extends Fragment implements
             verifyOTPSelected = true;
         }
 
-        if(mode == getResources().getInteger(R.integer.code_verify_button_not_clicked)) {
+        if(mode == getResources().getInteger(R.integer.verify_new_member)) {
             newMember = args.getParcelable(getString(R.string.new_member_key));
             if(newMember ==  null) {
                 throw new IllegalStateException("newMember must not be null");

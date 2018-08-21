@@ -302,12 +302,16 @@ public class HomeActivity extends AppCompatActivity implements
         else if(mode == getResources().getInteger(R.integer.verify_new_entered_sap)) {
             fragment= OTPVerificationFragment
                     .newInstance(mode); //verify otp clicked
+        }
+        else if(mode==getResources().getInteger(R.integer.verify_stored_sap)) {
+            fragment= OTPVerificationFragment
+                    .newInstance(mode);
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.new_member_sap_key), newMemberSap);
             fragment.setArguments(bundle);
         }
         else {
-            throw new IllegalStateException("undefined mode for OTP Verifiaction Fragment");
+            throw new IllegalStateException("undefined mode for OTP Verification Fragment");
         }
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout,fragment,"otp_verifiction");
@@ -557,7 +561,6 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void onSignUpPressed(LoginDialogFragment loginDialogFragment) {
-        System.out.println("sign up button pressed");
         loginDialogFragment.dismiss();
 
         /* **************** obtaining stored sap(if any)************************************* */
@@ -652,10 +655,7 @@ public class HomeActivity extends AppCompatActivity implements
                     .commit();
         }
         else {
-            OTPVerificationFragment fragment = OTPVerificationFragment.newInstance(statusCode);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout,fragment, getString(R.string.fragment_tag_otp_verification))
-                    .commit();
+            startOTPVerificationPage(statusCode,newMember);
         }
 
     }

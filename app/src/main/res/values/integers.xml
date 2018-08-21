@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="verify_button_clicked_sap_available">0</integer>
-    <integer name="verify_button_clicked_sap_not_available">1</integer>
-    <integer name="code_verify_button_not_clicked">2</integer>
 
     <integer name="verify_stored_sap">0</integer>
     <integer name="verify_new_entered_sap">1</integer>
