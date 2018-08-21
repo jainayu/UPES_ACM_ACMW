@@ -166,67 +166,78 @@ public class RecipientsFragment extends Fragment implements
     public void onResponse(Call<NewMember> call, Response<NewMember> response) {
         NewMember nm=response.body();
         if(nm==null) {
-            Call<Member> memberCall=callback.getMembershipClient().getMember(newMember.getSapId());
-            memberCall.enqueue(new Callback<Member>() {
-                @Override
-                public void onResponse(Call<Member> call, Response<Member> response) {
-                    if(response.body()==null) {
-                        callback.getMembershipClient().saveNewMemberData(newMember.getSapId(), newMember)
-                                .enqueue(new Callback<NewMember>() {
-                                    @Override
-                                    public void onResponse(Call<NewMember> call, Response<NewMember> response) {
-                                        if(response.code()==200) {
-                                            //MemberRegistrationFragment.this.saveSignUpInfoLocally();
-                                            if(listener!=null)
-                                                listener.onNewMemberDataSave(DATA_SAVE_SUCCESSFUL, newMember);
-                                            else
-                                                if(BuildConfig.DEBUG)
-                                                    Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
-                                                            "could compelete");
-                                        }
-                                        else {
-                                            if(listener!=null)
-                                                listener.onNewMemberDataSave(DATA_SAVE_FAILED, newMember);
-                                            else
-                                                if(BuildConfig.DEBUG)
-                                                    Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
-                                                            "could compelete");
-                                        }
-                                    }
-                                    @Override
-                                    public void onFailure(Call<NewMember> call, Throwable t) {
-                                        if(listener!=null)
-                                            listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
-                                        else
-                                            if(BuildConfig.DEBUG)
-                                                Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
-                                                    "could compelete");
+            if(callback!=null) {
+                Call<Member> memberCall = callback.getMembershipClient().getMember(newMember.getSapId());
+                memberCall.enqueue(new Callback<Member>() {
+                    @Override
+                    public void onResponse(Call<Member> call, Response<Member> response) {
+                        if (response.body() == null) {
+                            if(callback!=null) {
+                                callback.getMembershipClient().saveNewMemberData(newMember.getSapId(), newMember)
+                                        .enqueue(new Callback<NewMember>() {
+                                            @Override
+                                            public void onResponse(Call<NewMember> call, Response<NewMember> response) {
+                                                if (response.code() == 200) {
+                                                    //MemberRegistrationFragment.this.saveSignUpInfoLocally();
+                                                    if (listener != null)
+                                                        listener.onNewMemberDataSave(DATA_SAVE_SUCCESSFUL, newMember);
+                                                    else if (BuildConfig.DEBUG)
+                                                        Log.e(TAG, "The RecipientsFragment was Detached before the callback " +
+                                                                "could compelete");
+                                                } else {
+                                                    if (listener != null)
+                                                        listener.onNewMemberDataSave(DATA_SAVE_FAILED, newMember);
+                                                    else if (BuildConfig.DEBUG)
+                                                        Log.e(TAG, "The RecipientsFragment was Detached before the callback " +
+                                                                "could compelete");
+                                                }
+                                            }
 
-                                    }
-                                });
+                                            @Override
+                                            public void onFailure(Call<NewMember> call, Throwable t) {
+                                                if (listener != null)
+                                                    listener.onNewMemberDataSave(DATA_SAVE_FAILED, newMember);
+                                                else if (BuildConfig.DEBUG)
+                                                    Log.e(TAG, "The RecipientsFragment was Detached before the callback " +
+                                                            "could compelete");
+
+                                            }
+                                        });
+                            }
+                            else {
+                                if (BuildConfig.DEBUG)
+                                    Log.e(TAG, "The RecipientsFragment was Detached before the callback " +
+                                            "and HomeActivity callback variable became null " +
+                                            "could compelete");
+                            }
+                        } else {
+                            if (listener != null)
+                                listener.onNewMemberDataSave(ALREADY_PART_OF_ACM, newMember);
+                            else if (BuildConfig.DEBUG)
+                                Log.e(TAG, "The RecipientsFragment was Detached before the callback " +
+                                        "could compelete");
+                        }
                     }
-                    else {
-                        if(listener!=null)
-                            listener.onNewMemberDataSave(ALREADY_PART_OF_ACM,newMember);
+
+                    @Override
+                    public void onFailure(Call<Member> call, Throwable t) {
+                        t.printStackTrace();
+                        if (listener != null)
+                            listener.onNewMemberDataSave(DATA_SAVE_FAILED, newMember);
                         else
-                            if(BuildConfig.DEBUG)
-                                Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                            if (BuildConfig.DEBUG)
+                                Log.e(TAG, "The RecipientsFragment was Detached before the callback " +
                                     "could compelete");
+
                     }
-                }
-
-                @Override
-                public void onFailure(Call<Member> call, Throwable t) {
-                    t.printStackTrace();
-                    if(listener!=null)
-                        listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
-                    else
-                        if(BuildConfig.DEBUG)
-                            Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
-                                "could compelete");
-
-                }
-            });
+                });
+            }
+            else {
+                if (BuildConfig.DEBUG)
+                    Log.e(TAG, "The RecipientsFragment was Detached before the callback " +
+                            "and HomeActivity callback variable became null " +
+                            "could compelete");
+            }
         }
         else {
             if(listener!=null) {
