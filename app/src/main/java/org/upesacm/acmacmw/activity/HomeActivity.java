@@ -631,6 +631,7 @@ public class HomeActivity extends AppCompatActivity implements
             } else if (resultCode == RecipientsFragment.FAILED_TO_FETCH_RECIPIENTS) {
                 msg = "Failed to fetch recipients. Please check your connection";
             }
+            else
                 msg = "Data save Failed. Please check your connection";
             Bundle args = new Bundle();
             args.putParcelable(getString(R.string.new_member_key),newMember);

@@ -267,6 +267,7 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
         editTextWhatsappNo.setText("");
         editTextYear.setText("");
         editTextBranch.setText("");
+        editTextDob.setText("");
         editTextCurrentAddress.setText("");
 
         contentHolder.setVisibility(View.VISIBLE);
@@ -283,6 +284,7 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
             editTextWhatsappNo.setText(newMember.getWhatsappNo());
             editTextYear.setText(newMember.getYear());
             editTextBranch.setText(newMember.getBranch());
+            editTextDob.setText(newMember.getDob());
             editTextCurrentAddress.setText(newMember.getCurrentAddress());
         }
     }
