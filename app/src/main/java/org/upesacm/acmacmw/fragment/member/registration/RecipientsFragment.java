@@ -195,25 +195,47 @@ public class RecipientsFragment extends Fragment implements
                                     }
                                     @Override
                                     public void onFailure(Call<NewMember> call, Throwable t) {
-                                        listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
+                                        if(listener!=null)
+                                            listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
+                                        else
+                                            if(BuildConfig.DEBUG)
+                                                Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                                                    "could compelete");
 
                                     }
                                 });
                     }
                     else {
-                        listener.onNewMemberDataSave(ALREADY_PART_OF_ACM,newMember);
+                        if(listener!=null)
+                            listener.onNewMemberDataSave(ALREADY_PART_OF_ACM,newMember);
+                        else
+                            if(BuildConfig.DEBUG)
+                                Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                                    "could compelete");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Member> call, Throwable t) {
                     t.printStackTrace();
-                    listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
+                    if(listener!=null)
+                        listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
+                    else
+                        if(BuildConfig.DEBUG)
+                            Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                                "could compelete");
+
                 }
             });
         }
         else {
-            listener.onNewMemberDataSave(NEW_MEMBER_ALREADY_PRESENT,newMember);
+            if(listener!=null) {
+                listener.onNewMemberDataSave(NEW_MEMBER_ALREADY_PRESENT,newMember);
+            }
+            else
+                if(BuildConfig.DEBUG)
+                    Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                        "could compelete");
         }
     }
 
@@ -221,7 +243,12 @@ public class RecipientsFragment extends Fragment implements
     public void onFailure(Call<NewMember> call, Throwable t) {
         System.out.println("Failed to authenticate");
         t.printStackTrace();
-        listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
+        if(listener!=null)
+            listener.onNewMemberDataSave(DATA_SAVE_FAILED,newMember);
+        else
+            if(BuildConfig.DEBUG)
+                Log.e(TAG,"The RecipientsFragment was Detached before the callback " +
+                    "could compelete");
     }
 
     public interface FragmentInteractionListener {
