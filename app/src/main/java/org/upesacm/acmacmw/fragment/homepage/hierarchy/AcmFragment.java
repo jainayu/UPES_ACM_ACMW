@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +27,7 @@ public class AcmFragment extends android.support.v4.app.Fragment implements Valu
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
     RecyclerView mRecyclerView;
+    ProgressBar mProgressBar;
     List<HeirarchyModel> acmheirarchyModels = new ArrayList<>();
     HeirarchyAdapter heirarchyAdapter;
 
@@ -44,6 +46,7 @@ public class AcmFragment extends android.support.v4.app.Fragment implements Valu
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_acm, container, false);
         mRecyclerView=view.findViewById(R.id.acm_office_bearer);
+        mProgressBar=view.findViewById(R.id.progress_bar_heirarchy);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(heirarchyAdapter);
        acmheirarchyModels=new ArrayList<>();
@@ -85,6 +88,7 @@ public class AcmFragment extends android.support.v4.app.Fragment implements Valu
             }
             if (acmheirarchyModels != null && heirarchyAdapter != null) {
                 heirarchyAdapter.setHeirarchyModels(acmheirarchyModels);
+                mProgressBar.setVisibility(View.GONE);
 
             }
         }

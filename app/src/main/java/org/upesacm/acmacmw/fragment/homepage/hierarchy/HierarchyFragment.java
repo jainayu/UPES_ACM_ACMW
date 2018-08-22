@@ -36,9 +36,7 @@ public class HierarchyFragment extends Fragment {
         viewPager = view.findViewById(R.id.pager);
         mPagerAdapter=new PagerAdapter(this.getChildFragmentManager());
         viewPager.setAdapter(mPagerAdapter);
-
         tabLayout.setupWithViewPager(viewPager);
-
         return view;
     }
 
