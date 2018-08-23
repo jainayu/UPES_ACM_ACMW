@@ -1007,8 +1007,8 @@ public class HomeActivity extends AppCompatActivity implements
             for(HomeActivityStateChangeListener listener:stateChangeListeners) {
                 System.out.println(trialMember);
                 listener.onTrialMemberStateChange(trialMember);
-                customizeNavigationDrawer(HomeActivity.STATE_TRIAL_MEMBER_SIGNED_IN);
             }
+            customizeNavigationDrawer(HomeActivity.STATE_TRIAL_MEMBER_SIGNED_IN);
             Toast.makeText(HomeActivity.this, "trial member created", Toast.LENGTH_LONG).show();
             onBackPressed();
         }
