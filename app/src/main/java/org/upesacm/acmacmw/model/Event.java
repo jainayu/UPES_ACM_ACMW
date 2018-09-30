@@ -1,0 +1,123 @@
+package org.upesacm.acmacmw.model;
+
+import android.support.annotation.NonNull;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+public class Event implements Comparable<Event> {
+    @JsonProperty("eventID")
+    private String eventID;
+
+    @JsonProperty("eventName")
+    private String eventName;
+
+    @JsonProperty("minParticipant")
+    private int minParticipant;
+
+    @JsonProperty("entryFees")
+    private int entryFees;
+
+    @JsonProperty("prizeMoney")
+    private ArrayList<Integer> prizeMoney;
+
+    @JsonProperty("eventDate")
+    private Long eventDate;
+
+    public Long getEventDate() {
+        return eventDate;
+    }
+
+    public String getEventID() {
+        return eventID;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public int getMinParticipant() {
+        return minParticipant;
+    }
+
+    public int getEntryFees() {
+        return entryFees;
+    }
+
+
+
+    public ArrayList<Integer> getPrizeMoney() {
+        return prizeMoney;
+    }
+
+    @Override
+    public int compareTo(@NonNull Event event) {
+        return this.eventDate.compareTo(event.getEventDate());
+    }
+
+    public static class Builder {
+        private String eventID;
+        private String eventName;
+        private int minParticipant;
+        private int entryFees;
+        private ArrayList<Integer> prizeMoney;
+        private Long eventDate;
+
+        public Builder() {
+
+        }
+
+        public Builder(Event event) {
+            this.eventID = event.getEventID();
+            this.eventName = event.getEventName();
+            this.minParticipant = event.getMinParticipant();
+            this.entryFees = event.getEntryFees();
+            this.prizeMoney = event.getPrizeMoney();
+            this.eventDate = event.getEventDate();
+        }
+
+        public Event build() {
+            Event event = new Event();
+            event.eventID = this.eventID;
+            event.entryFees = this.entryFees;
+            event.minParticipant = this.minParticipant;
+            event.eventName = this.eventName;
+            event.prizeMoney = this.prizeMoney;
+            event.eventDate = this.eventDate;
+
+            return event;
+        }
+
+        public Builder setEventId(String eventID) {
+            this.eventID = eventID;
+            return this;
+        }
+
+        public Builder setEventName(String eventName) {
+            this.eventName = eventName;
+            return this;
+        }
+
+        public Builder setMinParticipant(int minParticipant) {
+            this.minParticipant = minParticipant;
+            return this;
+        }
+
+        public Builder setEntryFees(int entryFees) {
+            this.entryFees = entryFees;
+            return this;
+        }
+
+        public Builder setPrizeMoney(ArrayList<Integer> prizeMoney) {
+            this.prizeMoney = prizeMoney;
+            return this;
+        }
+
+        public Builder setEventDate(Long date) {
+            this.eventDate = date;
+            return this;
+        }
+    }
+}

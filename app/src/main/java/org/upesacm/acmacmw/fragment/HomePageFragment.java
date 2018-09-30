@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.fragment.homepage.contactus.ContactUsFragment;
+import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
 import org.upesacm.acmacmw.fragment.homepage.hierarchy.HierarchyFragment;
 import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
 
@@ -29,6 +30,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
 
     private static final int CONTACT_US_FRAGMENT = 2;
     private static final int HIERARCHY_FRAGMENT = 1;
+    private static final int UPCOMING_EVENTS_FRAGMENT = 3;
     BottomNavigationView bottomNavigationView;
     HomeActivity callback;
     private int userSelectedFragmentId;
@@ -77,6 +79,10 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
 
             case HIERARCHY_FRAGMENT : {
                 userSelectedFrament = new HierarchyFragment();
+                break;
+            }
+            case UPCOMING_EVENTS_FRAGMENT : {
+                userSelectedFrament = new EventsListFragment();
                 break;
             }
 
@@ -156,26 +162,25 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+        FragmentTransaction ft=getChildFragmentManager().beginTransaction();
         if(item.getItemId()== R.id.action_posts) {
-            FragmentTransaction ft=getChildFragmentManager().beginTransaction();
             userSelectedFragmentId=0;
             ft.replace(R.id.frameLayout_homepage, new PostsFragment());
-            ft.commit();
+        }
+        else if(item.getItemId() == R.id.action_upcoming_events) {
+            userSelectedFragmentId = UPCOMING_EVENTS_FRAGMENT;
+            ft.replace(R.id.frameLayout_homepage,new EventsListFragment());
         }
         else if(item.getItemId() == R.id.action_heirarchy) {
-            FragmentTransaction ft=getChildFragmentManager().beginTransaction();
             userSelectedFragmentId = HIERARCHY_FRAGMENT;
             ft.replace(R.id.frameLayout_homepage,new HierarchyFragment());
-            ft.commit();
         }
         else if(item.getItemId() == R.id.action_contact) {
-            FragmentTransaction ft=getChildFragmentManager().beginTransaction();
             userSelectedFragmentId = CONTACT_US_FRAGMENT;
             ft.replace(R.id.frameLayout_homepage, new ContactUsFragment());
-            ft.commit();
         }
 
+        ft.commit();
         System.gc();
         return true;
     }

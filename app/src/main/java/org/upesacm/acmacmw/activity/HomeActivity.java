@@ -38,6 +38,7 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.asynctask.OTPSender;
 import org.upesacm.acmacmw.fragment.AboutFragment;
 import org.upesacm.acmacmw.fragment.AlumniFragment;
+import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
 import org.upesacm.acmacmw.fragment.member.trail.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.HomePageFragment;
