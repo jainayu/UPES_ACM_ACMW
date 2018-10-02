@@ -6,10 +6,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.adapter.events.EventsRecyclerViewAdapter;
+import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;
@@ -27,7 +30,9 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EventsListFragment extends Fragment {
+public class EventsListFragment extends Fragment implements
+        OnRecyclerItemSelectListener<Event> {
+    private static String TAG = "EventsListFragment";
     ProgressBar progressBar;
     RecyclerView recyclerView;
     EventsRecyclerViewAdapter adapter;
@@ -52,6 +57,8 @@ public class EventsListFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter = new EventsRecyclerViewAdapter();
+        adapter.setItemSelectListener(this);// setting the item select listener
+
         recyclerView.setAdapter(adapter);
 
 
@@ -61,7 +68,7 @@ public class EventsListFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<Event> events = new ArrayList();
                 for(DataSnapshot ds:dataSnapshot.getChildren()) {
-                    Event event = (Event)ds.getValue(Event.class);
+                    Event event = ds.getValue(Event.class);
                     events.add(event);
                     System.out.println("event : "+event.getEventDate());
                 }
@@ -85,4 +92,9 @@ public class EventsListFragment extends Fragment {
         adapter = null;
     }
 
+    @Override
+    public void onRecyclerItemSelect(Event dataItem, int position) {
+        Toast.makeText(this.getContext(),dataItem.getEventID(),Toast.LENGTH_SHORT).show();
+        Log.d(TAG,dataItem.getEventID()+" clicked");
+    }
 }

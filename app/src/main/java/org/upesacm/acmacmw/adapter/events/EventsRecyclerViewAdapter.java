@@ -5,9 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.Collections;
 
 public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
     ArrayList<Event> eventArrayList = new ArrayList();
+    OnRecyclerItemSelectListener<Event> itemSelectListener;
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -28,7 +31,7 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(holder instanceof EventViewHolder)
-            ((EventViewHolder)holder).bindData(eventArrayList.get(position));
+            ((EventViewHolder)holder).bindData(eventArrayList.get(position),position);
     }
 
     @Override
@@ -75,20 +78,38 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
         }
     }
 
+    public void setItemSelectListener(OnRecyclerItemSelectListener<Event> listener) {
+        this.itemSelectListener = listener;
+    }
 
 
-    public class EventViewHolder extends RecyclerView.ViewHolder {
+
+    public class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textViewEventID;
         TextView textViewDate;
+
+        //the values of these variables will change with each call of bindViewHolder()
+        Event event;
+        int position;
         public EventViewHolder(View itemView) {
             super(itemView);
             this.textViewEventID = itemView.findViewById(R.id.text_view_event_ID);
             this.textViewDate = itemView.findViewById(R.id.text_view_event_date);
+            itemView.setOnClickListener(this);
         }
 
-        public void bindData(Event event) {
+        public void bindData(Event event, int position) {
+            this.event = event;
+            this.position = position;
+
             textViewEventID.setText(event.getEventID());
             textViewDate.setText(event.getEventDate().toString());
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(itemSelectListener != null)
+                itemSelectListener.onRecyclerItemSelect(event,position);
         }
     }
 
