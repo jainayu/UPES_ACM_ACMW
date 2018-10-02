@@ -45,6 +45,7 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.asynctask.OTPSender;
 import org.upesacm.acmacmw.fragment.AboutFragment;
 import org.upesacm.acmacmw.fragment.AlumniFragment;
+import org.upesacm.acmacmw.fragment.PolicyFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
 import org.upesacm.acmacmw.fragment.member.trail.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.HomePageFragment;
@@ -288,6 +289,9 @@ public class HomeActivity extends AppCompatActivity implements
         }
         else if(item.getItemId() == R.id.action_about) {
             ft.replace(R.id.frame_layout,new AboutFragment());
+        }
+        else if(item.getItemId() == R.id.action_policy) {
+            ft.replace(R.id.frame_layout,new PolicyFragment());
         }
         else if(item.getItemId() == MEMBER_PROFILE_MENU_ID) {
             UserProfileFragment userProfileFragment= UserProfileFragment.newInstance(signedInMember);

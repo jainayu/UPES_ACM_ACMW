@@ -15,5 +15,8 @@
                 <item
                     android:id="@+id/action_about"
                     android:title="@string/title_About" />
+                <item
+                    android:id="@+id/action_policy"
+                    android:title="Policy" />
         </group>
 </menu>
