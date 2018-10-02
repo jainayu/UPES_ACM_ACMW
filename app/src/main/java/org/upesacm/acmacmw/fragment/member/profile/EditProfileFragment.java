@@ -19,6 +19,7 @@ import org.upesacm.acmacmw.BuildConfig;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.util.Config;
 
 import java.util.regex.Pattern;
 
@@ -164,7 +165,7 @@ public class EditProfileFragment extends Fragment
         if(view.getId() == R.id.button_edit_save) {
             member = modifyMember();
             if(member!=null) {
-                callback.getMembershipClient().createMember(member.getSap(), member)
+                callback.getMembershipClient().createMember(member.getSap(), member, Config.AUTH_TOKEN)
                         .enqueue(this);
             }
         }

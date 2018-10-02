@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +31,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.upesacm.acmacmw.R;
@@ -56,6 +63,7 @@ import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.Config;
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
@@ -82,12 +90,12 @@ public class HomeActivity extends AppCompatActivity implements
         TrialMemberOTPVerificationFragment.TrialOTPVerificationListener,
         RecipientsFragment.FragmentInteractionListener{
 
-    private static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
+    private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     private static final int MEMBER_PROFILE_MENU_ID = 1;
     private static final int STATE_MEMBER_SIGNED_IN=1;
     private static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
     private static final int STATE_DEFAULT=3;
-
+    private FirebaseAuth mAuth;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
@@ -109,6 +117,65 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_main);
+        mAuth=FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser==null)
+        {
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("tag", "signInAnonymously:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                user.getIdToken(true)
+                                        .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                                            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                                                if (task.isSuccessful()) {
+                                                    String idToken = task.getResult().getToken();
+                                                    Config.AUTH_TOKEN=idToken;
+                                                    // ...
+                                                } else {
+                                                    // Handle error -> task.getException();
+                                                    Config.AUTH_TOKEN=null;
+                                                }
+                                            }
+                                        });
+
+                                startApp();
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("tag", "signInAnonymously:failure", task.getException());
+                                Toast.makeText(HomeActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+        else {
+            Log.d("tag", "Already Signed in :success");
+            currentUser.getIdToken(true)
+                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        public void onComplete(@NonNull Task<GetTokenResult> task) {
+                            if (task.isSuccessful()) {
+                                String idToken = task.getResult().getToken();
+                                Config.AUTH_TOKEN=idToken;
+                                // ...
+                            } else {
+                                // Handle error -> task.getException();
+                                Config.AUTH_TOKEN=null;
+                            }
+                        }
+                    });
+            startApp();
+        }
+
+
+    }
+
+    void startApp()
+    {
         toolbar = findViewById(R.id.my_toolbar);
         drawerLayout=findViewById(R.id.drawer_layout);
         navigationView=findViewById(R.id.nav_view);
@@ -158,7 +225,7 @@ public class HomeActivity extends AppCompatActivity implements
                 Context.MODE_PRIVATE);
         final String trialMemberSap=preferences.getString(getString(R.string.trial_member_sap),null);
         if(account!=null && trialMemberSap!=null) {
-            homePageClient.getTrialMember(trialMemberSap)
+            homePageClient.getTrialMember(trialMemberSap,Config.AUTH_TOKEN)
                     .enqueue(new Callback<TrialMember>() {
                         @Override
                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
@@ -180,9 +247,7 @@ public class HomeActivity extends AppCompatActivity implements
             signOutFromGoogle();
         }
         System.out.println("signedInMember : "+signedInMember);
-
     }
-
     @Override
     protected void onDestroy() {
         toolbar = null;
@@ -530,7 +595,7 @@ public class HomeActivity extends AppCompatActivity implements
         System.out.println("login user name : "+username);
         System.out.println("login password : "+password);
 
-        Call<Member> memberCall=membershipClient.getMember(username);
+        Call<Member> memberCall=membershipClient.getMember(username,Config.AUTH_TOKEN);
         memberCall.enqueue(new Callback<Member>() {
             @Override
             public void onResponse(Call<Member> call, Response<Member> response) {
@@ -686,7 +751,7 @@ public class HomeActivity extends AppCompatActivity implements
                 .setPremium(verifiedNewMember.isPremium())
                 .setMembershipType(verifiedNewMember.getMembershipType())
                 .build();
-        Call<Member> memberCall=membershipClient.createMember(verifiedNewMember.getSapId(),member);
+        Call<Member> memberCall=membershipClient.createMember(verifiedNewMember.getSapId(),member,Config.AUTH_TOKEN);
         memberCall.enqueue(new Callback<Member>() {
             @Override
             public void onResponse(Call<Member> call, Response<Member> response) {
@@ -700,7 +765,7 @@ public class HomeActivity extends AppCompatActivity implements
                 Toast.makeText(HomeActivity.this,"Welcome to ACM/ACM-W",Toast.LENGTH_LONG).show();
                 setUpMemberProfile(member);
 
-                membershipClient.getEmailMsg()
+                membershipClient.getEmailMsg(Config.AUTH_TOKEN)
                         .enqueue(new Callback<EmailMsg>() {
                             @Override
                             public void onResponse(Call<EmailMsg> call, Response<EmailMsg> response) {
@@ -740,7 +805,7 @@ public class HomeActivity extends AppCompatActivity implements
                 NewMember nullData= new NewMember.Builder()
                         .setPremium(null)
                         .build();
-                membershipClient.saveNewMemberData(member.getSap(),nullData)
+                membershipClient.saveNewMemberData(member.getSap(),nullData,Config.AUTH_TOKEN)
                         .enqueue(new Callback<NewMember>() {
                             @Override
                             public void onResponse(Call<NewMember> call, Response<NewMember> response) {
@@ -931,7 +996,7 @@ public class HomeActivity extends AppCompatActivity implements
                     .setSap(sap)
                     .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap),6))
                     .build();
-            homePageClient.getTrialMember(sap)
+            homePageClient.getTrialMember(sap,Config.AUTH_TOKEN)
                     .enqueue(new Callback<TrialMember>() {
                         @Override
                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
@@ -947,7 +1012,7 @@ public class HomeActivity extends AppCompatActivity implements
                             else {
                                 trialMember = newTrialMember;
                             }
-                                homePageClient.createTrialMember(sap,trialMember)
+                                homePageClient.createTrialMember(sap,trialMember,Config.AUTH_TOKEN)
                                         .enqueue(new Callback<TrialMember>() {
                                             @Override
                                             public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
