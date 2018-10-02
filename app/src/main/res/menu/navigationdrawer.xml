@@ -17,6 +17,6 @@
                     android:title="@string/title_About" />
                 <item
                     android:id="@+id/action_policy"
-                    android:title="Policy" />
+                    android:title="Privacy Policy" />
         </group>
 </menu>
