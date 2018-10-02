@@ -3,7 +3,9 @@ package org.upesacm.acmacmw.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -41,6 +43,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.asynctask.OTPSender;
 import org.upesacm.acmacmw.fragment.AboutFragment;
@@ -65,11 +69,14 @@ import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.util.Config;
+import org.upesacm.acmacmw.util.ForceUpdateChecker;
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -89,7 +96,8 @@ public class HomeActivity extends AppCompatActivity implements
         PasswordChangeDialogFragment.PasswordChangeListener,
         GoogleSignInFragment.GoogleSignInListener,
         TrialMemberOTPVerificationFragment.TrialOTPVerificationListener,
-        RecipientsFragment.FragmentInteractionListener{
+        RecipientsFragment.FragmentInteractionListener,
+        ForceUpdateChecker.OnUpdateNeededListener{
 
     private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     private static final int MEMBER_PROFILE_MENU_ID = 1;
@@ -174,9 +182,9 @@ public class HomeActivity extends AppCompatActivity implements
 
 
     }
-
     void startApp()
     {
+        ForceUpdateChecker.with(getApplicationContext()).onUpdateNeeded(this).check();
         toolbar = findViewById(R.id.my_toolbar);
         drawerLayout=findViewById(R.id.drawer_layout);
         navigationView=findViewById(R.id.nav_view);
@@ -249,6 +257,7 @@ public class HomeActivity extends AppCompatActivity implements
         }
         System.out.println("signedInMember : "+signedInMember);
     }
+
     @Override
     protected void onDestroy() {
         toolbar = null;
@@ -1091,4 +1100,29 @@ public class HomeActivity extends AppCompatActivity implements
         sender.execute(mailBody,recipientEmail,subject);
     }
 
+    @Override
+    public void onUpdateNeeded(final String updateUrl) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("New version available")
+                .setMessage("Please, update app to new version to continue reposting.")
+                .setPositiveButton("Update",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                redirectStore(updateUrl);
+                            }
+                        }).setNegativeButton("No, thanks",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        }).create();
+        dialog.show();
+    }
+    private void redirectStore(String updateUrl) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 }
