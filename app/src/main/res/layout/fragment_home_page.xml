@@ -7,7 +7,7 @@
     android:layout_weight="1">
 
     <FrameLayout
-        android:id="@+id/frameLayout_homepage"
+        android:id="@+id/frame_layout_homepage"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="56dp"

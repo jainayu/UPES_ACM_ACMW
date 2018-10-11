@@ -1,15 +1,18 @@
 package org.upesacm.acmacmw.fragment.homepage.event;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -20,7 +23,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.adapter.events.EventsRecyclerViewAdapter;
+import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Event;
 
@@ -37,17 +42,34 @@ public class EventsListFragment extends Fragment implements
     RecyclerView recyclerView;
     EventsRecyclerViewAdapter adapter;
 
-    FirebaseDatabase database;
+
+    HomeActivity callback;
+    FragmentInteractionListener listener;
     public EventsListFragment() {
         // Required empty public constructor
     }
 
-
+    @Override
+    public void onAttach(Context context) {
+        if(context instanceof HomeActivity) {
+            callback = (HomeActivity)context;
+            listener = (FragmentInteractionListener)callback.getEventController();
+            super.onAttach(context);
+        }
+        else {
+            throw new IllegalStateException(context+" must be instance of HomeActivity");
+        }
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        database = FirebaseDatabase.getInstance();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,7 +84,7 @@ public class EventsListFragment extends Fragment implements
         recyclerView.setAdapter(adapter);
 
 
-        DatabaseReference ref = database.getReference("event_db/events");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("event_db/events");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -96,5 +118,10 @@ public class EventsListFragment extends Fragment implements
     public void onRecyclerItemSelect(Event dataItem, int position) {
         Toast.makeText(this.getContext(),dataItem.getEventID(),Toast.LENGTH_SHORT).show();
         Log.d(TAG,dataItem.getEventID()+" clicked");
+        listener.onEventSelect(dataItem);
+    }
+
+    public interface FragmentInteractionListener {
+        public void onEventSelect(Event event);
     }
 }

@@ -35,20 +35,20 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.asynctask.OTPSender;
-import org.upesacm.acmacmw.fragment.AboutFragment;
-import org.upesacm.acmacmw.fragment.AlumniFragment;
-import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
+import org.upesacm.acmacmw.util.OTPSender;
+import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
+import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
+import org.upesacm.acmacmw.fragment.navdrawer.AlumniFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
-import org.upesacm.acmacmw.fragment.member.trail.GoogleSignInFragment;
-import org.upesacm.acmacmw.fragment.HomePageFragment;
+import org.upesacm.acmacmw.fragment.member.trial.GoogleSignInFragment;
+import org.upesacm.acmacmw.fragment.navdrawer.HomePageFragment;
 import org.upesacm.acmacmw.fragment.homepage.post.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
 import org.upesacm.acmacmw.fragment.member.registration.OTPVerificationFragment;
 import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.member.registration.RecipientsFragment;
-import org.upesacm.acmacmw.fragment.member.trail.TrialMemberOTPVerificationFragment;
+import org.upesacm.acmacmw.fragment.member.trial.TrialMemberOTPVerificationFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
 import org.upesacm.acmacmw.model.EmailMsg;
@@ -57,6 +57,7 @@ import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.Config;
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
@@ -71,19 +72,17 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class HomeActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        LoginDialogFragment.InteractionListener,
         MemberRegistrationFragment.RegistrationResultListener,
         OTPVerificationFragment.OTPVerificationResultListener,
-        ImageUploadFragment.UploadResultListener,
         View.OnClickListener,
         UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
         GoogleSignInFragment.GoogleSignInListener,
         TrialMemberOTPVerificationFragment.TrialOTPVerificationListener,
-        RecipientsFragment.FragmentInteractionListener{
+        RecipientsFragment.FragmentInteractionListener {
 
-    private static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
+    private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     private static final int MEMBER_PROFILE_MENU_ID = 1;
     private static final int STATE_MEMBER_SIGNED_IN=1;
     private static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
@@ -99,9 +98,9 @@ public class HomeActivity extends AppCompatActivity implements
     private MembershipClient membershipClient;
     private View headerLayout;
 
-    private Member signedInMember;
-    private TrialMember trialMember;
-    private String newMemberSap;
+    protected Member signedInMember;
+    protected TrialMember trialMember;
+    protected String newMemberSap;
 
     private FirebaseDatabase database;
     private ArrayList<HomeActivityStateChangeListener> stateChangeListeners;
@@ -345,11 +344,27 @@ public class HomeActivity extends AppCompatActivity implements
         }
     }
 
+    private long getCurrentFragmentUid(int containerId) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(containerId);
+        if(fragment == null)
+            return -1;
+        if(fragment instanceof HomePageFragment)
+            return Config.HOME_PAGE_FRAGMENT_UID;
+        if(fragment instanceof EventDetailFragment)
+            return Config.EVENT_DETAIL_FRAGMENT_UID;
+
+        return -1;
+    }
+
     @Override
     public void onBackPressed() {
         System.out.println("back button pressed");
         if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
+            return;
+        }
+        if(getCurrentFragmentUid(R.id.frame_layout) == EventDetailFragment.UID) {
+            getSupportFragmentManager().popBackStack();
             return;
         }
         if(isVisible(getString(R.string.fragment_tag_homepage))) {
@@ -522,88 +537,7 @@ public class HomeActivity extends AppCompatActivity implements
 
 
 
-    /* $$$$$$$$$$$$$$$$$$$$$$$$ Callbacks of LoginDialogFragment $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ */
-    @Override
-    public void onLoginPressed(LoginDialogFragment loginDialogFragment) {
-        System.out.println("login button pressed");
-        final String username=loginDialogFragment.getUsername();
-        final String password=loginDialogFragment.getPassword();
-        System.out.println("login user name : "+username);
-        System.out.println("login password : "+password);
 
-        Call<Member> memberCall=membershipClient.getMember(username);
-        memberCall.enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
-                Member member=response.body();
-                String msg="";
-                if(member!=null) {
-                    if(member.getPassword().equals(password)) {
-                        setUpMemberProfile(member);
-                        msg="Successfully signed in";
-                    }
-                    else {
-                        msg="Incorrect Username or password";
-                    }
-                }
-                else {
-                    msg="Incorrect Username or password";
-                }
-                Toast.makeText(HomeActivity.this,msg,Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                Toast.makeText(HomeActivity.this,"Unable to verify",Toast.LENGTH_SHORT).show();
-            }
-        });
-        loginDialogFragment.dismiss();
-    }
-
-    @Override
-    public void onSignUpPressed(LoginDialogFragment loginDialogFragment) {
-        loginDialogFragment.dismiss();
-
-        /* **************** obtaining stored sap(if any)************************************* */
-        SharedPreferences preferences=getSharedPreferences(getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE);
-        newMemberSap=preferences.getString(getString(R.string.new_member_sap_key),null);
-        /* **************************************************************************************/
-        System.out.println("stored sap id : "+newMemberSap);
-        if(newMemberSap==null) {
-
-            /* *****************Open the new member registration fragment here *************** */
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.frame_layout, new MemberRegistrationFragment(),
-                    getString(R.string.fragment_tag_new_member_registration));
-            ft.commit();
-
-            /* ******************************************************************************/
-        }
-        else {
-            startOTPVerificationPage(getResources().getInteger(R.integer.verify_stored_sap),null);
-        }
-        setDrawerEnabled(false);
-    }
-
-    @Override
-    public void onGuestSignUpPressed(LoginDialogFragment loginDialogFragment) {
-        getSupportActionBar().hide();
-        setDrawerEnabled(false);
-        GoogleSignInFragment fragment = new GoogleSignInFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, fragment, getString(R.string.fragment_tag_google_sign_in))
-                .commit();
-
-        loginDialogFragment.dismiss();
-    }
-
-    @Override
-    public void onCancelPressed(LoginDialogFragment loginDialogFragment) {
-        System.out.println("Cancel button pressed");
-        loginDialogFragment.dismiss();
-    }
-    /* $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ */
 
 
     @Override
@@ -772,29 +706,6 @@ public class HomeActivity extends AppCompatActivity implements
     }
     /* ###########################################################################################*/
 
-
-
-
-    /* !!!!!!!!!!!!!!!!!!!!!! Callback from ImageUploadFragment !!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-    @Override
-    public void onUpload(ImageUploadFragment imageUploadFragment, int resultCode) {
-        String msg=null;
-        if(resultCode == ImageUploadFragment.UPLOAD_SUCCESSFUL)
-            msg="New Post Uploaded";
-        else if(resultCode == ImageUploadFragment.UPLOAD_CANCELLED)
-            msg="Upload Cancelled";
-        else if(resultCode == ImageUploadFragment.UPLOAD_FAILED)
-            msg="Upload Failed. Please Try Again";
-        else if(resultCode == ImageUploadFragment.UPLOAD_CANCEL_OPERATION_FAILED)
-            msg="Upload cancel failed";
-        Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
-        if(isVisible((getString(R.string.fragment_tag_image_upload)))) {
-            displayHomePage();
-        }
-        getSupportActionBar().show();
-        setDrawerEnabled(true);
-    }
-    /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 
 
@@ -1023,4 +934,23 @@ public class HomeActivity extends AppCompatActivity implements
         sender.execute(mailBody,recipientEmail,subject);
     }
 
+
+    void setCurrentFragment(Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.frame_layout,fragment);
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    public EventController getEventController() {
+        return EventController.getInstance(this);
+    }
+
+    public PostController getPostController() {
+        return PostController.getInstance(this);
+    }
+
+    public MemberController getMemberController() {
+        return MemberController.getInstance(this);
+    }
 }

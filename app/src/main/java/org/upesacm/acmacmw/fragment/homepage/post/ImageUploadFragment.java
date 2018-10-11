@@ -24,6 +24,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.retrofit.ApiClient;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
@@ -76,6 +77,8 @@ public class ImageUploadFragment extends Fragment implements
     UploadTask uploadTask;
     private File destination;
 
+    private HomeActivity callback;
+
     public ImageUploadFragment() {
         // Required empty public constructor
     }
@@ -89,8 +92,9 @@ public class ImageUploadFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if (context instanceof UploadResultListener) {
-            resultListener = (UploadResultListener) context;
+        if (context instanceof HomeActivity) {
+            callback = (HomeActivity)context;
+            resultListener = callback.getPostController();
             super.onAttach(context);
         } else {
             throw new IllegalStateException(context.toString() + " must " +

@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 
 public class LoginDialogFragment extends DialogFragment implements View.OnClickListener{
     EditText editTextUsername;
@@ -24,15 +25,16 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     private String username,password;
     InteractionListener interactionListener;
 
-
+    HomeActivity homeActivity;
     public static LoginDialogFragment newInstance() {
         return new LoginDialogFragment();
     }
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof InteractionListener) {
-            interactionListener=(InteractionListener)context;
+        if(context instanceof HomeActivity) {
+            homeActivity = (HomeActivity)context;
+            interactionListener = (InteractionListener)homeActivity.getMemberController();
             super.onAttach(context);
         }
 

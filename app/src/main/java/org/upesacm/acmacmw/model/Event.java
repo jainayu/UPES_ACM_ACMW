@@ -1,13 +1,15 @@
 package org.upesacm.acmacmw.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.Date;
 
-public class Event implements Comparable<Event> {
+public class Event implements Comparable<Event>, Parcelable {
+    public static final String PARCEL_KEY = "Event";
     @JsonProperty("eventID")
     private String eventID;
 
@@ -25,6 +27,34 @@ public class Event implements Comparable<Event> {
 
     @JsonProperty("eventDate")
     private Long eventDate;
+
+    protected Event(Parcel in) {
+        eventID = in.readString();
+        eventName = in.readString();
+        minParticipant = in.readInt();
+        entryFees = in.readInt();
+        if (in.readByte() == 0) {
+            eventDate = null;
+        } else {
+            eventDate = in.readLong();
+        }
+    }
+
+    public Event() {
+        //Empty constructor
+    }
+
+    public static final Creator<Event> CREATOR = new Creator<Event>() {
+        @Override
+        public Event createFromParcel(Parcel in) {
+            return new Event(in);
+        }
+
+        @Override
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
 
     public Long getEventDate() {
         return eventDate;
@@ -46,8 +76,6 @@ public class Event implements Comparable<Event> {
         return entryFees;
     }
 
-
-
     public ArrayList<Integer> getPrizeMoney() {
         return prizeMoney;
     }
@@ -55,6 +83,25 @@ public class Event implements Comparable<Event> {
     @Override
     public int compareTo(@NonNull Event event) {
         return this.eventDate.compareTo(event.getEventDate());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(eventID);
+        parcel.writeString(eventName);
+        parcel.writeInt(minParticipant);
+        parcel.writeInt(entryFees);
+        if (eventDate == null) {
+            parcel.writeByte((byte) 0);
+        } else {
+            parcel.writeByte((byte) 1);
+            parcel.writeLong(eventDate);
+        }
     }
 
     public static class Builder {
