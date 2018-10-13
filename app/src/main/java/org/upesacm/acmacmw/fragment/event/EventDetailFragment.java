@@ -1,9 +1,13 @@
 package org.upesacm.acmacmw.fragment.event;
 
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +40,7 @@ public class EventDetailFragment extends Fragment {
     Event event;
     TextView textViewId;
     TextView textViewDate;
-    ImageView poster;
+    ImageView poster,phone,whatsapp;
     private TextView textViewEventName,textViewDay,textViewMonth,textViewTagline,textViewEventDescription;
 
     public EventDetailFragment() {
@@ -80,7 +84,26 @@ public class EventDetailFragment extends Fragment {
         textViewTagline=view.findViewById(R.id.textview_tagline);
         poster=view.findViewById(R.id.poster);
         textViewEventDescription=view.findViewById(R.id.textview_description);
-
+        phone=view.findViewById(R.id.phone);
+        whatsapp=view.findViewById(R.id.whatsapp);
+        phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                String temp = "tel:" + event.getPhone();
+                callIntent.setData(Uri.parse(temp));
+                callback.startActivity(callIntent);
+            }
+        });
+        whatsapp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sendIntent = new Intent("android.intent.action.MAIN");
+                sendIntent.setComponent(new ComponentName("com.whatsapp", "com.whatsapp.Conversation"));
+                sendIntent.putExtra("jid", PhoneNumberUtils.stripSeparators("91" + event.getWhatsapp()) + "@s.whatsapp.net");//phone number without "+" prefix
+                callback.startActivity(sendIntent);
+            }
+        });
         buttonEventDetailRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

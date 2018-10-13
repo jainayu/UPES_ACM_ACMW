@@ -41,6 +41,10 @@ public class Event implements Comparable<Event>, Parcelable {
     private String tagline="";
     @JsonProperty("eventDescription")
     private String eventDescription="";
+    @JsonProperty("whatsapp")
+    private String whatsapp;
+    @JsonProperty("phone")
+    private String phone;
 
     public String getCover() {
         return cover;
@@ -104,6 +108,8 @@ public class Event implements Comparable<Event>, Parcelable {
         poster=in.readString();
         tagline=in.readString();
         eventDescription=in.readString();
+        phone=in.readString();
+        whatsapp=in.readString();
         if (in.readByte() == 0) {
             eventDate = null;
         } else {
@@ -181,6 +187,22 @@ public class Event implements Comparable<Event>, Parcelable {
 
     public void setEventDescription(String eventDescription) {
         this.eventDescription = eventDescription;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 
     public static class Builder {
