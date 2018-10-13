@@ -126,6 +126,7 @@ public class PostsFragment extends Fragment
         if(database==null) {
             database = FirebaseDatabase.getInstance();
         }
+        callback.getSupportActionBar().show();
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 

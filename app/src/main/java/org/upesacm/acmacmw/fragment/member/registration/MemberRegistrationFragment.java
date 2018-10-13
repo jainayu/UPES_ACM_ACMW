@@ -75,7 +75,7 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        callback.getSupportActionBar().setHomeButtonEnabled(true);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

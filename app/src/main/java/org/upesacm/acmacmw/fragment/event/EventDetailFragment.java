@@ -22,6 +22,8 @@ import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Config;
 
+import java.util.Objects;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -108,6 +110,7 @@ public class EventDetailFragment extends Fragment {
                     .thumbnail(Glide.with(getContext()).load(R.drawable.post_image_holder))
                     .into(poster);
             callback.setActionBarTitle(event.getEventName());
+            callback.getSupportActionBar().hide();
         }
     }
     public interface FragmentInteractionListener {

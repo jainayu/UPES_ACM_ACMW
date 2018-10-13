@@ -63,6 +63,7 @@ public class EventsListFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        callback.getSupportActionBar().show();
     }
 
     @Override
