@@ -4,6 +4,7 @@ package org.upesacm.acmacmw.fragment.event;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -122,8 +123,12 @@ public class EventDetailFragment extends Fragment {
 
     private void updateUI() {
         if(event!=null) {
+            Typeface typeface = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
+
             textViewEventName.setText(event.getEventName());
+            textViewEventName.setTypeface(typeface);
             textViewTagline.setText(event.getTagline());
+            textViewTagline.setTypeface(typeface);
             textViewDate.setText(event.getDate());
             textViewDay.setText(event.getDay());
             textViewMonth.setText(event.getMonth());
