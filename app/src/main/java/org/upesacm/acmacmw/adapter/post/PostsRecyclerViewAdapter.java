@@ -157,7 +157,7 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             requestOptions.placeholder(R.drawable.post_image_holder)
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .error(R.drawable.post_image_error);
-            Glide.with(callback)
+            Glide.with(itemView.getContext())
                     .load(post.getImageUrl())
                     .apply(requestOptions)
                     .into(imageView);

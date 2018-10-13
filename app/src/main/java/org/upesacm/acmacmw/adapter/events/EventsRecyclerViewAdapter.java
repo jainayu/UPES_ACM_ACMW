@@ -7,7 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
@@ -86,28 +89,39 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
 
 
     public class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView textViewEventID;
+        TextView textViewEventName,textViewTagline,textViewDay,textViewMonth;
+        ImageView imageViewCover;
         TextView textViewDate;
-        Button details;
+        Button buttonDetails;
+
         //the values of these variables will change with each call of bindViewHolder()
         Event event;
         int position;
         public EventViewHolder(View itemView) {
             super(itemView);
-            this.textViewEventID = itemView.findViewById(R.id.text_view_event_ID);
+            this.textViewEventName = itemView.findViewById(R.id.text_view_event_name);
             this.textViewDate = itemView.findViewById(R.id.text_view_event_date);
-            this.details=itemView.findViewById(R.id.details);
-            details.setOnClickListener(this);
+            this.buttonDetails=itemView.findViewById(R.id.details);
+            this.textViewDay=itemView.findViewById(R.id.textview_day);
+            this.textViewMonth=itemView.findViewById(R.id.textview_month);
+            this.textViewTagline=itemView.findViewById(R.id.textview_tagline);
+            this.imageViewCover=itemView.findViewById(R.id.image_view_cover);
+            buttonDetails.setOnClickListener(this);
         }
 
         public void bindData(Event event, int position) {
             this.event = event;
             this.position = position;
-
-            textViewEventID.setText(event.getEventID());
-            textViewDate.setText(event.getEventDate().toString());
+            textViewEventName.setText(event.getEventName());
+            textViewDate.setText(event.getDate());
+            textViewDay.setText(event.getDay());
+            textViewMonth.setText(event.getMonth());
+            textViewTagline.setText(event.getTagline());
+            Glide.with(itemView.getContext())
+                    .load(event.getCover())
+                    .thumbnail(Glide.with(itemView.getContext()).load(R.drawable.post_image_holder))
+                    .into(imageViewCover);
         }
-
         @Override
         public void onClick(View view) {
             if(itemSelectListener != null)

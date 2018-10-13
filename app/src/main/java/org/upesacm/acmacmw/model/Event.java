@@ -14,7 +14,7 @@ public class Event implements Comparable<Event>, Parcelable {
     private String eventID;
 
     @JsonProperty("eventName")
-    private String eventName;
+    private String eventName="";
 
     @JsonProperty("minParticipant")
     private int minParticipant;
@@ -27,12 +27,83 @@ public class Event implements Comparable<Event>, Parcelable {
 
     @JsonProperty("eventDate")
     private Long eventDate;
+    @JsonProperty("cover")
+    private String cover="";
+    @JsonProperty("date")
+    private String date="";
+    @JsonProperty("day")
+    private String day="";
+    @JsonProperty("month")
+    private String month="";
+    @JsonProperty("poster")
+    private String poster="";
+    @JsonProperty("tagline")
+    private String tagline="";
+    @JsonProperty("eventDescription")
+    private String eventDescription="";
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public String getPoster() {
+        return poster;
+    }
+
+    public void setPoster(String poster) {
+        this.poster = poster;
+    }
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
+
+
 
     protected Event(Parcel in) {
         eventID = in.readString();
         eventName = in.readString();
         minParticipant = in.readInt();
         entryFees = in.readInt();
+        cover=in.readString();
+        date=in.readString();
+        day=in.readString();
+        month=in.readString();
+        poster=in.readString();
+        tagline=in.readString();
+        eventDescription=in.readString();
         if (in.readByte() == 0) {
             eventDate = null;
         } else {
@@ -102,6 +173,14 @@ public class Event implements Comparable<Event>, Parcelable {
             parcel.writeByte((byte) 1);
             parcel.writeLong(eventDate);
         }
+    }
+
+    public String getEventDescription() {
+        return eventDescription;
+    }
+
+    public void setEventDescription(String eventDescription) {
+        this.eventDescription = eventDescription;
     }
 
     public static class Builder {

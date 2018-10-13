@@ -12,11 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <ImageView
+            android:id="@+id/image_view_cover"
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/acm_app_logo"/>
+            android:src="@drawable/acm_app_logo" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,14 +31,14 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="OCT"
+                <TextView
+                    android:id="@+id/textview_month"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
 
-                android:textStyle="bold"
-                android:textColor="#79bcf7"
-                />
+                    android:text="OCT"
+                    android:textColor="#79bcf7"
+                    android:textStyle="bold" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -45,12 +47,13 @@
                     android:textSize="25sp"
                     android:textColor="#000000"
                     />
+
                 <TextView
+                    android:id="@+id/textview_day"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="SAT"
-                    android:textColor="#000"
-                    />
+                    android:textColor="#000" />
             </LinearLayout>
             <View
                 android:layout_width="1dp"
@@ -59,7 +62,7 @@
                 android:layout_gravity="center_vertical"
                 />
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_weight="1"
@@ -68,20 +71,20 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Event Name"
-                    android:id="@+id/text_view_event_ID"
+                    android:id="@+id/text_view_event_name"
                     android:textColor="#000000"
                     android:textSize="18sp" />
+
                 <TextView
+                    android:id="@+id/textview_tagline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="EventineTaglineTaglineTagline"
                     />
             </LinearLayout>
             <Button
                 android:layout_width="100dp"
                 android:layout_height="30dp"
-                android:background="#3999f4"
+                android:background="@drawable/button_background_events"
                 android:textColor="#fff"
                 android:layout_weight="1"
                 android:padding="3dp"

@@ -9,8 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventController;
@@ -31,6 +34,9 @@ public class EventDetailFragment extends Fragment {
     Event event;
     TextView textViewId;
     TextView textViewDate;
+    ImageView poster;
+    private TextView textViewEventName,textViewDay,textViewMonth,textViewTagline,textViewEventDescription;
+
     public EventDetailFragment() {
         // Required empty public constructor
     }
@@ -64,9 +70,15 @@ public class EventDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_detail, container, false);
-        textViewId = view.findViewById(R.id.text_view_event_detail_id);
-        textViewDate = view.findViewById(R.id.text_view_event_detail_date);
         buttonEventDetailRegister=view.findViewById(R.id.button_event_detail_register);
+        textViewEventName = view.findViewById(R.id.text_view_event_name);
+        textViewDate = view.findViewById(R.id.text_view_event_date);
+        textViewDay=view.findViewById(R.id.textview_day);
+        textViewMonth=view.findViewById(R.id.textview_month);
+        textViewTagline=view.findViewById(R.id.textview_tagline);
+        poster=view.findViewById(R.id.poster);
+        textViewEventDescription=view.findViewById(R.id.textview_description);
+
         buttonEventDetailRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,9 +97,16 @@ public class EventDetailFragment extends Fragment {
 
     private void updateUI() {
         if(event!=null) {
-            textViewId.setText(event.getEventID());
-            textViewDate.setText(event.getEventDate().toString());
-
+            textViewEventName.setText(event.getEventName());
+            textViewTagline.setText(event.getTagline());
+            textViewDate.setText(event.getDate());
+            textViewDay.setText(event.getDay());
+            textViewMonth.setText(event.getMonth());
+            textViewEventDescription.setText(event.getEventDescription());
+            Glide.with(getContext())
+                    .load(event.getPoster())
+                    .thumbnail(Glide.with(getContext()).load(R.drawable.post_image_holder))
+                    .into(poster);
             callback.setActionBarTitle(event.getEventName());
         }
     }
