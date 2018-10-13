@@ -131,7 +131,8 @@ public class EventRegistration extends Fragment implements View.OnClickListener 
                                                             ref.child("NonACMParticipants").child(sap).setValue(nonAcmParticipant).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
                                                                 public void onSuccess(Void aVoid) {
-                                                                    ref.child("events").child(event.getEventID()).child("NonACMParticipants").setValue(nonAcmParticipant).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    nonAcmParticipant.setEvent(null);
+                                                                    ref.child("events").child(event.getEventID()).child("NonACMParticipants").child(sap).setValue(nonAcmParticipant).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
                                                                             progressBar.setVisibility(View.INVISIBLE);
