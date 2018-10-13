@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.upesacm.acmacmw.R;
@@ -87,7 +88,7 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
     public class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textViewEventID;
         TextView textViewDate;
-
+        Button details;
         //the values of these variables will change with each call of bindViewHolder()
         Event event;
         int position;
@@ -95,7 +96,8 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
             super(itemView);
             this.textViewEventID = itemView.findViewById(R.id.text_view_event_ID);
             this.textViewDate = itemView.findViewById(R.id.text_view_event_date);
-            itemView.setOnClickListener(this);
+            this.details=itemView.findViewById(R.id.details);
+            details.setOnClickListener(this);
         }
 
         public void bindData(Event event, int position) {

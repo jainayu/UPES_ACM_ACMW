@@ -6,36 +6,89 @@
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="7dp"
     card_view:cardElevation="4dp"
+    android:padding="5dp"
     card_view:cardUseCompatPadding="true">
-
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/text_view_event_date"
-            android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/acm_app_logo"/>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="TextView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/text_view_event_ID"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:padding="20dp"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/text_view_event_ID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="TextView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="OCT"
+
+                android:textStyle="bold"
+                android:textColor="#79bcf7"
+                />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="20"
+                    android:id="@+id/text_view_event_date"
+                    android:textSize="25sp"
+                    android:textColor="#000000"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SAT"
+                    android:textColor="#000"
+                    />
+            </LinearLayout>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="50dp"
+                android:background="#c2baba"
+                android:layout_gravity="center_vertical"
+                />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Event Name"
+                    android:id="@+id/text_view_event_ID"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="EventineTaglineTaglineTagline"
+                    />
+            </LinearLayout>
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:background="#3999f4"
+                android:textColor="#fff"
+                android:layout_weight="1"
+                android:padding="3dp"
+                android:id="@+id/details"
+                android:layout_gravity="center_vertical"
+                android:text="Details"/>
+        </LinearLayout>
+
+    </LinearLayout>
 </android.support.v7.widget.CardView>
