@@ -6,15 +6,12 @@
         android:id="@+id/action_posts"
         android:icon="@drawable/round_home_black_24dp"
         android:title="" />
-
-    <!--<item-->
-        <!--android:id="@+id/action_upcoming_events"-->
-        <!--android:icon="@drawable/ic_event_note_black_24dp"-->
-        <!--android:visible="false"/>-->
-
     <item
         android:id="@+id/action_upcoming_events"
-        android:title="Upcoming Events" />
+        android:title=""
+        android:icon="@drawable/ic_event_note_black_24dp"
+    />
+
     <item
         android:id="@+id/action_heirarchy"
         android:icon="@drawable/ic_supervisor_account_black_24dp"

@@ -35,6 +35,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.fragment.event.EventRegistration;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
@@ -352,6 +353,8 @@ public class HomeActivity extends AppCompatActivity implements
             return Config.HOME_PAGE_FRAGMENT_UID;
         if(fragment instanceof EventDetailFragment)
             return Config.EVENT_DETAIL_FRAGMENT_UID;
+        if(fragment instanceof EventRegistration)
+            return Config.EVENT_REGISTRATION_FRAGMENT_UID;
 
         return -1;
     }
@@ -364,6 +367,10 @@ public class HomeActivity extends AppCompatActivity implements
             return;
         }
         if(getCurrentFragmentUid(R.id.frame_layout) == EventDetailFragment.UID) {
+            getSupportFragmentManager().popBackStack();
+            return;
+        }
+        if(getCurrentFragmentUid(R.id.frame_layout) == EventRegistration.UID) {
             getSupportFragmentManager().popBackStack();
             return;
         }
@@ -937,7 +944,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     void setCurrentFragment(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.frame_layout,fragment);
+        ft.replace(R.id.frame_layout,fragment);
         ft.addToBackStack(null);
         ft.commit();
     }

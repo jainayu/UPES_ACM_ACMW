@@ -4,10 +4,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
+import org.upesacm.acmacmw.fragment.event.EventRegistration;
 import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
 import org.upesacm.acmacmw.model.Event;
 
-public class EventController implements EventsListFragment.FragmentInteractionListener {
+public class EventController implements EventsListFragment.FragmentInteractionListener,
+        EventDetailFragment.FragmentInteractionListener {
     private static EventController eventController;
 
     private HomeActivity homeActivity;
@@ -30,6 +32,15 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
         args.putParcelable(Event.PARCEL_KEY,event);
         fragment.setArguments(args);
 
+        homeActivity.setCurrentFragment(fragment);
+    }
+
+    @Override
+    public void onRegisterEvent(Event event) {
+        android.support.v4.app.Fragment fragment = new EventRegistration();
+        Bundle args = new Bundle();
+        args.putParcelable(Event.PARCEL_KEY,event);
+        fragment.setArguments(args);
         homeActivity.setCurrentFragment(fragment);
     }
 }

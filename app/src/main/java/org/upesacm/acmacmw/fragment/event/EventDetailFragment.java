@@ -8,11 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.EventController;
 import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Config;
 
@@ -23,7 +26,8 @@ public class EventDetailFragment extends Fragment {
     private static final String TAG = "EventDetailsFragment";
     public static final long UID = Config.EVENT_DETAIL_FRAGMENT_UID;
     HomeActivity callback;
-
+    FragmentInteractionListener fragmentInteractionListener;
+    Button buttonEventDetailRegister;
     Event event;
     TextView textViewId;
     TextView textViewDate;
@@ -35,6 +39,8 @@ public class EventDetailFragment extends Fragment {
     public void onAttach(Context context) {
         if(context instanceof HomeActivity) {
             callback = (HomeActivity)context;
+            fragmentInteractionListener = (FragmentInteractionListener) callback.getEventController();
+
             super.onAttach(context);
         }
         else {
@@ -60,7 +66,13 @@ public class EventDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_event_detail, container, false);
         textViewId = view.findViewById(R.id.text_view_event_detail_id);
         textViewDate = view.findViewById(R.id.text_view_event_detail_date);
-
+        buttonEventDetailRegister=view.findViewById(R.id.button_event_detail_register);
+        buttonEventDetailRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            fragmentInteractionListener.onRegisterEvent(event);
+            }
+        });
         updateUI();
         return view;
     }
@@ -78,5 +90,8 @@ public class EventDetailFragment extends Fragment {
 
             callback.setActionBarTitle(event.getEventName());
         }
+    }
+    public interface FragmentInteractionListener {
+        public void onRegisterEvent(Event event);
     }
 }

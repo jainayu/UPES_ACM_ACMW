@@ -94,6 +94,7 @@ public class EventsListFragment extends Fragment implements
                     events.add(event);
                     System.out.println("event : "+event.getEventDate());
                 }
+                if(adapter!=null)
                 adapter.setEventsList(events);
 
                 progressBar.setVisibility(View.GONE);
@@ -110,8 +111,7 @@ public class EventsListFragment extends Fragment implements
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        recyclerView.setAdapter(null);
-        adapter = null;
+        listener=null;
     }
 
     @Override
