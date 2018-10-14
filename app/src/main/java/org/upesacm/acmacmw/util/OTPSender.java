@@ -1,8 +1,10 @@
 package org.upesacm.acmacmw.util;
 
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.upesacm.acmacmw.util.mail.GMailSender;
 
@@ -17,8 +19,6 @@ public class OTPSender extends AsyncTask<String, Void, String> {
     private String recipientMail;
     private final static String ACM_EMAIL = "appdev.upesacmacmw@gmail.com";               //ACM's gmail address
     private final static String ACM_PASSWORD = "appdev2018-2019";                      //ACM's gmsil sccount'd password
-
-
     @Override
     protected String doInBackground(String... params) {
         mailBody=params[0];
@@ -62,6 +62,8 @@ public class OTPSender extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         Log.e("OTPSender",result+"");
+
+
     }
 
 }

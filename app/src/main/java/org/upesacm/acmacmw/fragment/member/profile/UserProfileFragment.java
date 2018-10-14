@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.model.Member;
 
@@ -91,9 +93,10 @@ public class UserProfileFragment extends Fragment implements
 
         fabEdit = view.findViewById(R.id.fab_profile_edit);
         fabLogout = view.findViewById(R.id.fab_profile_logout);
-
-
-
+        if(member.getProfilePicture()!=null)
+        {
+            Glide.with(getContext()).load(member.getProfilePicture()).into(imageViewProfilePic);
+        }
         textViewName.setText(member.getName());
         textViewYear.setText(member.getYear());
         textViewBranch.setText(member.getBranch());

@@ -1,20 +1,31 @@
 package org.upesacm.acmacmw.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +47,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.EventRegistration;
+import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
+import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
+import org.upesacm.acmacmw.model.Post;
+import org.upesacm.acmacmw.retrofit.ApiClient;
+import org.upesacm.acmacmw.retrofit.ResponseModel;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
@@ -61,10 +77,18 @@ import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.util.Config;
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
+import org.upesacm.acmacmw.util.UploadService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -86,6 +110,7 @@ public class HomeActivity extends AppCompatActivity implements
     private static final int STATE_MEMBER_SIGNED_IN=1;
     private static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
     private static final int STATE_DEFAULT=3;
+    private static final int CHOOSE_PROFILE_PICTURE = 4;
 
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -243,6 +268,7 @@ public class HomeActivity extends AppCompatActivity implements
             LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
             loginDialogFragment.show(getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));
             drawerLayout.closeDrawer(GravityCompat.START);
+
         }
         else if(view.getId() == R.id.text_view_trial_signout) {
             AlertDialog alertDialog=new AlertDialog.Builder(this)
@@ -269,7 +295,112 @@ public class HomeActivity extends AppCompatActivity implements
 
         }
     }
+Bitmap imageBitmap;
+    private File destination;
+    byte[] byteArray;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CHOOSE_PROFILE_PICTURE && resultCode == RESULT_OK && resultCode!=RESULT_CANCELED) {
+            System.out.println("choose from gallery");
+            Uri uri = data.getData();
+            try {
+                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                int nh = (int) ( imageBitmap.getHeight() * (1024.0 / imageBitmap.getWidth()) );
+                Bitmap scaled = Bitmap.createScaledBitmap(imageBitmap, 1024, nh, true);
+                scaled.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                 byteArray = stream.toByteArray();
+                new AsyncTask<byte[], Void, File>() {
+                    @Override
+                    protected File doInBackground(byte[]... bytes) {
+                        try {
+                            destination = new File(Environment.getExternalStorageDirectory(),
+                                    System.currentTimeMillis() + ".jpg");
+                            destination.createNewFile();
+                            FileOutputStream fo = new FileOutputStream(destination);
+                            fo.write(byteArray);
+                            fo.close();
+                            return destination;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
 
+                    @Override
+                    protected void onPostExecute(File file) {
+                        super.onPostExecute(file);
+                        uploadToServer(destination);
+                    }
+                }.execute(byteArray);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private void uploadToServer(File destination) {
+        UploadService.ProgressRequestBody fileBody = new UploadService.ProgressRequestBody(destination, new UploadService.ProgressRequestBody.UploadCallbacks() {
+            @Override
+            public void onProgressUpdate(int percentage) {
+            }
+
+            @Override
+            public void onError() {
+                }
+
+            @Override
+            public void onFinish() {
+
+            }
+        });
+
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("image", destination.getName(), fileBody);
+        RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
+// Change base URL to your upload server URL.
+        final MembershipClient membershipClient = ApiClient.getClient().create(MembershipClient.class);
+        membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
+            @Override
+            public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+                Log.d("Tag", "code" + response.code() + "");
+                if (response.code()==200) {
+                    String uri = response.body().getUrl();
+                    if (uri != null) {
+                        System.out.println("image url is : " + uri);
+                        System.out.println("create the post object here");
+                        if(signedInMember!=null)
+                        {
+                            final Member member=new Member.Builder().setProfilePicture(uri).buildFrom(signedInMember);
+                            MembershipClient membershipClient1=retrofit.create(MembershipClient.class);
+                            membershipClient1.createMember(member.getSap(),member).enqueue(new Callback<Member>() {
+                                @Override
+                                public void onResponse(Call<Member> call, Response<Member> response) {
+                                    if(response.code()==200)
+                                    {
+                                        Glide.with(getBaseContext()).load(member.getProfilePicture()).into(imageButtonProfile);
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<Member> call, Throwable t) {
+
+                                }
+                            });
+
+                        }
+                    } else {
+                        System.out.println("failed to get the download uri");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseModel> call, Throwable t) {
+                t.printStackTrace();
+                System.out.println("failed to get the download uri");
+            }
+        });
+    }
     public void setDrawerEnabled(boolean enable) {
         int lockMode=enable? DrawerLayout.LOCK_MODE_UNLOCKED: DrawerLayout.
                 LOCK_MODE_LOCKED_CLOSED;
@@ -404,7 +535,8 @@ public class HomeActivity extends AppCompatActivity implements
         setDrawerEnabled(true);
         navigationView.setCheckedItem(R.id.action_home);
     }
-
+    ImageButton imageButtonProfile;
+    public static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 10;
     @SuppressLint("CheckResult")
     void customizeNavigationDrawer(int state) {
         navigationView.removeHeaderView(headerLayout);
@@ -414,7 +546,30 @@ public class HomeActivity extends AppCompatActivity implements
         if(state == STATE_MEMBER_SIGNED_IN) {
             headerLayout = navigationView.inflateHeaderView(R.layout.signed_in_header);
             /* *********************************Setting the new header components**************************/
-            ImageButton imageButtonProfile=headerLayout.findViewById(R.id.image_button_profile_pic);
+             imageButtonProfile=headerLayout.findViewById(R.id.image_button_profile_pic);
+            if(signedInMember.getProfilePicture()!=null)
+            {
+                Glide.with(getBaseContext()).load(signedInMember.getProfilePicture()).into(imageButtonProfile);
+            }
+            imageButtonProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!(ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
+                            && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)) {
+                        System.out.println("Permission for camera or storage not granted. Requesting Permission");
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE);
+                        }
+                        return;
+                    }
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_PROFILE_PICTURE);
+
+                }
+            });
 
             TextView textViewUsername = headerLayout.findViewById(R.id.text_view_username);
             textViewUsername.setText(signedInMember.getName());
@@ -774,5 +929,48 @@ public class HomeActivity extends AppCompatActivity implements
 
     public MemberController getMemberController() {
         return MemberController.getInstance(this);
+    }
+    Member member;
+    @Override
+    public Member getMember(String sapid) {
+        Call<Member> memberCall=membershipClient.getMember(sapid);
+        memberCall.enqueue(new Callback<Member>() {
+            @Override
+            public void onResponse(Call<Member> call, Response<Member> response) {
+                 member=response.body();
+                String msg="";
+                if(member!=null) {
+                }
+                else {
+                    msg="Incorrect Username or password";
+                }
+                Toast.makeText(getBaseContext(),msg,Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<Member> call, Throwable t) {
+
+            }
+        });
+        return member;
+    }
+
+    @Override
+    public void changePassword(Member member) {
+        membershipClient.createMember(member.getSap(),member).enqueue(new Callback<Member>() {
+            @Override
+            public void onResponse(Call<Member> call, Response<Member> response) {
+                if(response.code()==200)
+                {
+                    Toast.makeText(getBaseContext(), "Password changed successfully", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Member> call, Throwable t) {
+                Toast.makeText(getBaseContext(), "Failed changing passsword", Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 }

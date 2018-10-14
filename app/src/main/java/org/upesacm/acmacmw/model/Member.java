@@ -20,6 +20,8 @@ public class Member implements Parcelable{
     private Boolean premium;
     private String membershipType;
 
+    private String profilePicture;
+
     Member() {}
 
     protected Member(Parcel in) {
@@ -36,6 +38,7 @@ public class Member implements Parcelable{
         dob = in.readString();
         currentAdd = in.readString();
         recepientSap = in.readString();
+        profilePicture=in.readString();
         boolean array[]=new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
@@ -53,6 +56,10 @@ public class Member implements Parcelable{
             return new Member[size];
         }
     };
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
 
     public String getBranch() {
         return branch;
@@ -128,6 +135,7 @@ public class Member implements Parcelable{
         parcel.writeString(dob);
         parcel.writeString(currentAdd);
         parcel.writeString(recepientSap);
+        parcel.writeString(profilePicture);
         parcel.writeBooleanArray(new boolean[]{premium});
     }
 
@@ -147,6 +155,10 @@ public class Member implements Parcelable{
         private Boolean premium;
         private String membershipType;
 
+
+
+        private String profilePicture;
+
         public Member build() {
             Member member=new Member();
             member.memberId=memberId;
@@ -163,6 +175,7 @@ public class Member implements Parcelable{
             member.recepientSap = recepientSap;
             member.premium = premium;
             member.membershipType = membershipType;
+            member.profilePicture=profilePicture;
             return member;
         }
 
@@ -182,10 +195,14 @@ public class Member implements Parcelable{
             memberCopy.recepientSap =member.recepientSap;
             memberCopy.premium =member.premium;
             memberCopy.membershipType =  member.membershipType;
+            memberCopy.profilePicture=profilePicture;
 
             return memberCopy;
         }
-
+        public Builder setProfilePicture(String profilePicture) {
+            this.profilePicture = profilePicture;
+            return this;
+        }
         public Builder setmemberId(String memberId) {
             this.memberId=memberId;
             return this;

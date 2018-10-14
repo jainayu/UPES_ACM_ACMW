@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
 import org.upesacm.acmacmw.fragment.member.registration.OTPVerificationFragment;
@@ -19,10 +20,14 @@ import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 import org.upesacm.acmacmw.util.OTPSender;
+import org.upesacm.acmacmw.retrofit.ApiClient;
+import org.upesacm.acmacmw.retrofit.MembershipClient;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class MemberController implements
         LoginDialogFragment.InteractionListener,

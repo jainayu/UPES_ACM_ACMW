@@ -14,7 +14,7 @@
         android:layout_marginTop="32dp"
         android:padding="10dp"
 
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         android:background="@drawable/round_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

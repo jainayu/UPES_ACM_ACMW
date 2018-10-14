@@ -20,7 +20,8 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     Button buttonLogin;
     Button buttonCancel;
     Button buttonSignup;
-    Button buttonGuestSignUp;
+    Button buttonGuestSignUp;TextView forgotPassword;
+
     
     private String username,password;
     InteractionListener interactionListener;
@@ -52,7 +53,14 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
         buttonCancel=view.findViewById(R.id.button_cancel);
         buttonSignup=view.findViewById(R.id.button_signup);
         buttonGuestSignUp=view.findViewById(R.id.button_guest_sign_up);
-
+        forgotPassword=view.findViewById(R.id.forgot);
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ForgotPasswordFragment forgotPasswordFragment=new ForgotPasswordFragment();
+                forgotPasswordFragment.show(getActivity().getSupportFragmentManager(),"Fogot password dialog fragment");
+            }
+        });
         TextView logincred =view.findViewById(R.id.text_view_login_credentials);
         Typeface type = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
         logincred.setTypeface(type);
