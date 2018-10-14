@@ -154,10 +154,29 @@ public class Member implements Parcelable{
         private String recepientSap;
         private Boolean premium;
         private String membershipType;
-
-
-
         private String profilePicture;
+
+        public Builder() {
+            //default constructor
+        }
+
+        public Builder(Member member) {
+            this.memberId = member.getMemberId();
+            this.name = member.getName();
+            this.password = member.getPassword();
+            this.sap = member.getSap();
+            this.branch = member.getBranch();
+            this.year = member.getYear();
+            this.email = member.getEmail();
+            this.contact = member.getContact();
+            this.whatsappNo = member.getWhatsappNo();
+            this.dob = member.getDob();
+            this.currentAdd = member.getCurrentAdd();
+            this.recepientSap = member.getRecepientSap();
+            this.premium = member.isPremium();
+            this.membershipType = member.getMembershipType();
+            this.profilePicture = member.getProfilePicture();
+        }
 
         public Member build() {
             Member member=new Member();
@@ -179,26 +198,7 @@ public class Member implements Parcelable{
             return member;
         }
 
-        public Member buildFrom(Member member) {
-            Member memberCopy = new Member();
-            memberCopy.memberId=member.memberId;
-            memberCopy.name=member.name;
-            memberCopy.password=member.password;
-            memberCopy.sap=member.sap;
-            memberCopy.branch=member.branch;
-            memberCopy.year=member.year;
-            memberCopy.email=member.email;
-            memberCopy.contact=member.contact;
-            memberCopy.whatsappNo=member.whatsappNo;
-            memberCopy.dob=member.dob;
-            memberCopy.currentAdd=member.currentAdd;
-            memberCopy.recepientSap =member.recepientSap;
-            memberCopy.premium =member.premium;
-            memberCopy.membershipType =  member.membershipType;
-            memberCopy.profilePicture=profilePicture;
 
-            return memberCopy;
-        }
         public Builder setProfilePicture(String profilePicture) {
             this.profilePicture = profilePicture;
             return this;

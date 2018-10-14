@@ -74,14 +74,8 @@ public class EditProfileFragment extends Fragment
     @Override
     public void onAttach(Context context) {
         if(context instanceof HomeActivity) {
-            if (context instanceof FragmentInteractionListener) {
-                callback = (HomeActivity)context;
-                listener = (FragmentInteractionListener) context;
-                super.onAttach(context);
-            } else {
-                throw new IllegalStateException(context.toString() + " must implement" +
-                        "FragmentInteraction Listener");
-            }
+            callback = (HomeActivity)context;
+            listener = callback.getUserController();
         }
         else {
             throw new IllegalStateException("context must be HomeActivity");

@@ -39,17 +39,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.EventRegistration;
-import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
-import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
-import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.retrofit.ApiClient;
 import org.upesacm.acmacmw.retrofit.ResponseModel;
 import org.upesacm.acmacmw.util.OTPSender;
@@ -57,26 +50,20 @@ import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AlumniFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
-import org.upesacm.acmacmw.fragment.member.trial.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.HomePageFragment;
-import org.upesacm.acmacmw.fragment.homepage.post.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
-import org.upesacm.acmacmw.fragment.member.registration.OTPVerificationFragment;
 import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.member.registration.RecipientsFragment;
 import org.upesacm.acmacmw.fragment.member.trial.TrialMemberOTPVerificationFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
-import org.upesacm.acmacmw.model.EmailMsg;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.util.Config;
-import org.upesacm.acmacmw.util.MemberIDGenerator;
-import org.upesacm.acmacmw.util.RandomOTPGenerator;
 import org.upesacm.acmacmw.util.UploadService;
 
 import java.io.ByteArrayOutputStream;
@@ -84,7 +71,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -97,20 +83,14 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class HomeActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        MemberRegistrationFragment.RegistrationResultListener,
-        View.OnClickListener,
-        UserProfileFragment.FragmentInteractionListener,
-        EditProfileFragment.FragmentInteractionListener,
-        PasswordChangeDialogFragment.PasswordChangeListener,
-        GoogleSignInFragment.GoogleSignInListener,
-        TrialMemberOTPVerificationFragment.TrialOTPVerificationListener {
+        View.OnClickListener {
 
     private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
-    private static final int MEMBER_PROFILE_MENU_ID = 1;
-    private static final int STATE_MEMBER_SIGNED_IN=1;
-    private static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
-    private static final int STATE_DEFAULT=3;
-    private static final int CHOOSE_PROFILE_PICTURE = 4;
+    protected static final int MEMBER_PROFILE_MENU_ID = 1;
+    protected static final int STATE_MEMBER_SIGNED_IN=1;
+    protected static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
+    protected static final int STATE_DEFAULT=3;
+    protected static final int CHOOSE_PROFILE_PICTURE = 4;
 
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -127,7 +107,7 @@ public class HomeActivity extends AppCompatActivity implements
     protected String newMemberSap;
 
     private FirebaseDatabase database;
-    private ArrayList<HomeActivityStateChangeListener> stateChangeListeners;
+    protected ArrayList<HomeActivityStateChangeListener> stateChangeListeners;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,7 +181,7 @@ public class HomeActivity extends AppCompatActivity implements
                     });
         }
         else if(account!=null) {
-            signOutFromGoogle();
+            getUserController().signOutFromGoogle();
         }
         System.out.println("signedInMember : "+signedInMember);
 
@@ -280,7 +260,7 @@ public class HomeActivity extends AppCompatActivity implements
                                     Context.MODE_PRIVATE).edit();
                             editor.remove(getString(R.string.trial_member_sap));
                             editor.commit();
-                            signOutFromGoogle();
+                            getUserController().signOutFromGoogle();
                             drawerLayout.closeDrawer(GravityCompat.START);
                             customizeNavigationDrawer(STATE_DEFAULT);
                         }
@@ -295,6 +275,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         }
     }
+
 Bitmap imageBitmap;
     private File destination;
     byte[] byteArray;
@@ -338,6 +319,7 @@ Bitmap imageBitmap;
             }
         }
     }
+
     private void uploadToServer(File destination) {
         UploadService.ProgressRequestBody fileBody = new UploadService.ProgressRequestBody(destination, new UploadService.ProgressRequestBody.UploadCallbacks() {
             @Override
@@ -369,7 +351,9 @@ Bitmap imageBitmap;
                         System.out.println("create the post object here");
                         if(signedInMember!=null)
                         {
-                            final Member member=new Member.Builder().setProfilePicture(uri).buildFrom(signedInMember);
+                            final Member member=new Member.Builder(signedInMember)
+                                    .setProfilePicture(uri)
+                                    .build();
                             MembershipClient membershipClient1=retrofit.create(MembershipClient.class);
                             membershipClient1.createMember(member.getSap(),member).enqueue(new Callback<Member>() {
                                 @Override
@@ -429,7 +413,7 @@ Bitmap imageBitmap;
         this.trialMember=null;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account!=null) {
-            signOutFromGoogle();
+            getUserController().signOutFromGoogle();
         }
         /* *************************************************************************************/
         this.signedInMember=member;
@@ -535,6 +519,7 @@ Bitmap imageBitmap;
         setDrawerEnabled(true);
         navigationView.setCheckedItem(R.id.action_home);
     }
+
     ImageButton imageButtonProfile;
     public static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 10;
     @SuppressLint("CheckResult")
@@ -622,33 +607,7 @@ Bitmap imageBitmap;
         stateChangeListeners.remove(listener);
     }
 
-    void signOutFromGoogle() {
-        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,signInOptions);
-        signInClient.signOut()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(HomeActivity.this,"Signed out from guest user",Toast.LENGTH_SHORT)
-                                .show();
-                        HomeActivity.this.trialMember=null;
-                        for(HomeActivityStateChangeListener listener:stateChangeListeners) {
-                            System.out.println("calling state change listeners onGoogleSignout");
-                            listener.onGoogleSignOut();
-                        }
-                        System.out.println("Successfully signed out from guest user");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                        System.out.println("failed to sign out from google");
-                    }
-                });
-    }
+
 
     public HomePageClient getHomePageClient() {
         return homePageClient;
@@ -663,21 +622,6 @@ Bitmap imageBitmap;
     public Toolbar getToolbar() {return toolbar;}
 
 
-    /* ********************** Callback from MemberRegistrationFragment ************************ */
-    @Override
-    public void onRegistrationDataAvailable(final int statusCode,final NewMember newMember) {
-        if(statusCode == getResources().getInteger(R.integer.verify_new_member)) {
-            RecipientsFragment fragment = RecipientsFragment.newInstance(newMember);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, fragment, getString(R.string.fragment_tag_recipients))
-                    .commit();
-        }
-        else {
-            getMemberController().startOTPVerificationPage(statusCode,newMember);
-        }
-
-    }
-    /* ******************************************************************************************/
 
 
 
@@ -687,224 +631,21 @@ Bitmap imageBitmap;
 
 
 
-    /* %%%%%%%%%%%%%%%%%%%%%%%%%%Callback from UserProfileFragment %%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-    @Override
-    public void onSignOutClicked(final UserProfileFragment userProfileFragment) {
-        System.out.println("onSignOutclicked called");
-
-        AlertDialog alertDialog=new AlertDialog.Builder(this)
-                .setMessage(getString(R.string.logout_confirmation))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        /* ******************* Clear the member data from the app ***********************/
-                        signedInMember=null;
-                        SharedPreferences.Editor editor=getSharedPreferences(getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE).edit();
-                        editor.clear();
-                        editor.commit();
-                        /* **************************************************************************/
-
-                        customizeNavigationDrawer(HomeActivity.STATE_DEFAULT);
-                        displayHomePage();
-                        for(HomeActivityStateChangeListener listener:stateChangeListeners) {
-                            System.out.println("calling statechange listener callbacks logout");
-                            listener.onMemberLogout();
-                        }
-                        Toast.makeText(HomeActivity.this,"Successfully Logged Out",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        System.out.println("user canceled the logout action");
-                    }
-                })
-                .create();
-        alertDialog.show();
-    }
-
-    @Override
-    public void onEditClicked(UserProfileFragment fragment) {
-        System.out.println("on edit clicked");
-        getSupportFragmentManager().beginTransaction()
-                .remove(fragment)
-                .commit();
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame_layout, EditProfileFragment.newInstance(signedInMember),
-                getString(R.string.fragment_tag_edit_profile));
-        ft.commit();
-    }
-    /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
 
 
 
-    /* &&&&&&&&&&&&&&&&&&&&&&&Callback from EditProfileFragment&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-    @Override
-    public void onDataEditResult(EditProfileFragment fragment, int resultCode, Member member) {
-        String msg="";
-        switch (resultCode) {
-            case EditProfileFragment.SUCESSFULLY_SAVED_NEW_DATA : {
-                msg="Saved";
-                signedInMember = member;
-                setUpMemberProfile(member);
-                break;
-            }
-
-            case EditProfileFragment.FAILED_TO_SAVE_NEW_DATA : {
-                msg="Some error occured. please Try again later";
-                break;
-            }
-
-            case EditProfileFragment.ACTION_CANCELLED_BY_USER : {
-                msg="Cancelled";
-            }
-
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, UserProfileFragment.newInstance(signedInMember),
-                        getString(R.string.fragment_tag_user_profile))
-                .commit();
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
-        //displayHomePage();
-    }
-    /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 
 
-    @Override
-    public void onPasswordChange(PasswordChangeDialogFragment fragment, int resultCode) {
-        String msg;
-        if(resultCode== PasswordChangeDialogFragment.PASSWORD_SUCCESSSFULLY_CHANGED) {
-            Member modifiedMember = new Member.Builder()
-                    .setSAPId(signedInMember.getSap())
-                    .setPassword(fragment.getNewPass())
-                    .setYear(signedInMember.getYear())
-                    .setBranch(signedInMember.getBranch())
-                    .setName(signedInMember.getName())
-                    .setContact(signedInMember.getContact())
-                    .setmemberId(signedInMember.getMemberId())
-                    .setCurrentAdd(signedInMember.getCurrentAdd())
-                    .setDob(signedInMember.getDob())
-                    .setEmail(signedInMember.getEmail())
-                    .setMembershipType(signedInMember.getMembershipType())
-                    .setWhatsappNo(signedInMember.getWhatsappNo())
-                    .setPremium(signedInMember.isPremium())
-                    .setRecipientSap(signedInMember.getRecepientSap())
-                    .build();
-            signedInMember = modifiedMember;
-            msg="Password Successfully Changed";
-        }
-        else if(resultCode == PasswordChangeDialogFragment.INCORRECT_OLD_PASSWORD) {
-            msg="Incorrect Old Password";
-        }
-        else if(resultCode == PasswordChangeDialogFragment.ACTION_CANCELLED_BY_USER)
-            msg="cancelled";
-        else if(resultCode == PasswordChangeDialogFragment.PASSWORD_CHANGE_FAILED)
-            msg="Some error occured while changing password";
-        else
-            msg="unexpected resultcode";
-
-        Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
-    }
 
 
-    @Override
-    public void onGoogleSignIn(final String sap,GoogleSignInAccount account) {
-        if(account!=null) {
-            final TrialMember newTrialMember = new TrialMember.Builder(String.valueOf(Calendar.getInstance().getTimeInMillis()))
-                    .setEmail(account.getEmail())
-                    .setName(account.getDisplayName())
-                    .setSap(sap)
-                    .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap),6))
-                    .build();
-            homePageClient.getTrialMember(sap)
-                    .enqueue(new Callback<TrialMember>() {
-                        @Override
-                        public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
-                            final TrialMember trialMember;
-                            if(!(response.body()==null)) {
-                                trialMember = new TrialMember.Builder(response.body().getCreationTimeStamp())
-                                        .setEmail(newTrialMember.getEmail())
-                                        .setName(newTrialMember.getName())
-                                        .setSap(newTrialMember.getSap())
-                                        .setOtp(newTrialMember.getOtp())
-                                        .build();
-                            }
-                            else {
-                                trialMember = newTrialMember;
-                            }
-                                homePageClient.createTrialMember(sap,trialMember)
-                                        .enqueue(new Callback<TrialMember>() {
-                                            @Override
-                                            public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
-                                                System.out.println("createTrialMember response : "+response.message());
-                                                String mailBody = getString(R.string.guest_user_sign_in_msg_header)+"\n\n"+
-                                                        getString(R.string.guest_user_sign_in_msg_body)+" "+trialMember.getOtp();
-                                                OTPSender sender=new OTPSender();
-                                                sender.execute(mailBody,trialMember.getSap()+"@"+getString(R.string.upes_domain),"ACM");
 
-                                                TrialMemberOTPVerificationFragment fragment = TrialMemberOTPVerificationFragment
-                                                        .newInstance(trialMember);
-                                                getSupportFragmentManager().beginTransaction()
-                                                        .replace(R.id.frame_layout,fragment,
-                                                                getString(R.string.fragment_tag_trial_otp_verification))
-                                                        .commit();
 
-                                                HomeActivity.this.getSupportActionBar().show();
-                                                HomeActivity.this.setDrawerEnabled(true);
-                                            }
 
-                                            @Override
-                                            public void onFailure(Call<TrialMember> call, Throwable t) {
-                                                t.printStackTrace();
-                                                Toast.makeText(HomeActivity.this, "unable to create trial member", Toast.LENGTH_LONG).show();
-                                            }
-                                        });
 
-                        }
 
-                        @Override
-                        public void onFailure(Call<TrialMember> call, Throwable t) {
-                            Toast.makeText(HomeActivity.this, "unable to verify trial member Please try again", Toast.LENGTH_LONG).show();
-                        }
-                    });
 
-        }
-        else {
-            Toast.makeText(this, "unable to sign in", Toast.LENGTH_LONG).show();
-        }
-    }
 
-    @Override
-    public void onTrialOTPVerificationResult(TrialMember trialMember, int code) {
-        if(code == TrialMemberOTPVerificationFragment.SUCCESSFUL_VERIFICATION) {
-            SharedPreferences.Editor editor=getSharedPreferences(getString(R.string.preference_file_key),
-                    Context.MODE_PRIVATE).edit();
-            editor.putString(getString(R.string.trial_member_sap),trialMember.getSap());
-            editor.commit();
-
-            HomeActivity.this.trialMember=trialMember;
-            DatabaseReference trialMemberReference = database.getReference("postsTrialLogin/" +
-                    trialMember.getSap());
-            trialMemberReference.setValue(trialMember);
-
-            System.out.println("inside home activity onTrialMemberStateChange"+trialMember);
-            System.out.println(trialMember.getName()+trialMember.getEmail());
-            for(HomeActivityStateChangeListener listener:stateChangeListeners) {
-                System.out.println(trialMember);
-                listener.onTrialMemberStateChange(trialMember);
-            }
-            customizeNavigationDrawer(HomeActivity.STATE_TRIAL_MEMBER_SIGNED_IN);
-            Toast.makeText(HomeActivity.this, "trial member created", Toast.LENGTH_LONG).show();
-            onBackPressed();
-        }
-        else {
-            Toast.makeText(this,"Maximum tries exceeded",Toast.LENGTH_LONG);
-        }
-    }
 
     public void sendIDCard(String recipientEmail,String subject,String mailBody) {
         OTPSender sender=new OTPSender();
@@ -927,11 +668,11 @@ Bitmap imageBitmap;
         return PostController.getInstance(this);
     }
 
-    public MemberController getMemberController() {
-        return MemberController.getInstance(this);
+    public UserController getUserController() {
+        return UserController.getInstance(this);
     }
     Member member;
-    @Override
+
     public Member getMember(String sapid) {
         Call<Member> memberCall=membershipClient.getMember(sapid);
         memberCall.enqueue(new Callback<Member>() {
@@ -955,7 +696,6 @@ Bitmap imageBitmap;
         return member;
     }
 
-    @Override
     public void changePassword(Member member) {
         membershipClient.createMember(member.getSap(),member).enqueue(new Callback<Member>() {
             @Override

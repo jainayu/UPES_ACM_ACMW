@@ -80,7 +80,7 @@ public class OTPVerificationFragment extends Fragment implements
         if (context instanceof HomeActivity) {
             super.onAttach(context);
             callback = (HomeActivity)context;
-            resultListener = callback.getMemberController();
+            resultListener = callback.getUserController();
         }
         else {
             throw new IllegalStateException("context must be instance of HomeActivity");

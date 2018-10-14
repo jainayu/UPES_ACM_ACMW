@@ -2,7 +2,6 @@ package org.upesacm.acmacmw.fragment.member.registration;
 
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -69,7 +68,7 @@ public class RecipientsFragment extends Fragment implements
         if(context instanceof HomeActivity) {
             super.onAttach(context);
             callback = (HomeActivity)context;
-            listener = callback.getMemberController();
+            listener = callback.getUserController();
         }
         else {
             throw new IllegalStateException("context must be instance of HomeActivity");

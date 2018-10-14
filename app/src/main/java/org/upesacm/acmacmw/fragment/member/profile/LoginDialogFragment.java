@@ -35,7 +35,7 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     public void onAttach(Context context) {
         if(context instanceof HomeActivity) {
             homeActivity = (HomeActivity)context;
-            interactionListener = (InteractionListener)homeActivity.getMemberController();
+            interactionListener = (InteractionListener)homeActivity.getUserController();
             super.onAttach(context);
         }
 

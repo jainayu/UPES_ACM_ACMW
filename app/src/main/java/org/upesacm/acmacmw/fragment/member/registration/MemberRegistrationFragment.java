@@ -57,14 +57,9 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
     @Override
     public void onAttach(Context context) {
         if(context instanceof HomeActivity) {
+            super.onAttach(context);
             callback = (HomeActivity)context;
-            if(context instanceof RegistrationResultListener) {
-                resultListener=(RegistrationResultListener)context;
-                super.onAttach(context);
-            }
-            else
-                throw new IllegalStateException(context.toString()+" must implement " +
-                        "RegistrationCompleteListener");
+            resultListener = callback.getUserController();
         }
         else {
             throw new IllegalStateException("context must be instance of HomeActivity");

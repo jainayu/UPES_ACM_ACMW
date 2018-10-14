@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 
@@ -43,6 +44,7 @@ public class PasswordChangeDialogFragment extends DialogFragment
     Button buttonSave;
 
     PasswordChangeListener changeListener;
+    HomeActivity homeActivity;
     String newpass;
     public PasswordChangeDialogFragment() {
         // Required empty public constructor
@@ -60,9 +62,10 @@ public class PasswordChangeDialogFragment extends DialogFragment
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof PasswordChangeListener) {
-            changeListener = (PasswordChangeListener)context;
+        if(context instanceof HomeActivity) {
             super.onAttach(context);
+            homeActivity = (HomeActivity)context;
+            changeListener = homeActivity.getUserController();
         }
         else
             throw new IllegalStateException(context.toString()+" must implement" +

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 
 /**
@@ -23,6 +24,7 @@ public class UserProfileFragment extends Fragment implements
         View.OnClickListener{
 
     FragmentInteractionListener listener;
+    HomeActivity homeActivity;
 
     ImageView imageViewProfilePic;
     TextView textViewName;
@@ -58,9 +60,10 @@ public class UserProfileFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof FragmentInteractionListener) {
-            listener=(FragmentInteractionListener)context;
+        if(context instanceof HomeActivity) {
             super.onAttach(context);
+            homeActivity = (HomeActivity)context;
+            listener = homeActivity.getUserController();
         }
         else
             throw new IllegalStateException(context.toString()+" must implement" +

@@ -149,8 +149,28 @@ public class NewMember implements Parcelable{
         String currentAddress;
         String membershipType;
 
+        public Builder() {
+            //default
+        }
+
+        public Builder(NewMember newMember) {
+            this.fullName = newMember.getFullName();
+            this.branch = newMember.getBranch();
+            this.year = newMember.getYear();
+            this.email = newMember.getEmail();
+            this.sapId = newMember.getSapId();
+            this.phoneNo = newMember.getPhoneNo();
+            this.whatsappNo = newMember.getWhatsappNo();
+            this.otp = newMember.getOtp();
+            this.recipientSap = newMember.getRecipientSap();
+            this.premium = newMember.isPremium();
+            this.dob = newMember.getDob();
+            this.currentAddress = newMember.getCurrentAddress();
+            this.membershipType = newMember.getMembershipType();
+        }
         public NewMember build() {
             NewMember newMember=new NewMember();
+
             newMember.fullName=this.fullName;
             newMember.branch=this.branch;
             newMember.year=this.year;
@@ -164,24 +184,6 @@ public class NewMember implements Parcelable{
             newMember.dob = this.dob;
             newMember.currentAddress = this.currentAddress;
             newMember.membershipType = this.membershipType;
-            return newMember;
-        }
-
-        public NewMember buildFrom(NewMember newMember) {
-            NewMember newMemberCopy=new NewMember();
-            newMemberCopy.fullName = newMember.fullName;
-            newMemberCopy.branch = newMember.branch;
-            newMemberCopy.year = newMember.year;
-            newMemberCopy.email = newMember.email;
-            newMemberCopy.sapId = newMember.sapId;
-            newMemberCopy.phoneNo = newMember.phoneNo;
-            newMemberCopy.whatsappNo = newMember.whatsappNo;
-            newMemberCopy.premium = newMember.premium;
-            newMemberCopy.otp = newMember.otp;
-            newMemberCopy.recipientSap =  newMember.recipientSap;
-            newMemberCopy.dob =  newMember.dob;
-            newMemberCopy.currentAddress =  newMember.currentAddress;
-            newMemberCopy.membershipType = newMember.membershipType;
             return newMember;
         }
 

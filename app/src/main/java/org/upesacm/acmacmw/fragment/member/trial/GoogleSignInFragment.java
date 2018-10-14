@@ -22,6 +22,7 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.Task;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.HomeActivity;
 
 import java.util.regex.Pattern;
 
@@ -36,6 +37,7 @@ public class GoogleSignInFragment extends Fragment
     EditText editTextSap;
 
     GoogleSignInClient signInClient;
+    HomeActivity callback;
     String sap;
 
     private GoogleSignInListener listener;
@@ -45,8 +47,9 @@ public class GoogleSignInFragment extends Fragment
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof GoogleSignInListener) {
-            listener=(GoogleSignInListener)context;
+        if(context instanceof HomeActivity) {
+            callback = (HomeActivity)context;
+            listener = callback.getUserController();
             super.onAttach(context);
         }
         else
@@ -98,7 +101,9 @@ public class GoogleSignInFragment extends Fragment
         }
     }
 
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("on activity result : google sign in");
         if(requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> completedTask = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {

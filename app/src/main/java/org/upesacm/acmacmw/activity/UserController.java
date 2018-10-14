@@ -1,52 +1,73 @@
 package org.upesacm.acmacmw.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
+import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
+import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
+import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
 import org.upesacm.acmacmw.fragment.member.registration.OTPVerificationFragment;
 import org.upesacm.acmacmw.fragment.member.registration.RecipientsFragment;
 import org.upesacm.acmacmw.fragment.member.trial.GoogleSignInFragment;
+import org.upesacm.acmacmw.fragment.member.trial.TrialMemberOTPVerificationFragment;
+import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
 import org.upesacm.acmacmw.model.EmailMsg;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
+import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 import org.upesacm.acmacmw.util.OTPSender;
-import org.upesacm.acmacmw.retrofit.ApiClient;
-import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.RandomOTPGenerator;
+
+import java.util.Calendar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class MemberController implements
+public class UserController implements
         LoginDialogFragment.InteractionListener,
         RecipientsFragment.FragmentInteractionListener,
-        OTPVerificationFragment.OTPVerificationResultListener {
+        OTPVerificationFragment.OTPVerificationResultListener,
+        GoogleSignInFragment.GoogleSignInListener,
+        TrialMemberOTPVerificationFragment.TrialOTPVerificationListener,
+        UserProfileFragment.FragmentInteractionListener,
+        PasswordChangeDialogFragment.PasswordChangeListener,
+        EditProfileFragment.FragmentInteractionListener,
+        MemberRegistrationFragment.RegistrationResultListener {
     private HomeActivity homeActivity;
 
-    private static MemberController memberController;
-    private MemberController() {
+    private static UserController userController;
+    private UserController() {
 
     }
 
-    public static MemberController getInstance(@NonNull HomeActivity homeActivity) {
-        if(memberController == null) {
-            memberController = new MemberController();
-            memberController.homeActivity = homeActivity;
+    public static UserController getInstance(@NonNull HomeActivity homeActivity) {
+        if(userController == null) {
+            userController = new UserController();
+            userController.homeActivity = homeActivity;
         }
 
-        return memberController;
+        return userController;
     }
 
 
@@ -316,4 +337,252 @@ public class MemberController implements
     }
     /* ###########################################################################################*/
 
+    @Override
+    public void onGoogleSignIn(final String sap,GoogleSignInAccount account) {
+        if(account!=null) {
+            final TrialMember newTrialMember = new TrialMember.Builder(String.valueOf(Calendar.getInstance().getTimeInMillis()))
+                    .setEmail(account.getEmail())
+                    .setName(account.getDisplayName())
+                    .setSap(sap)
+                    .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap),6))
+                    .build();
+            homeActivity.getHomePageClient().getTrialMember(sap)
+                    .enqueue(new Callback<TrialMember>() {
+                        @Override
+                        public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
+                            final TrialMember trialMember;
+                            if(!(response.body()==null)) {
+                                trialMember = new TrialMember.Builder(response.body().getCreationTimeStamp())
+                                        .setEmail(newTrialMember.getEmail())
+                                        .setName(newTrialMember.getName())
+                                        .setSap(newTrialMember.getSap())
+                                        .setOtp(newTrialMember.getOtp())
+                                        .build();
+                            }
+                            else {
+                                trialMember = newTrialMember;
+                            }
+                            homeActivity.getHomePageClient().createTrialMember(sap,trialMember)
+                                    .enqueue(new Callback<TrialMember>() {
+                                        @Override
+                                        public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
+                                            System.out.println("createTrialMember response : "+response.message());
+                                            String mailBody = homeActivity.getString(R.string.guest_user_sign_in_msg_header)+"\n\n"+
+                                                    homeActivity.getString(R.string.guest_user_sign_in_msg_body)+" "+trialMember.getOtp();
+                                            OTPSender sender=new OTPSender();
+                                            sender.execute(mailBody,trialMember.getSap()+"@"+homeActivity.getString(R.string.upes_domain),"ACM");
+
+                                            TrialMemberOTPVerificationFragment fragment = TrialMemberOTPVerificationFragment
+                                                    .newInstance(trialMember);
+                                            homeActivity.getSupportFragmentManager().beginTransaction()
+                                                    .replace(R.id.frame_layout,fragment,
+                                                            homeActivity.getString(R.string.fragment_tag_trial_otp_verification))
+                                                    .commit();
+
+                                            homeActivity.getSupportActionBar().show();
+                                            homeActivity.setDrawerEnabled(true);
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<TrialMember> call, Throwable t) {
+                                            t.printStackTrace();
+                                            Toast.makeText(homeActivity, "unable to create trial member", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<TrialMember> call, Throwable t) {
+                            Toast.makeText(homeActivity, "unable to verify trial member Please try again", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+        }
+        else {
+            Toast.makeText(homeActivity, "unable to sign in", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void signOutFromGoogle() {
+        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(homeActivity,signInOptions);
+        signInClient.signOut()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(homeActivity,"Signed out from guest user",Toast.LENGTH_SHORT)
+                                .show();
+                        homeActivity.trialMember=null;
+                        for(HomeActivityStateChangeListener listener:homeActivity.stateChangeListeners) {
+                            System.out.println("calling state change listeners onGoogleSignout");
+                            listener.onGoogleSignOut();
+                        }
+                        System.out.println("Successfully signed out from guest user");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                        System.out.println("failed to sign out from google");
+                    }
+                });
+    }
+
+    @Override
+    public void onTrialOTPVerificationResult(TrialMember trialMember, int code) {
+        if(code == TrialMemberOTPVerificationFragment.SUCCESSFUL_VERIFICATION) {
+            SharedPreferences.Editor editor = homeActivity.getSharedPreferences(homeActivity.getString(R.string.preference_file_key),
+                    Context.MODE_PRIVATE).edit();
+            editor.putString(homeActivity.getString(R.string.trial_member_sap),trialMember.getSap());
+            editor.commit();
+
+            homeActivity.trialMember=trialMember;
+            DatabaseReference trialMemberReference = FirebaseDatabase.getInstance().getReference("postsTrialLogin/" +
+                    trialMember.getSap());
+            trialMemberReference.setValue(trialMember);
+
+            System.out.println("inside home activity onTrialMemberStateChange"+trialMember);
+            System.out.println(trialMember.getName()+trialMember.getEmail());
+            for(HomeActivityStateChangeListener listener:homeActivity.stateChangeListeners) {
+                System.out.println(trialMember);
+                listener.onTrialMemberStateChange(trialMember);
+            }
+            homeActivity.customizeNavigationDrawer(HomeActivity.STATE_TRIAL_MEMBER_SIGNED_IN);
+            Toast.makeText(homeActivity, "trial member created", Toast.LENGTH_LONG).show();
+            homeActivity.onBackPressed();
+        }
+        else {
+            Toast.makeText(homeActivity,"Maximum tries exceeded",Toast.LENGTH_LONG);
+        }
+    }
+
+
+    /* %%%%%%%%%%%%%%%%%%%%%%%%%%Callback from UserProfileFragment %%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+    @Override
+    public void onSignOutClicked(final UserProfileFragment userProfileFragment) {
+        System.out.println("onSignOutclicked called");
+
+        AlertDialog alertDialog=new AlertDialog.Builder(homeActivity)
+                .setMessage(homeActivity.getString(R.string.logout_confirmation))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        /* ******************* Clear the member data from the app ***********************/
+                        homeActivity.signedInMember=null;
+                        SharedPreferences.Editor editor=homeActivity.getSharedPreferences(homeActivity.getString(R.string.preference_file_key),
+                                Context.MODE_PRIVATE).edit();
+                        editor.clear();
+                        editor.commit();
+                        /* **************************************************************************/
+
+                        homeActivity.customizeNavigationDrawer(HomeActivity.STATE_DEFAULT);
+                        homeActivity.displayHomePage();
+                        for(HomeActivityStateChangeListener listener:homeActivity.stateChangeListeners) {
+                            System.out.println("calling statechange listener callbacks logout");
+                            listener.onMemberLogout();
+                        }
+                        Toast.makeText(homeActivity,"Successfully Logged Out",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        System.out.println("user canceled the logout action");
+                    }
+                })
+                .create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void onEditClicked(UserProfileFragment fragment) {
+        System.out.println("on edit clicked");
+        homeActivity.getSupportFragmentManager().beginTransaction()
+                .remove(fragment)
+                .commit();
+
+        FragmentTransaction ft = homeActivity.getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.frame_layout, EditProfileFragment.newInstance(homeActivity.signedInMember),
+                homeActivity.getString(R.string.fragment_tag_edit_profile));
+        ft.commit();
+    }
+    /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+
+    @Override
+    public void onPasswordChange(PasswordChangeDialogFragment fragment, int resultCode) {
+        String msg;
+        if(resultCode== PasswordChangeDialogFragment.PASSWORD_SUCCESSSFULLY_CHANGED) {
+            Member modifiedMember = new Member.Builder(homeActivity.signedInMember)
+                    .setPassword(fragment.getNewPass())
+                    .build();
+
+            homeActivity.signedInMember = modifiedMember;
+            msg="Password Successfully Changed";
+        }
+        else if(resultCode == PasswordChangeDialogFragment.INCORRECT_OLD_PASSWORD) {
+            msg="Incorrect Old Password";
+        }
+        else if(resultCode == PasswordChangeDialogFragment.ACTION_CANCELLED_BY_USER)
+            msg="cancelled";
+        else if(resultCode == PasswordChangeDialogFragment.PASSWORD_CHANGE_FAILED)
+            msg="Some error occured while changing password";
+        else
+            msg="unexpected resultcode";
+
+        Toast.makeText(homeActivity,msg,Toast.LENGTH_LONG).show();
+    }
+
+
+    /* &&&&&&&&&&&&&&&&&&&&&&&Callback from EditProfileFragment&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+    @Override
+    public void onDataEditResult(EditProfileFragment fragment, int resultCode, Member member) {
+        String msg="";
+        switch (resultCode) {
+            case EditProfileFragment.SUCESSFULLY_SAVED_NEW_DATA : {
+                msg="Saved";
+                homeActivity.signedInMember = member;
+                homeActivity.setUpMemberProfile(member);
+                break;
+            }
+
+            case EditProfileFragment.FAILED_TO_SAVE_NEW_DATA : {
+                msg="Some error occured. please Try again later";
+                break;
+            }
+
+            case EditProfileFragment.ACTION_CANCELLED_BY_USER : {
+                msg="Cancelled";
+            }
+
+        }
+        homeActivity.getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, UserProfileFragment.newInstance(homeActivity.signedInMember),
+                        homeActivity.getString(R.string.fragment_tag_user_profile))
+                .commit();
+        Toast.makeText(homeActivity,msg,Toast.LENGTH_SHORT).show();
+        //displayHomePage();
+    }
+    /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
+
+
+    /* ********************** Callback from MemberRegistrationFragment ************************ */
+    @Override
+    public void onRegistrationDataAvailable(final int statusCode,final NewMember newMember) {
+        if(statusCode == homeActivity.getResources().getInteger(R.integer.verify_new_member)) {
+            RecipientsFragment fragment = RecipientsFragment.newInstance(newMember);
+            homeActivity.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, fragment, homeActivity.getString(R.string.fragment_tag_recipients))
+                    .commit();
+        }
+        else {
+            homeActivity.getUserController().startOTPVerificationPage(statusCode,newMember);
+        }
+
+    }
+    /* ******************************************************************************************/
 }
