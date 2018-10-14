@@ -4,12 +4,28 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Event implements Comparable<Event>, Parcelable {
     public static final String PARCEL_KEY = "Event";
+    public static final Creator<Event> CREATOR = new Creator<Event>() {
+
+        @NonNull
+        @Override
+        public Event createFromParcel(@NonNull Parcel in) {
+            return new Event(in);
+        }
+
+        @Override
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
+
     @JsonProperty("eventID")
     private String eventID;
 
@@ -25,117 +41,56 @@ public class Event implements Comparable<Event>, Parcelable {
     @JsonProperty("prizeMoney")
     private ArrayList<Integer> prizeMoney;
 
-    @JsonProperty("eventDate")
-    private Long eventDate;
+    @JsonIgnore //date object is not to be saved in database instead the timestamp will be saved
+    private Date eventDate;
+
+    @JsonProperty("eventTimeStamp")
+    private Long eventTimeStamp;
+
     @JsonProperty("cover")
-    private String cover="";
-    @JsonProperty("date")
-    private String date="";
-    @JsonProperty("day")
-    private String day="";
-    @JsonProperty("month")
-    private String month="";
-    @JsonProperty("poster")
-    private String poster="";
+    private String cover;
+
+    @JsonProperty("posterUrl")
+    private String posterUrl;
+
     @JsonProperty("tagline")
-    private String tagline="";
+    private String tagline;
+
     @JsonProperty("eventDescription")
-    private String eventDescription="";
+    private String eventDescription;
+
     @JsonProperty("whatsapp")
     private String whatsapp;
+
     @JsonProperty("phone")
     private String phone;
 
-    public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getDay() {
-        return day;
-    }
-
-    public void setDay(String day) {
-        this.day = day;
-    }
-
-    public String getMonth() {
-        return month;
-    }
-
-    public void setMonth(String month) {
-        this.month = month;
-    }
-
-    public String getPoster() {
-        return poster;
-    }
-
-    public void setPoster(String poster) {
-        this.poster = poster;
-    }
-
-    public String getTagline() {
-        return tagline;
-    }
-
-    public void setTagline(String tagline) {
-        this.tagline = tagline;
-    }
 
 
-
-    protected Event(Parcel in) {
+    protected Event(@NonNull Parcel in) {
         eventID = in.readString();
         eventName = in.readString();
         minParticipant = in.readInt();
         entryFees = in.readInt();
         cover=in.readString();
-        date=in.readString();
-        day=in.readString();
-        month=in.readString();
-        poster=in.readString();
+        posterUrl =in.readString();
         tagline=in.readString();
         eventDescription=in.readString();
         phone=in.readString();
         whatsapp=in.readString();
         if (in.readByte() == 0) {
-            eventDate = null;
+            eventTimeStamp = null;
         } else {
-            eventDate = in.readLong();
+            eventTimeStamp = in.readLong();
         }
+        in.readList(prizeMoney,this.getClass().getClassLoader());
     }
+
 
     public Event() {
         //Empty constructor
     }
 
-    public static final Creator<Event> CREATOR = new Creator<Event>() {
-        @Override
-        public Event createFromParcel(Parcel in) {
-            return new Event(in);
-        }
-
-        @Override
-        public Event[] newArray(int size) {
-            return new Event[size];
-        }
-    };
-
-    public Long getEventDate() {
-        return eventDate;
-    }
 
     public String getEventID() {
         return eventID;
@@ -157,10 +112,42 @@ public class Event implements Comparable<Event>, Parcelable {
         return prizeMoney;
     }
 
-    @Override
-    public int compareTo(@NonNull Event event) {
-        return this.eventDate.compareTo(event.getEventDate());
+    public Date getEventDate() {
+        if(eventDate == null) {
+            eventDate = new Date(eventTimeStamp);
+        }
+        return eventDate;
     }
+
+    public Long getEventTimeStamp() {
+        return eventTimeStamp;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public String getPosterUrl() {
+        return posterUrl;
+    }
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public String getEventDescription() {
+        return eventDescription;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+
 
     @Override
     public int describeContents() {
@@ -173,37 +160,27 @@ public class Event implements Comparable<Event>, Parcelable {
         parcel.writeString(eventName);
         parcel.writeInt(minParticipant);
         parcel.writeInt(entryFees);
-        if (eventDate == null) {
+        parcel.writeString(cover);
+        parcel.writeString(posterUrl);
+        parcel.writeString(tagline);
+        parcel.writeString(eventDescription);
+        parcel.writeString(phone);
+        parcel.writeString(whatsapp);
+        if (eventTimeStamp == null) {
             parcel.writeByte((byte) 0);
         } else {
             parcel.writeByte((byte) 1);
-            parcel.writeLong(eventDate);
+            parcel.writeLong(eventTimeStamp);
         }
+        parcel.writeList(prizeMoney);
     }
 
-    public String getEventDescription() {
-        return eventDescription;
+
+    @Override
+    public int compareTo(@NonNull Event event) {
+        return this.eventTimeStamp.compareTo(event.eventTimeStamp);
     }
 
-    public void setEventDescription(String eventDescription) {
-        this.eventDescription = eventDescription;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getWhatsapp() {
-        return whatsapp;
-    }
-
-    public void setWhatsapp(String whatsapp) {
-        this.whatsapp = whatsapp;
-    }
 
     public static class Builder {
         private String eventID;
@@ -211,19 +188,25 @@ public class Event implements Comparable<Event>, Parcelable {
         private int minParticipant;
         private int entryFees;
         private ArrayList<Integer> prizeMoney;
-        private Long eventDate;
+        private Long eventTimeStamp;
+        private String cover;
+        private String posterUrl;
+        private String tagline;
+        private String eventDescription;
+        private String whatsapp;
+        private String phone;
 
         public Builder() {
 
         }
 
-        public Builder(Event event) {
+        public Builder(@NonNull Event event) {
             this.eventID = event.getEventID();
             this.eventName = event.getEventName();
             this.minParticipant = event.getMinParticipant();
             this.entryFees = event.getEntryFees();
             this.prizeMoney = event.getPrizeMoney();
-            this.eventDate = event.getEventDate();
+            this.eventTimeStamp = event.eventTimeStamp;
         }
 
         public Event build() {
@@ -233,7 +216,13 @@ public class Event implements Comparable<Event>, Parcelable {
             event.minParticipant = this.minParticipant;
             event.eventName = this.eventName;
             event.prizeMoney = this.prizeMoney;
-            event.eventDate = this.eventDate;
+            event.eventTimeStamp = this.eventTimeStamp;
+            event.cover = this.cover;
+            event.posterUrl = this.posterUrl;
+            event.tagline = this.tagline;
+            event.eventDescription = this.eventDescription;
+            event.whatsapp = this.whatsapp;
+            event.phone = this.phone;
 
             return event;
         }
@@ -263,9 +252,41 @@ public class Event implements Comparable<Event>, Parcelable {
             return this;
         }
 
-        public Builder setEventDate(Long date) {
-            this.eventDate = date;
+        public Builder setEventTimeStamp(Long date) {
+            this.eventTimeStamp = date;
+            return this;
+        }
+
+        public Builder setEventCover(String cover) {
+            this.cover = cover;
+            return this;
+        }
+
+        public Builder setPosterUrl(String posterUrl) {
+            this.posterUrl = posterUrl;
+            return this;
+        }
+
+        public Builder setTagline(String tagline) {
+            this.tagline = tagline;
+            return this;
+        }
+
+        public Builder setEventDescription(String eventDescription) {
+            this.eventDescription = eventDescription;
+            return this;
+        }
+
+        public Builder setWhatsapp(String whatsapp) {
+            this.whatsapp = whatsapp;
+            return this;
+        }
+
+        public Builder setPhone(String phone) {
+            this.phone = phone;
             return this;
         }
     }
+
+
 }

@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,7 +15,9 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Event;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
@@ -53,8 +54,8 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
         if(event!=null) {
             int i;
             for(i=0;i<eventArrayList.size()-1;i++) {
-                boolean found = (eventArrayList.get(i).getEventDate().compareTo(event.getEventDate()) < 0 ) &&
-                        (eventArrayList.get(i+1).getEventDate().compareTo(event.getEventDate()) > 0 );
+                boolean found = (eventArrayList.get(i).getEventTimeStamp().compareTo(event.getEventTimeStamp()) < 0 ) &&
+                        (eventArrayList.get(i+1).getEventTimeStamp().compareTo(event.getEventTimeStamp()) > 0 );
                 if(found)
                     break;
             }
@@ -113,9 +114,14 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
             this.event = event;
             this.position = position;
             textViewEventName.setText(event.getEventName());
-            textViewDate.setText(event.getDate());
-            textViewDay.setText(event.getDay());
-            textViewMonth.setText(event.getMonth());
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(event.getEventDate());
+            DateFormatSymbols symbols = new DateFormatSymbols();
+            textViewDate.setText(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
+            textViewDay.setText(symbols.getShortWeekdays()[calendar.get(Calendar.DAY_OF_WEEK)]);
+            textViewMonth.setText(symbols.getShortMonths()[calendar.get(Calendar.MONTH)]);
+
             textViewTagline.setText(event.getTagline());
             Glide.with(itemView.getContext())
                     .load(event.getCover())

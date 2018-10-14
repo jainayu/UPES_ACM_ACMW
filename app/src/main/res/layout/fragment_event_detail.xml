@@ -64,17 +64,18 @@ android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#000" />
+
+            <ImageView
+                android:id="@+id/image_view_event_detail_phone"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_call_black_24dp" />
             <ImageView
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_marginTop="10dp"
-                android:id="@+id/phone"
-                android:src="@drawable/ic_call_black_24dp"/>
-            <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginTop="10dp"
-                android:id="@+id/whatsapp"
+                android:id="@+id/image_view_event_detail_whatsapp"
                 android:src="@drawable/whatsapp"/>
         </LinearLayout>
 

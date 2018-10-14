@@ -111,16 +111,16 @@ public class EventRegistration extends Fragment implements View.OnClickListener 
                                     if (isWhatsappNoValid) {
                                         if(!branch.isEmpty())
                                         {
-                                            final NonAcmParticipant nonAcmParticipant=new NonAcmParticipant();
-                                            List<Event> events=new ArrayList<>();
-                                            events.add(event);
-                                            nonAcmParticipant.setEvent(events);
-                                            nonAcmParticipant.setName(name);
-                                            nonAcmParticipant.setBranch(branch);
-                                            nonAcmParticipant.setContact(contact);
-                                            nonAcmParticipant.setEmail(email);
-                                            nonAcmParticipant.setSap(sap);
-                                            nonAcmParticipant.setWhatsapp(whatsapp);
+                                            List<String> events=new ArrayList<>();
+                                            events.add(event.getEventID());
+                                            final NonAcmParticipant nonAcmParticipant=new NonAcmParticipant.Builder()
+                                                    .setEventsList(events)
+                                                    .setName(name)
+                                                    .setBranch(branch).setContact(contact)
+                                                    .setEmail(email)
+                                                    .setSap(sap)
+                                                    .setWhatsapp(whatsapp)
+                                                    .build();
                                             new AlertDialog.Builder(getContext())
                                                     .setMessage("Confirm details ?")
                                                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -131,8 +131,10 @@ public class EventRegistration extends Fragment implements View.OnClickListener 
                                                             ref.child("NonACMParticipants").child(sap).setValue(nonAcmParticipant).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
                                                                 public void onSuccess(Void aVoid) {
-                                                                    nonAcmParticipant.setEvent(null);
-                                                                    ref.child("events").child(event.getEventID()).child("NonACMParticipants").child(sap).setValue(nonAcmParticipant).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    NonAcmParticipant participant = new NonAcmParticipant.Builder(nonAcmParticipant)
+                                                                            .setEventsList(null)
+                                                                            .build();
+                                                                    ref.child("events").child(event.getEventID()).child("Participants").child(sap).setValue(participant).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
                                                                             progressBar.setVisibility(View.INVISIBLE);

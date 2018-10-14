@@ -119,7 +119,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             name = itemView.findViewById(R.id.name);
             position = itemView.findViewById(R.id.position);
             about = itemView.findViewById(R.id.about);
-            whatsapp = itemView.findViewById(R.id.whatsapp);
+            whatsapp = itemView.findViewById(R.id.image_view_hierarchy_whatsapp);
             linkedin = itemView.findViewById(R.id.linkedin);
             contact = itemView.findViewById(R.id.contact);
             availabeInCampus = itemView.findViewById(R.id.availabe_in_campus);

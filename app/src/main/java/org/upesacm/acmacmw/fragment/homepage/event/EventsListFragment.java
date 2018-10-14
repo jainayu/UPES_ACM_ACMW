@@ -5,14 +5,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -25,12 +23,10 @@ import com.google.firebase.database.ValueEventListener;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.adapter.events.EventsRecyclerViewAdapter;
-import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,7 +89,7 @@ public class EventsListFragment extends Fragment implements
                 for(DataSnapshot ds:dataSnapshot.getChildren()) {
                     Event event = ds.getValue(Event.class);
                     events.add(event);
-                    System.out.println("event : "+event.getEventDate());
+                    System.out.println("event : "+event.getEventTimeStamp());
                 }
                 if(adapter!=null)
                 adapter.setEventsList(events);
@@ -123,6 +119,6 @@ public class EventsListFragment extends Fragment implements
     }
 
     public interface FragmentInteractionListener {
-        public void onEventSelect(Event event);
+        void onEventSelect(Event event);
     }
 }
