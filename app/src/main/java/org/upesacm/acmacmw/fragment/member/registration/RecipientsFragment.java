@@ -20,6 +20,7 @@ import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.adapter.member.registration.RecepientsAdapter;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
+import org.upesacm.acmacmw.util.Config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public class RecipientsFragment extends Fragment implements
         progressBar = view.findViewById(R.id.progress_bar_recepients);
 
         Toast.makeText(getContext(),"fetching recipients",Toast.LENGTH_SHORT).show();
-        callback.getMembershipClient().getOTPRecipients()
+        callback.getMembershipClient().getOTPRecipients(Config.AUTH_TOKEN)
                 .enqueue(new Callback<HashMap<String, String>>() {
                     @Override
                     public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
@@ -158,7 +159,7 @@ public class RecipientsFragment extends Fragment implements
 
         newMember = completeNewMember;
 
-        Call<NewMember> call = callback.getMembershipClient().getNewMemberData(newMember.getSapId());
+        Call<NewMember> call = callback.getMembershipClient().getNewMemberData(newMember.getSapId(), Config.AUTH_TOKEN);
                             call.enqueue(this);
     }
 
@@ -167,13 +168,13 @@ public class RecipientsFragment extends Fragment implements
         NewMember nm=response.body();
         if(nm==null) {
             if(callback!=null) {
-                Call<Member> memberCall = callback.getMembershipClient().getMember(newMember.getSapId());
+                Call<Member> memberCall = callback.getMembershipClient().getMember(newMember.getSapId(),Config.AUTH_TOKEN);
                 memberCall.enqueue(new Callback<Member>() {
                     @Override
                     public void onResponse(Call<Member> call, Response<Member> response) {
                         if (response.body() == null) {
                             if(callback!=null) {
-                                callback.getMembershipClient().saveNewMemberData(newMember.getSapId(), newMember)
+                                callback.getMembershipClient().saveNewMemberData(newMember.getSapId(), newMember,Config.AUTH_TOKEN)
                                         .enqueue(new Callback<NewMember>() {
                                             @Override
                                             public void onResponse(Call<NewMember> call, Response<NewMember> response) {

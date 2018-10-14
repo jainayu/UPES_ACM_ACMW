@@ -10,6 +10,7 @@ import android.os.Bundle;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.Config;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,7 +41,7 @@ public class SplashActivity extends AppCompatActivity {
         final String signedInMemberSap=preferences.getString(getString(R.string.logged_in_member_key),null);
         if(signedInMemberSap!=null) {
             System.out.println("signed in member is not null");
-            membershipClient.getMember(signedInMemberSap)
+            membershipClient.getMember(signedInMemberSap, Config.AUTH_TOKEN)
                     .enqueue(new Callback<Member>() {
                         @Override
                         public void onResponse(Call<Member> call, final Response<Member> response) {

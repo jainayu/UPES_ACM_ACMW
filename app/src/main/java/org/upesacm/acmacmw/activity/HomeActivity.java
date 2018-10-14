@@ -3,7 +3,9 @@ package org.upesacm.acmacmw.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -15,6 +17,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,14 +33,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.asynctask.OTPSender;
 import org.upesacm.acmacmw.fragment.AboutFragment;
 import org.upesacm.acmacmw.fragment.AlumniFragment;
+import org.upesacm.acmacmw.fragment.PolicyFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
 import org.upesacm.acmacmw.fragment.member.trail.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.HomePageFragment;
@@ -56,11 +68,15 @@ import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.Config;
+import org.upesacm.acmacmw.util.ForceUpdateChecker;
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -80,14 +96,15 @@ public class HomeActivity extends AppCompatActivity implements
         PasswordChangeDialogFragment.PasswordChangeListener,
         GoogleSignInFragment.GoogleSignInListener,
         TrialMemberOTPVerificationFragment.TrialOTPVerificationListener,
-        RecipientsFragment.FragmentInteractionListener{
+        RecipientsFragment.FragmentInteractionListener,
+        ForceUpdateChecker.OnUpdateNeededListener{
 
     private static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
     private static final int MEMBER_PROFILE_MENU_ID = 1;
     private static final int STATE_MEMBER_SIGNED_IN=1;
     private static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
     private static final int STATE_DEFAULT=3;
-
+    private FirebaseAuth mAuth;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
@@ -109,6 +126,65 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_main);
+        mAuth=FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser==null)
+        {
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("tag", "signInAnonymously:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                user.getIdToken(true)
+                                        .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                                            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                                                if (task.isSuccessful()) {
+                                                    String idToken = task.getResult().getToken();
+                                                    Config.AUTH_TOKEN=idToken;
+                                                    // ...
+                                                } else {
+                                                    // Handle error -> task.getException();
+                                                    Config.AUTH_TOKEN=null;
+                                                }
+                                            }
+                                        });
+
+                                startApp();
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("tag", "signInAnonymously:failure", task.getException());
+                                Toast.makeText(HomeActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+        else {
+            Log.d("tag", "Already Signed in :success");
+            currentUser.getIdToken(true)
+                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        public void onComplete(@NonNull Task<GetTokenResult> task) {
+                            if (task.isSuccessful()) {
+                                String idToken = task.getResult().getToken();
+                                Config.AUTH_TOKEN=idToken;
+                                // ...
+                            } else {
+                                // Handle error -> task.getException();
+                                Config.AUTH_TOKEN=null;
+                            }
+                        }
+                    });
+            startApp();
+        }
+
+
+    }
+    void startApp()
+    {
+        ForceUpdateChecker.with(getApplicationContext()).onUpdateNeeded(this).check();
         toolbar = findViewById(R.id.my_toolbar);
         drawerLayout=findViewById(R.id.drawer_layout);
         navigationView=findViewById(R.id.nav_view);
@@ -158,7 +234,7 @@ public class HomeActivity extends AppCompatActivity implements
                 Context.MODE_PRIVATE);
         final String trialMemberSap=preferences.getString(getString(R.string.trial_member_sap),null);
         if(account!=null && trialMemberSap!=null) {
-            homePageClient.getTrialMember(trialMemberSap)
+            homePageClient.getTrialMember(trialMemberSap,Config.AUTH_TOKEN)
                     .enqueue(new Callback<TrialMember>() {
                         @Override
                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
@@ -180,7 +256,6 @@ public class HomeActivity extends AppCompatActivity implements
             signOutFromGoogle();
         }
         System.out.println("signedInMember : "+signedInMember);
-
     }
 
     @Override
@@ -223,6 +298,9 @@ public class HomeActivity extends AppCompatActivity implements
         }
         else if(item.getItemId() == R.id.action_about) {
             ft.replace(R.id.frame_layout,new AboutFragment());
+        }
+        else if(item.getItemId() == R.id.action_policy) {
+            ft.replace(R.id.frame_layout,new PolicyFragment());
         }
         else if(item.getItemId() == MEMBER_PROFILE_MENU_ID) {
             UserProfileFragment userProfileFragment= UserProfileFragment.newInstance(signedInMember);
@@ -530,7 +608,7 @@ public class HomeActivity extends AppCompatActivity implements
         System.out.println("login user name : "+username);
         System.out.println("login password : "+password);
 
-        Call<Member> memberCall=membershipClient.getMember(username);
+        Call<Member> memberCall=membershipClient.getMember(username,Config.AUTH_TOKEN);
         memberCall.enqueue(new Callback<Member>() {
             @Override
             public void onResponse(Call<Member> call, Response<Member> response) {
@@ -686,7 +764,7 @@ public class HomeActivity extends AppCompatActivity implements
                 .setPremium(verifiedNewMember.isPremium())
                 .setMembershipType(verifiedNewMember.getMembershipType())
                 .build();
-        Call<Member> memberCall=membershipClient.createMember(verifiedNewMember.getSapId(),member);
+        Call<Member> memberCall=membershipClient.createMember(verifiedNewMember.getSapId(),member,Config.AUTH_TOKEN);
         memberCall.enqueue(new Callback<Member>() {
             @Override
             public void onResponse(Call<Member> call, Response<Member> response) {
@@ -700,7 +778,7 @@ public class HomeActivity extends AppCompatActivity implements
                 Toast.makeText(HomeActivity.this,"Welcome to ACM/ACM-W",Toast.LENGTH_LONG).show();
                 setUpMemberProfile(member);
 
-                membershipClient.getEmailMsg()
+                membershipClient.getEmailMsg(Config.AUTH_TOKEN)
                         .enqueue(new Callback<EmailMsg>() {
                             @Override
                             public void onResponse(Call<EmailMsg> call, Response<EmailMsg> response) {
@@ -740,7 +818,7 @@ public class HomeActivity extends AppCompatActivity implements
                 NewMember nullData= new NewMember.Builder()
                         .setPremium(null)
                         .build();
-                membershipClient.saveNewMemberData(member.getSap(),nullData)
+                membershipClient.saveNewMemberData(member.getSap(),nullData,Config.AUTH_TOKEN)
                         .enqueue(new Callback<NewMember>() {
                             @Override
                             public void onResponse(Call<NewMember> call, Response<NewMember> response) {
@@ -931,7 +1009,7 @@ public class HomeActivity extends AppCompatActivity implements
                     .setSap(sap)
                     .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap),6))
                     .build();
-            homePageClient.getTrialMember(sap)
+            homePageClient.getTrialMember(sap,Config.AUTH_TOKEN)
                     .enqueue(new Callback<TrialMember>() {
                         @Override
                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
@@ -947,7 +1025,7 @@ public class HomeActivity extends AppCompatActivity implements
                             else {
                                 trialMember = newTrialMember;
                             }
-                                homePageClient.createTrialMember(sap,trialMember)
+                                homePageClient.createTrialMember(sap,trialMember,Config.AUTH_TOKEN)
                                         .enqueue(new Callback<TrialMember>() {
                                             @Override
                                             public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
@@ -1022,4 +1100,29 @@ public class HomeActivity extends AppCompatActivity implements
         sender.execute(mailBody,recipientEmail,subject);
     }
 
+    @Override
+    public void onUpdateNeeded(final String updateUrl) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("New version available")
+                .setMessage("Please, update app to new version to continue reposting.")
+                .setPositiveButton("Update",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                redirectStore(updateUrl);
+                            }
+                        }).setNegativeButton("No, thanks",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        }).create();
+        dialog.show();
+    }
+    private void redirectStore(String updateUrl) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 }

@@ -19,6 +19,7 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
+import org.upesacm.acmacmw.util.Config;
 
 import java.util.regex.Pattern;
 
@@ -309,7 +310,7 @@ public class OTPVerificationFragment extends Fragment implements
 
     void fetchNewMemberData(final String sap,final int postActionCode) {
         showLoading(true);
-        callback.getMembershipClient().getNewMemberData(sap)
+        callback.getMembershipClient().getNewMemberData(sap, Config.AUTH_TOKEN)
                 .enqueue( new Callback<NewMember>(){
                     @Override
                     public void onResponse (Call < NewMember > call, Response < NewMember > response){
@@ -348,7 +349,7 @@ public class OTPVerificationFragment extends Fragment implements
 
     void fetchRecipientDetails(final String recipientSap, final int postFetchActionCode) {
         showLoading(true);
-        callback.getMembershipClient().getMember(recipientSap)
+        callback.getMembershipClient().getMember(recipientSap,Config.AUTH_TOKEN)
                 .enqueue(new Callback<Member>() {
                     @Override
                     public void onResponse(Call<Member> call, Response<Member> response) {

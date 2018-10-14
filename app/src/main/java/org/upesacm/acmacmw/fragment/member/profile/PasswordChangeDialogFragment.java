@@ -17,6 +17,7 @@ import android.widget.Toast;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.Config;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -112,7 +113,7 @@ public class PasswordChangeDialogFragment extends DialogFragment
                             .setMembershipType(member.getMembershipType())
                             .build();
 
-                            membershipClient.createMember(member.getSap(), member)
+                            membershipClient.createMember(member.getSap(), member, Config.AUTH_TOKEN)
                                     .enqueue(new Callback<Member>() {
                                         @Override
                                         public void onResponse(Call<Member> call, Response<Member> response) {
