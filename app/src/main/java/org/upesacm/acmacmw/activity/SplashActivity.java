@@ -21,7 +21,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 public class SplashActivity extends AppCompatActivity {
       private static int SPLASH_TIME_OUT=2000;
 
-    private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
+    private static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
     MembershipClient membershipClient;
     Retrofit retrofit;
     @Override
