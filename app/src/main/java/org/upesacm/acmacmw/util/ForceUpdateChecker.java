@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 public class ForceUpdateChecker {
@@ -15,7 +16,7 @@ public class ForceUpdateChecker {
     public static final String KEY_UPDATE_REQUIRED = "force_update_required";
     public static final String KEY_CURRENT_VERSION = "force_update_current_version";
     public static final String KEY_UPDATE_URL = "force_update_store_url";
-
+    FirebaseRemoteConfig remoteConfig;
     private OnUpdateNeededListener onUpdateNeededListener;
     private Context context;
 
@@ -34,18 +35,23 @@ public class ForceUpdateChecker {
     }
 
     public void check() {
-        final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig.fetch(3600).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                if (remoteConfig.getBoolean(KEY_UPDATE_REQUIRED)) {
+                    String currentVersion = remoteConfig.getString(KEY_CURRENT_VERSION);
+                    String appVersion = getAppVersion(context);
+                    String updateUrl = remoteConfig.getString(KEY_UPDATE_URL);
 
-        if (remoteConfig.getBoolean(KEY_UPDATE_REQUIRED)) {
-            String currentVersion = remoteConfig.getString(KEY_CURRENT_VERSION);
-            String appVersion = getAppVersion(context);
-            String updateUrl = remoteConfig.getString(KEY_UPDATE_URL);
-
-            if (!TextUtils.equals(currentVersion, appVersion)
-                    && onUpdateNeededListener != null) {
-                onUpdateNeededListener.onUpdateNeeded(updateUrl);
+                    if (!TextUtils.equals(currentVersion, appVersion)
+                            && onUpdateNeededListener != null) {
+                        onUpdateNeededListener.onUpdateNeeded(updateUrl);
+                    }
+                }
             }
-        }
+        });
+
     }
 
     private String getAppVersion(Context context) {

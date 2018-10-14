@@ -99,7 +99,7 @@ public class HomeActivity extends AppCompatActivity implements
         RecipientsFragment.FragmentInteractionListener,
         ForceUpdateChecker.OnUpdateNeededListener{
 
-    private static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
+    private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     private static final int MEMBER_PROFILE_MENU_ID = 1;
     private static final int STATE_MEMBER_SIGNED_IN=1;
     private static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
