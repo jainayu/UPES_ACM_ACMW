@@ -67,13 +67,9 @@ public class RecipientsFragment extends Fragment implements
     @Override
     public void onAttach(Context context) {
         if(context instanceof HomeActivity) {
-            if (context instanceof FragmentInteractionListener) {
-                super.onAttach(context);
-                callback = (HomeActivity)context;
-                listener = (FragmentInteractionListener) context;
-            } else
-                throw new IllegalStateException(context.toString() + " must implement " +
-                        "FragmentInteractionListener");
+            super.onAttach(context);
+            callback = (HomeActivity)context;
+            listener = callback.getMemberController();
         }
         else {
             throw new IllegalStateException("context must be instance of HomeActivity");

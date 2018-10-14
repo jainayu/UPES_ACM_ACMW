@@ -74,14 +74,12 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 public class HomeActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         MemberRegistrationFragment.RegistrationResultListener,
-        OTPVerificationFragment.OTPVerificationResultListener,
         View.OnClickListener,
         UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
         GoogleSignInFragment.GoogleSignInListener,
-        TrialMemberOTPVerificationFragment.TrialOTPVerificationListener,
-        RecipientsFragment.FragmentInteractionListener {
+        TrialMemberOTPVerificationFragment.TrialOTPVerificationListener {
 
     private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     private static final int MEMBER_PROFILE_MENU_ID = 1;
@@ -284,40 +282,7 @@ public class HomeActivity extends AppCompatActivity implements
         toolbar.setTitle(title);
     }
 
-    public void startOTPVerificationPage(int mode,NewMember newMember) {
-        OTPVerificationFragment fragment;
-        if(mode == getResources().getInteger(R.integer.verify_new_member)) {
-            SharedPreferences preferences=getSharedPreferences(getString(R.string.preference_file_key),
-                    Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor=preferences.edit();
-            System.out.println(getString(R.string.new_member_sap_key));
-            editor.putString(getString(R.string.new_member_sap_key),newMember.getSapId());
-            editor.commit();
 
-            fragment= OTPVerificationFragment
-                    .newInstance(mode); //verify otp not clicked
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(getString(R.string.new_member_key), newMember);
-            fragment.setArguments(bundle);
-        }
-        else if(mode == getResources().getInteger(R.integer.verify_new_entered_sap)) {
-            fragment= OTPVerificationFragment
-                    .newInstance(mode); //verify otp clicked
-        }
-        else if(mode==getResources().getInteger(R.integer.verify_stored_sap)) {
-            fragment= OTPVerificationFragment
-                    .newInstance(mode);
-            Bundle bundle = new Bundle();
-            bundle.putString(getString(R.string.new_member_sap_key), newMemberSap);
-            fragment.setArguments(bundle);
-        }
-        else {
-            throw new IllegalStateException("undefined mode for OTP Verification Fragment");
-        }
-        FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame_layout,fragment,"otp_verifiction");
-        ft.commit();
-    }
 
     void setUpMemberProfile(@NonNull Member member){
         System.out.println("setting up member profile");
@@ -543,51 +508,6 @@ public class HomeActivity extends AppCompatActivity implements
     public Toolbar getToolbar() {return toolbar;}
 
 
-
-
-
-
-    @Override
-    public void onNewMemberDataSave(int resultCode,NewMember newMember) {
-        System.out.println("result code is : "+resultCode);
-        String msg="";
-        if(resultCode== RecipientsFragment.DATA_SAVE_SUCCESSFUL) {
-            msg="Data Saved";
-            String recipientEmail = newMember.getRecipientSap()+"@"+getString(R.string.upes_domain);
-            Toast.makeText(HomeActivity.this,recipientEmail,Toast.LENGTH_LONG).show();
-            String mailBody="<b>Name :<b/> "+newMember.getFullName()+"<br />"
-                    +"<b>Email</b>  : "+newMember.getEmail()+"<br />"
-                    +"<b>SAP ID</b> : "+newMember.getSapId()+"<br />"
-                    +"<b>OTP</b>    : "+newMember.getOtp()+"<br />"
-                    +"<b>Contact</b>  : "+newMember.getPhoneNo()+"<br />"
-                    +"<b>Membership Type : "+newMember.getMembershipType()+"<br/>";
-            OTPSender sender=new OTPSender();
-            sender.execute(mailBody,recipientEmail,"OTP Details");
-            startOTPVerificationPage(getResources().getInteger(R.integer.verify_new_member),newMember);
-        }
-        else {
-            if (resultCode == RecipientsFragment.NEW_MEMBER_ALREADY_PRESENT) {
-                msg = getString(R.string.msg_new_member_already_registered);
-            } else if (resultCode == RecipientsFragment.ALREADY_PART_OF_ACM) {
-                msg = getString(R.string.msg_already_acm_member);
-            } else if (resultCode == RecipientsFragment.FAILED_TO_FETCH_RECIPIENTS) {
-                msg = "Failed to fetch recipients. Please check your connection";
-            }
-            else
-                msg = "Data save Failed. Please check your connection";
-            Bundle args = new Bundle();
-            args.putParcelable(getString(R.string.new_member_key),newMember);
-
-            Fragment fragment = new MemberRegistrationFragment();
-            fragment.setArguments(args);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout,fragment,getString(R.string.fragment_tag_new_member_registration))
-                    .commit();
-        }
-
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
-    }
-
     /* ********************** Callback from MemberRegistrationFragment ************************ */
     @Override
     public void onRegistrationDataAvailable(final int statusCode,final NewMember newMember) {
@@ -598,7 +518,7 @@ public class HomeActivity extends AppCompatActivity implements
                     .commit();
         }
         else {
-            startOTPVerificationPage(statusCode,newMember);
+            getMemberController().startOTPVerificationPage(statusCode,newMember);
         }
 
     }
@@ -607,111 +527,6 @@ public class HomeActivity extends AppCompatActivity implements
 
 
 
-    /* ########################### Callback from OTPVerificationFragment ######################## */
-    @Override
-    public void onSuccessfulVerification(final OTPVerificationFragment otpVerificationFragment) {
-        System.out.println("successfully verified");
-        NewMember verifiedNewMember=otpVerificationFragment.getVerifiedNewMember();
-        final Member member=new Member.Builder()
-                .setmemberId(MemberIDGenerator.generate(verifiedNewMember.getSapId()))
-                .setName(verifiedNewMember.getFullName())
-                .setPassword("somepassword")
-                .setSAPId(verifiedNewMember.getSapId())
-                .setBranch(verifiedNewMember.getBranch())
-                .setEmail(verifiedNewMember.getEmail())
-                .setContact(verifiedNewMember.getPhoneNo())
-                .setYear(verifiedNewMember.getYear())
-                .setWhatsappNo(verifiedNewMember.getWhatsappNo())
-                .setDob(verifiedNewMember.getDob())
-                .setCurrentAdd(verifiedNewMember.getCurrentAddress())
-                .setRecipientSap(verifiedNewMember.getRecipientSap())
-                .setPremium(verifiedNewMember.isPremium())
-                .setMembershipType(verifiedNewMember.getMembershipType())
-                .build();
-        Call<Member> memberCall=membershipClient.createMember(verifiedNewMember.getSapId(),member);
-        memberCall.enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
-                System.out.println("new acm acm w member added");
-                /* ********************Adding log in info locally ************************/
-                SharedPreferences.Editor editor=getSharedPreferences(getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE).edit();
-                editor.putString(getString(R.string.logged_in_member_key),member.getSap());
-                editor.commit();
-                /* ************************************************************************* */
-                Toast.makeText(HomeActivity.this,"Welcome to ACM/ACM-W",Toast.LENGTH_LONG).show();
-                setUpMemberProfile(member);
-
-                membershipClient.getEmailMsg()
-                        .enqueue(new Callback<EmailMsg>() {
-                            @Override
-                            public void onResponse(Call<EmailMsg> call, Response<EmailMsg> response) {
-                                EmailMsg message = response.body();
-                                String memberDetails =
-                                                  "<b>Name</b>      : " + member.getName() + "<br />"
-                                                + "<b>SAP ID</b>    : " + member.getSap() + "<br />"
-                                                + "<b>ACM ID</b>    : " + member.getMemberId() + "<br />"
-                                                + "<b>Password</b>  : " + member.getPassword() + "<br />" +
-                                                "(Please set your own password from the app)" + "<br />"
-                                                + "<b>Branch</b>    : " + member.getBranch() + "<br />"
-                                                + "<b>Year</b>      : " + member.getYear() + "<br />"
-                                                + "<b>Contact</b>   : " + member.getContact() + "<br />"
-                                                + "<b>WhatsApp</b>  : " + member.getWhatsappNo() + "<br />"
-                                                + "<b>DOB</b>       : " + member.getDob() + "<br />"
-                                                + "<b>Address</b>   : " + member.getCurrentAdd() + "<br />";
-                                if(message!=null) {
-                                    String mailBody = message.getBody()+"<br /><br />"+memberDetails+"<br />"+message.getSenderDetails();
-
-                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),message.getSubject(),
-                                            mailBody);
-                                }
-                                else
-                                    sendIDCard(member.getSap()+"@"+getString(R.string.upes_domain),
-                                            "ACM Member Details",memberDetails);
-                            }
-
-                            @Override
-                            public void onFailure(Call<EmailMsg> call, Throwable t) {
-                                t.printStackTrace();
-                                Toast.makeText(HomeActivity.this,"Failed to Send the details Mail. Please Check" +
-                                        "your connection",Toast.LENGTH_LONG).show();
-
-                            }
-                        });
-
-                NewMember nullData= new NewMember.Builder()
-                        .setPremium(null)
-                        .build();
-                membershipClient.saveNewMemberData(member.getSap(),nullData)
-                        .enqueue(new Callback<NewMember>() {
-                            @Override
-                            public void onResponse(Call<NewMember> call, Response<NewMember> response) {
-                                System.out.println("Successfully removed from unconfirmed member");
-                            }
-
-                            @Override
-                            public void onFailure(Call<NewMember> call, Throwable t) {
-                                System.out.println("Failed to remove from unconfirmed members");
-                            }
-                        });
-
-                displayHomePage();
-            }
-
-            @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                System.out.println("failed to add new acm acmw member");
-                displayHomePage();
-            }
-        });
-    }
-
-    @Override
-    public void onMaxTriesExceed(OTPVerificationFragment otpVerificationFragment) {
-        System.out.println("Max tries exceed");
-        displayHomePage();
-    }
-    /* ###########################################################################################*/
 
 
 

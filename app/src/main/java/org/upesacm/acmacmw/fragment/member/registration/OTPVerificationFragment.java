@@ -78,13 +78,9 @@ public class OTPVerificationFragment extends Fragment implements
     @Override
     public void onAttach(Context context) {
         if (context instanceof HomeActivity) {
-            if (context instanceof OTPVerificationResultListener) {
-                super.onAttach(context);
-                resultListener = (OTPVerificationResultListener) context;
-                callback  = (HomeActivity)context;
-            } else
-                throw new IllegalStateException(context.toString() + " must implement " +
-                        "OnVerificationResultListener");
+            super.onAttach(context);
+            callback = (HomeActivity)context;
+            resultListener = callback.getMemberController();
         }
         else {
             throw new IllegalStateException("context must be instance of HomeActivity");
