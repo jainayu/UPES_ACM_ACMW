@@ -85,7 +85,7 @@ public class HomeActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener {
 
-    private static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
+    public static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     protected static final int MEMBER_PROFILE_MENU_ID = 1;
     protected static final int STATE_MEMBER_SIGNED_IN=1;
     protected static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
@@ -276,114 +276,10 @@ public class HomeActivity extends AppCompatActivity implements
         }
     }
 
-Bitmap imageBitmap;
-    private File destination;
-    byte[] byteArray;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CHOOSE_PROFILE_PICTURE && resultCode == RESULT_OK && resultCode!=RESULT_CANCELED) {
-            System.out.println("choose from gallery");
-            Uri uri = data.getData();
-            try {
-                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                int nh = (int) ( imageBitmap.getHeight() * (1024.0 / imageBitmap.getWidth()) );
-                Bitmap scaled = Bitmap.createScaledBitmap(imageBitmap, 1024, nh, true);
-                scaled.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                 byteArray = stream.toByteArray();
-                new AsyncTask<byte[], Void, File>() {
-                    @Override
-                    protected File doInBackground(byte[]... bytes) {
-                        try {
-                            destination = new File(Environment.getExternalStorageDirectory(),
-                                    System.currentTimeMillis() + ".jpg");
-                            destination.createNewFile();
-                            FileOutputStream fo = new FileOutputStream(destination);
-                            fo.write(byteArray);
-                            fo.close();
-                            return destination;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(File file) {
-                        super.onPostExecute(file);
-                        uploadToServer(destination);
-                    }
-                }.execute(byteArray);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void uploadToServer(File destination) {
-        UploadService.ProgressRequestBody fileBody = new UploadService.ProgressRequestBody(destination, new UploadService.ProgressRequestBody.UploadCallbacks() {
-            @Override
-            public void onProgressUpdate(int percentage) {
-            }
-
-            @Override
-            public void onError() {
-                }
-
-            @Override
-            public void onFinish() {
-
-            }
-        });
-
-        MultipartBody.Part filePart = MultipartBody.Part.createFormData("image", destination.getName(), fileBody);
-        RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
-// Change base URL to your upload server URL.
-        final MembershipClient membershipClient = ApiClient.getClient().create(MembershipClient.class);
-        membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
-            @Override
-            public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
-                Log.d("Tag", "code" + response.code() + "");
-                if (response.code()==200) {
-                    String uri = response.body().getUrl();
-                    if (uri != null) {
-                        System.out.println("image url is : " + uri);
-                        System.out.println("create the post object here");
-                        if(signedInMember!=null)
-                        {
-                            final Member member=new Member.Builder(signedInMember)
-                                    .setProfilePicture(uri)
-                                    .build();
-                            MembershipClient membershipClient1=retrofit.create(MembershipClient.class);
-                            membershipClient1.createMember(member.getSap(),member).enqueue(new Callback<Member>() {
-                                @Override
-                                public void onResponse(Call<Member> call, Response<Member> response) {
-                                    if(response.code()==200)
-                                    {
-                                        Glide.with(getBaseContext()).load(member.getProfilePicture()).into(imageButtonProfile);
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<Member> call, Throwable t) {
-
-                                }
-                            });
-
-                        }
-                    } else {
-                        System.out.println("failed to get the download uri");
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<ResponseModel> call, Throwable t) {
-                t.printStackTrace();
-                System.out.println("failed to get the download uri");
-            }
-        });
+        UserProfileFragment userProfileFragment=UserProfileFragment.newInstance(signedInMember);
+        userProfileFragment.onActivityResult(requestCode,resultCode,data);
     }
     public void setDrawerEnabled(boolean enable) {
         int lockMode=enable? DrawerLayout.LOCK_MODE_UNLOCKED: DrawerLayout.
@@ -539,22 +435,15 @@ Bitmap imageBitmap;
             imageButtonProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!(ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
-                            && ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)) {
-                        System.out.println("Permission for camera or storage not granted. Requesting Permission");
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                    CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE);
-                        }
-                        return;
-                    }
-                    Intent intent = new Intent();
-                    intent.setType("image/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_PROFILE_PICTURE);
+                    UserProfileFragment userProfileFragment=UserProfileFragment.newInstance(signedInMember);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frame_layout,userProfileFragment)
+                            .commit();
+                    drawerLayout.closeDrawer(GravityCompat.START);
 
                 }
             });
+
 
             TextView textViewUsername = headerLayout.findViewById(R.id.text_view_username);
             textViewUsername.setText(signedInMember.getName());
