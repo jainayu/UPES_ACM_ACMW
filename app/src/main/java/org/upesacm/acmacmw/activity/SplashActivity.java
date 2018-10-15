@@ -27,6 +27,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        SessionManager.init(this);
 
         getWindow().setStatusBarColor(getResources().getColor(R.color.transparent));
 
@@ -35,6 +36,8 @@ public class SplashActivity extends AppCompatActivity {
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
         membershipClient=retrofit.create(MembershipClient.class);
+
+
         SharedPreferences preferences=getSharedPreferences(getString(R.string.preference_file_key),
                 Context.MODE_PRIVATE);
         final String signedInMemberSap=preferences.getString(getString(R.string.logged_in_member_key),null);

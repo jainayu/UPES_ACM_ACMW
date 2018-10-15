@@ -44,6 +44,7 @@ import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
 import org.upesacm.acmacmw.listener.OnLoadMoreListener;
+import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.model.TrialMember;
@@ -77,7 +78,8 @@ public class PostsFragment extends Fragment
         Callback<HashMap<String,Post>>,
         ValueEventListener,
         HomeActivityStateChangeListener,
-        View.OnClickListener {
+        View.OnClickListener,
+        OnRecyclerItemSelectListener<Post> {
 
     static final int CHOOSE_FROM_GALLERY=2;
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -101,6 +103,7 @@ public class PostsFragment extends Fragment
     TrialMember trialMember;
     private Uri fileUri;
     HomeActivity callback;
+    FragmentInteractionListener interactionListener;
 
     public PostsFragment() {
         // Required empty public constructor
@@ -111,6 +114,7 @@ public class PostsFragment extends Fragment
     public void onAttach(Context context) {
         if(context instanceof HomeActivity) {
             callback = (HomeActivity)context;
+            interactionListener = callback.getPostController();
             super.onAttach(context);
         }
         else {
@@ -133,6 +137,7 @@ public class PostsFragment extends Fragment
         homePageClient = callback.getHomePageClient();
 
         recyclerViewAdapter=new PostsRecyclerViewAdapter(callback);
+        recyclerViewAdapter.setItemSelectListener(this);
 
         Calendar calendar = Calendar.getInstance();
         postsReference = database
@@ -314,20 +319,7 @@ public class PostsFragment extends Fragment
                 if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                     fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-                    //                File imageFile = null;
-//                try {
-//                    imageFile = createImageFile();
-//                }catch(IOException ioe) {
-//                    ioe.printStackTrace();
-//                }
-//                if(imageFile !=null) {
-//                    imageUri = FileProvider.getUriForFile(getContext(),
-//                            "org.upesacm.acmacmw.fileprovider",imageFile);
-//                    System.out.println("imageUri : "+imageUri);
-//                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                    // }
                 }
             }
             catch (OutOfMemoryError error)
@@ -591,6 +583,18 @@ public class PostsFragment extends Fragment
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
     @Override
     public void onSignedInMemberStateChange(@NonNull Member signedInMember) {
         System.out.println("postfragment onSignedInMemberStateChange : "+signedInMember);
@@ -618,6 +622,20 @@ public class PostsFragment extends Fragment
         this.trialMember=null;
         recyclerViewAdapter.setTrialMember(null);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public String compressImage(String imageUri) {
 
@@ -778,4 +796,23 @@ public class PostsFragment extends Fragment
         return inSampleSize;
     }
 
+
+
+
+    @Override
+    public void onRecyclerItemSelect(View view,Post dataItem, int position) {
+        if(view.getId() == R.id.image_button_post_like) {
+            interactionListener.onPostLiked(dataItem);
+        }
+        else if(view.getId() == R.id.image_button_post_delete) {
+            interactionListener.onPostDeleted(dataItem);
+        }
+
+    }
+
+    public interface FragmentInteractionListener {
+        void onCameraButtonClicked();
+        void onPostLiked(Post post);
+        void onPostDeleted(Post post);
+    }
 }

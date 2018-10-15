@@ -89,6 +89,7 @@ public class UserController implements
                     if(member.getPassword().equals(password)) {
                         homeActivity.setUpMemberProfile(member);
                         msg="Successfully signed in";
+                        SessionManager.getInstance().createMemberSession(member);
                     }
                     else {
                         msg="Incorrect Username or password";
@@ -263,6 +264,9 @@ public class UserController implements
                 editor.putString(homeActivity.getString(R.string.logged_in_member_key),member.getSap());
                 editor.commit();
                 /* ************************************************************************* */
+                SessionManager.getInstance().createMemberSession(member);
+
+
                 Toast.makeText(homeActivity,"Welcome to ACM/ACM-W",Toast.LENGTH_LONG).show();
                 homeActivity.setUpMemberProfile(member);
 
@@ -439,8 +443,10 @@ public class UserController implements
                     Context.MODE_PRIVATE).edit();
             editor.putString(homeActivity.getString(R.string.trial_member_sap),trialMember.getSap());
             editor.commit();
+            //Create the Guest Session Here
+            SessionManager.getInstance().createGuestSession(trialMember);
 
-            homeActivity.trialMember=trialMember;
+            homeActivity.trialMember = trialMember;
             DatabaseReference trialMemberReference = FirebaseDatabase.getInstance().getReference("postsTrialLogin/" +
                     trialMember.getSap());
             trialMemberReference.setValue(trialMember);
@@ -477,6 +483,7 @@ public class UserController implements
                                 Context.MODE_PRIVATE).edit();
                         editor.clear();
                         editor.commit();
+                        SessionManager.getInstance().destroySession();
                         /* **************************************************************************/
 
                         homeActivity.customizeNavigationDrawer(HomeActivity.STATE_DEFAULT);

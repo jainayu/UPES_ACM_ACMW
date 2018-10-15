@@ -112,7 +112,7 @@ public class EventsListFragment extends Fragment implements
     }
 
     @Override
-    public void onRecyclerItemSelect(Event dataItem, int position) {
+    public void onRecyclerItemSelect(View view,Event dataItem, int position) {
         Toast.makeText(this.getContext(),dataItem.getEventID(),Toast.LENGTH_SHORT).show();
         Log.d(TAG,dataItem.getEventID()+" clicked");
         listener.onEventSelect(dataItem);

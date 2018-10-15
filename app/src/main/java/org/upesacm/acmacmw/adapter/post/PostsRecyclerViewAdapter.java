@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
+import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.model.TrialMember;
@@ -38,11 +39,10 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
     HomePageClient homePageClient;
     Member signedInMember;
     TrialMember trialMember;
-    FirebaseDatabase database;
+    OnRecyclerItemSelectListener<Post> itemSelectListener;
 
     public PostsRecyclerViewAdapter(HomeActivity callback) {
         this.callback = callback;
-        this.database = callback.getDatabase();
         this.homePageClient = callback.getHomePageClient();
     }
     @Override
@@ -114,6 +114,9 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
 
             Typeface bold = Typeface.createFromAsset(callback.getAssets(),"Fonts/product_sans_bold.ttf");
             username.setTypeface(bold);
+
+            imageButtonLike.setOnClickListener(this);
+            imageButtonDelete.setOnClickListener(this);
         }
 
         //This function has been defined to seperate the code of binding the data with the views
@@ -124,7 +127,7 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             this.post=post;
             this.position = position;
             String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
-            postReference = database.getReference(postUrl);
+            postReference = FirebaseDatabase.getInstance().getReference(postUrl);
             if(signedInMember != null || trialMember!=null) {
                 String signedInUserSap;
                 if(signedInMember!=null) {
@@ -186,6 +189,8 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onClick(View view) {
+            itemSelectListener.onRecyclerItemSelect(view,post,position);
+
             System.out.println("Liked button pressed");
             if (view.getId() == R.id.image_button_post_like) {
                 if(signedInMember != null || trialMember!=null) {
@@ -214,11 +219,11 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
                 }
                 else {
 //                    AppCompatActivity activity = (AppCompatActivity)recyclerView.getContext();
-                    LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
+                  /*  LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
                     loginDialogFragment.show(callback.getSupportFragmentManager(),
                             callback.getString(R.string.dialog_fragment_tag_login));
                     Toast.makeText(callback,"Please log in to like the post",Toast.LENGTH_LONG).show();
-                    System.out.println("like button User not signed in");
+                    System.out.println("like button User not signed in"); */
                 }
 
             }
@@ -301,6 +306,10 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             this.posts.addAll(posts);
             notifyItemRangeInserted(prevLast + 1, posts.size());
         }
+    }
+
+    public void setItemSelectListener(OnRecyclerItemSelectListener<Post> listener) {
+        this.itemSelectListener = listener;
     }
 
     public void setLoading(boolean value) {

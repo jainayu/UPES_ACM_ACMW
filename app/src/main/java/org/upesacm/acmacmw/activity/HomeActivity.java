@@ -113,6 +113,8 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_main);
+        SessionManager.init(this);
+
         toolbar = findViewById(R.id.my_toolbar);
         drawerLayout=findViewById(R.id.drawer_layout);
         navigationView=findViewById(R.id.nav_view);
@@ -260,6 +262,7 @@ public class HomeActivity extends AppCompatActivity implements
                                     Context.MODE_PRIVATE).edit();
                             editor.remove(getString(R.string.trial_member_sap));
                             editor.commit();
+                            SessionManager.getInstance().destroySession();
                             getUserController().signOutFromGoogle();
                             drawerLayout.closeDrawer(GravityCompat.START);
                             customizeNavigationDrawer(STATE_DEFAULT);

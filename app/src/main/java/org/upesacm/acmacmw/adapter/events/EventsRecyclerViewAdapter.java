@@ -131,7 +131,7 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
         @Override
         public void onClick(View view) {
             if(itemSelectListener != null)
-                itemSelectListener.onRecyclerItemSelect(event,position);
+                itemSelectListener.onRecyclerItemSelect(view,event,position);
         }
     }
 
