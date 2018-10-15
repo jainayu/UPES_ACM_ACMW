@@ -39,8 +39,6 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
     boolean isLoading=false;
     ArrayList<Post> posts;
     HomePageClient homePageClient;
-    Member signedInMember;
-    TrialMember trialMember;
     OnRecyclerItemSelectListener<Post> itemSelectListener;
 
     public PostsRecyclerViewAdapter(HomeActivity callback) {
@@ -100,8 +98,6 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
         private TextView textViewDate;
         private TextView textViewTime;
         private Post post;
-        private DatabaseReference ownerReference;
-        private DatabaseReference postReference;
         private int position;
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -128,35 +124,17 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             System.out.println("bindData called");
             this.post=post;
             this.position = position;
-            String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
-            postReference = FirebaseDatabase.getInstance().getReference(postUrl);
-            if(signedInMember != null || trialMember!=null) {
-                String signedInUserSap;
-                if(signedInMember!=null) {
-                    post.syncOwnerData(signedInMember);
-                    signedInUserSap = signedInMember.getSap();
-                }
-                else  {
-                    post.syncOwnerData(trialMember);
-                    signedInUserSap = trialMember.getSap();
-                }
 
-                boolean previouslyLiked = false;
-                for (String ownerSapId : post.getLikesIds()) {
-                    if (ownerSapId.equals(signedInUserSap)) {
-                        previouslyLiked = true;
-                        break;
-                    }
-                }
-                if (previouslyLiked) {
-                    imageButtonLike.setImageResource(R.drawable.ic_thumb_up_blue_24dp);
-                } else {
-                    imageButtonLike.setImageResource(R.drawable.like);
-                }
-            }
-            postReference.setValue(post);
             username.setText(post.getOwnerName());
             textViewCaption.setText(post.getCaption());
+            textViewLikeCount.setText(String.valueOf(post.getLikesIds().size()));
+
+            String date=post.getDay()+"/"
+                    +(Integer.parseInt(post.getMonthId().substring(1))+1)
+                    +"/"+post.getYearId().substring(1);
+            textViewDate.setText(date);
+            textViewTime.setText(post.getTime());
+
 
             RequestOptions requestOptions=new RequestOptions();
             requestOptions.placeholder(R.drawable.post_image_holder)
@@ -167,24 +145,29 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
                     .apply(requestOptions)
                     .into(imageView);
 
-            textViewLikeCount.setText(String.valueOf(post.getLikesIds().size()));
 
-            /* ************************** Setting up the date and time *********************************** */
-            String date=post.getDay()+"/"
-                    +(Integer.parseInt(post.getMonthId().substring(1))+1)
-                    +"/"+post.getYearId().substring(1);
-            textViewDate.setText(date);
-            textViewTime.setText(post.getTime());
-            /* **************************************************************************************/
-
-            /*boolean deleteButtonVisible = (signedInMember!=null && post.getOwnerSapId().equals(signedInMember.getSap()))
-                    || (trialMember!=null && post.getOwnerSapId().equals(trialMember.getSap()));*/
             boolean deleteButtonVisible = post.getOwnerSapId().equals(SessionManager.getInstance().getUserSap());
             if(deleteButtonVisible)
                 imageButtonDelete.setVisibility(View.VISIBLE);
             else
                 imageButtonDelete.setVisibility(View.GONE);
 
+            if(SessionManager.getInstance().isSessionAlive()) {
+                String loggedInUserSap = SessionManager.getInstance().getUserSap();
+                int noOfLikes = post.getLikesIds().size();
+                int i = 0;
+                while (i < noOfLikes) {
+                    if (post.getLikesIds().get(i).equals(loggedInUserSap)) {
+                        imageButtonLike.setImageResource(R.drawable.ic_thumb_up_blue_24dp);
+                        break;
+                    }
+                    i++;
+                }
+                // if no current user id is not present in likesIds
+                if (i == noOfLikes) {
+                    imageButtonLike.setImageResource(R.drawable.like);
+                }
+            }
         }
 
         @Override
@@ -272,17 +255,6 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             }
         }
     }
-
-    public void setSignedInMember(Member signedInMember) {
-        this.signedInMember = signedInMember;
-        notifyDataSetChanged();
-    }
-
-    public void setTrialMember(TrialMember trialMember) {
-        this.trialMember = trialMember;
-        notifyDataSetChanged();
-    }
-
 
     public void setItemSelectListener(OnRecyclerItemSelectListener<Post> listener) {
         this.itemSelectListener = listener;

@@ -597,28 +597,24 @@ public class PostsFragment extends Fragment
     public void onSignedInMemberStateChange(@NonNull Member signedInMember) {
         System.out.println("postfragment onSignedInMemberStateChange : "+signedInMember);
         this.signedInMember=signedInMember;
-        recyclerViewAdapter.setSignedInMember(signedInMember);
     }
 
     @Override
     public void onMemberLogout() {
         System.out.println("postfragment onMemberLogout : ");
         this.signedInMember=null;
-        recyclerViewAdapter.setSignedInMember(null);
     }
 
     @Override
     public void onTrialMemberStateChange(TrialMember trialMember) {
         System.out.println("post fragment on google sign in callback called"+trialMember);
         this.trialMember=trialMember;
-        recyclerViewAdapter.setTrialMember(trialMember);
     }
 
     @Override
     public void onGoogleSignOut() {
         System.out.println("post fragment on google sign out");
         this.trialMember=null;
-        recyclerViewAdapter.setTrialMember(null);
     }
 
 
