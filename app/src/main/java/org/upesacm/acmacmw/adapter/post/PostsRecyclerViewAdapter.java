@@ -229,7 +229,7 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             }
             else if(view.getId() == R.id.image_button_post_delete) {
                 System.out.println("deleting post");
-                if (itemView != null) {
+              /*  if (itemView != null) {
                     final Context context = itemView.getContext();
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                     alertDialog.setTitle("Delete this Post");
@@ -251,11 +251,10 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
 
                         }
                     });
-
                     AlertDialog dialog = alertDialog.create();
                     dialog.show();
 
-                }
+                } */
             }
         }
     }
@@ -279,9 +278,40 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
         }
     }
 
+    synchronized public void removePost(String postId) {
+        if(postId!=null) {
+            for(int i=0;i<posts.size();i++) {
+                if(postId.equals(posts.get(i))) {
+                    removePost(i);
+                    break;
+                }
+            }
+        }
+    }
+
+
     synchronized public void addPost(Post post) {
         posts.add(post);
         notifyItemInserted(posts.size()-1);
+    }
+    
+    synchronized public void addPostv2(Post post) {
+        if(post!=null) {
+            int i;
+            for(i=0;i<posts.size()-1;i++) {
+                boolean found = (posts.get(i).getPostId().compareTo(post.getPostId()) < 0 ) &&
+                        (posts.get(i+1).getPostId().compareTo(post.getPostId()) > 0 );
+                if(found)
+                    break;
+            }
+            if(i==posts.size()-1)
+                i +=2;
+            else if(i!=0)
+                i +=1;
+
+            posts.add(i,post);
+            notifyItemInserted(i);
+        }
     }
 
     synchronized public void setPosts(ArrayList<Post> posts) {

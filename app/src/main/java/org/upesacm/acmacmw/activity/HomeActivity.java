@@ -279,11 +279,6 @@ public class HomeActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        UserProfileFragment userProfileFragment=UserProfileFragment.newInstance(signedInMember);
-        userProfileFragment.onActivityResult(requestCode,resultCode,data);
-    }
     public void setDrawerEnabled(boolean enable) {
         int lockMode=enable? DrawerLayout.LOCK_MODE_UNLOCKED: DrawerLayout.
                 LOCK_MODE_LOCKED_CLOSED;

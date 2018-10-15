@@ -92,7 +92,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
             }
 
             default: {
-                userSelectedFrament = new PostsFragment();
+                userSelectedFrament = callback.getPostController().getPostsFragmentInstance();
                 break;
             }
         }
@@ -170,7 +170,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
         FragmentTransaction ft=getChildFragmentManager().beginTransaction();
         if(item.getItemId()== R.id.action_posts) {
             userSelectedFragmentId=0;
-            ft.replace(R.id.frame_layout_homepage, new PostsFragment());
+            ft.replace(R.id.frame_layout_homepage, callback.getPostController().getPostsFragmentInstance());
         }
         else if(item.getItemId() == R.id.action_upcoming_events) {
             userSelectedFragmentId = UPCOMING_EVENTS_FRAGMENT;

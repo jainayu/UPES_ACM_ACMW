@@ -1,10 +1,16 @@
 package org.upesacm.acmacmw.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
 import org.upesacm.acmacmw.fragment.homepage.post.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
@@ -17,6 +23,7 @@ public class PostController implements
     private static final String TAG = "PostController";
     private static PostController postController;
     private HomeActivity homeActivity;
+    private PostsFragment postsFragment;
 
     private PostController() {
     }
@@ -28,6 +35,13 @@ public class PostController implements
         }
 
         return postController;
+    }
+
+    public PostsFragment getPostsFragmentInstance() {
+        if(postsFragment == null)
+            postsFragment = new PostsFragment();
+
+        return postsFragment;
     }
 
     @Override
@@ -71,7 +85,34 @@ public class PostController implements
     }
 
     @Override
-    public void onPostDeleted(Post post) {
+    public void onPostDeleted(final Post post) {
         Log.i(TAG,"Post by "+post.getPostId()+" Deleted");
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(homeActivity);
+        alertDialog.setTitle("Delete this Post");
+        alertDialog.setMessage("Are you Sure ? ");
+        alertDialog.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
+                DatabaseReference postReference = FirebaseDatabase.getInstance().getReference(postUrl);
+                Post nullPost = new Post();
+                postReference.setValue(nullPost);
+
+                postsFragment.removePost(post);
+                Toast.makeText(homeActivity,"Deleted Sucessfully by Post Controller",Toast.LENGTH_SHORT).show();
+            }
+        });
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                // DO SOMETHING HERE
+
+            }
+        });
+
+        AlertDialog dialog = alertDialog.create();
+        dialog.show();
     }
 }

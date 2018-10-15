@@ -158,7 +158,7 @@ public class UserProfileFragment extends Fragment implements
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 progressBarUserProfile.setVisibility(View.VISIBLE);
-                getActivity().startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_PROFILE_PICTURE);
+                startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_PROFILE_PICTURE);
 
             }
         });

@@ -95,16 +95,14 @@ public class PostsFragment extends Fragment
     PostsRecyclerViewAdapter recyclerViewAdapter;
     FloatingActionButton floatingActionButton;
     SwipeRefreshLayout swipeContainer;
-
     RecyclerView.OnScrollListener scrollListener;
     Call<HashMap<String,Post>> loadMoreCall;
-
     Member signedInMember;
     TrialMember trialMember;
     private Uri fileUri;
     HomeActivity callback;
     FragmentInteractionListener interactionListener;
-
+    boolean viewAlive;
     public PostsFragment() {
         // Required empty public constructor
     }
@@ -198,6 +196,8 @@ public class PostsFragment extends Fragment
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        viewAlive = true;
+
         return view;
     }
 
@@ -229,6 +229,8 @@ public class PostsFragment extends Fragment
         monthCount = -1;
 
         super.onDestroyView();
+
+        viewAlive = false;
     }
 
     @Override
@@ -328,7 +330,6 @@ public class PostsFragment extends Fragment
 
             }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
         if(grantResults!=null) {
@@ -341,7 +342,6 @@ public class PostsFragment extends Fragment
             }
         }
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -397,7 +397,6 @@ public class PostsFragment extends Fragment
             }
         }
     }
-
     public void onCameraButtonClick() {
         if(!(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)) {
@@ -420,7 +419,7 @@ public class PostsFragment extends Fragment
                     Intent intent = new Intent();
                     intent.setType("image/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_FROM_GALLERY);
+                    PostsFragment.this.startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_FROM_GALLERY);
                 } else if (options[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
@@ -517,7 +516,6 @@ public class PostsFragment extends Fragment
             }
         }
     }
-
     @Override
     public void onFailure(Call<HashMap<String, Post>> call, Throwable t) {
         System.out.println("failed");
@@ -808,6 +806,18 @@ public class PostsFragment extends Fragment
             interactionListener.onPostDeleted(dataItem);
         }
 
+    }
+
+    public void addPost(Post post) {
+        recyclerViewAdapter.addPostv2(post);
+    }
+
+    public void removePost(Post post) {
+        recyclerViewAdapter.removePost(post.getPostId());
+    }
+
+    public boolean isViewAlive() {
+        return viewAlive;
     }
 
     public interface FragmentInteractionListener {

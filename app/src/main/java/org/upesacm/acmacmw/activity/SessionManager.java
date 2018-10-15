@@ -158,7 +158,7 @@ public class SessionManager  {
      * @return The sap id of the member if a Member Session is alive otherwise null
      */
     @Nullable
-    public String getMemberSap() {
+    private String retriveMemberSap() {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
@@ -176,7 +176,7 @@ public class SessionManager  {
      * @return The Sap id of the guest if a Guest Session is alive otherwise null
      */
     @Nullable
-    public String getGuestMemberSap() {
+    private String retrieveGuestMemberSap() {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
@@ -188,6 +188,24 @@ public class SessionManager  {
             throw new IllegalStateException("Guest Member Sap stored by SessionManager was null");
 
         return guestMemberSap;
+    }
+
+
+    @Nullable
+    public String getUserSap() {
+        switch (sessionID) {
+            case GUEST_SESSION_ID : {
+                return retrieveGuestMemberSap();
+            }
+
+            case MEMBER_SESSION_ID : {
+                return retriveMemberSap();
+            }
+
+            default : {
+                return null;
+            }
+        }
     }
 
 
