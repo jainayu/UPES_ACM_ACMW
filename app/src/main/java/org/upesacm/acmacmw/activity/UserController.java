@@ -87,9 +87,9 @@ public class UserController implements
                 String msg="";
                 if(member!=null) {
                     if(member.getPassword().equals(password)) {
-                        homeActivity.setUpMemberProfile(member);
                         msg="Successfully signed in";
                         SessionManager.getInstance().createMemberSession(member);
+                        homeActivity.customizeNavigationDrawer();
                     }
                     else {
                         msg="Incorrect Username or password";
@@ -268,7 +268,6 @@ public class UserController implements
 
 
                 Toast.makeText(homeActivity,"Welcome to ACM/ACM-W",Toast.LENGTH_LONG).show();
-                homeActivity.setUpMemberProfile(member);
 
                 homeActivity.getMembershipClient().getEmailMsg()
                         .enqueue(new Callback<EmailMsg>() {
@@ -419,11 +418,7 @@ public class UserController implements
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(homeActivity,"Signed out from guest user",Toast.LENGTH_SHORT)
                                 .show();
-                        homeActivity.trialMember=null;
-                        for(HomeActivityStateChangeListener listener:homeActivity.stateChangeListeners) {
-                            System.out.println("calling state change listeners onGoogleSignout");
-                            listener.onGoogleSignOut();
-                        }
+                        SessionManager.getInstance().destroySession();
                         System.out.println("Successfully signed out from guest user");
                     }
                 })
@@ -446,18 +441,13 @@ public class UserController implements
             //Create the Guest Session Here
             SessionManager.getInstance().createGuestSession(trialMember);
 
-            homeActivity.trialMember = trialMember;
             DatabaseReference trialMemberReference = FirebaseDatabase.getInstance().getReference("postsTrialLogin/" +
                     trialMember.getSap());
             trialMemberReference.setValue(trialMember);
 
             System.out.println("inside home activity onTrialMemberStateChange"+trialMember);
             System.out.println(trialMember.getName()+trialMember.getEmail());
-            for(HomeActivityStateChangeListener listener:homeActivity.stateChangeListeners) {
-                System.out.println(trialMember);
-                listener.onTrialMemberStateChange(trialMember);
-            }
-            homeActivity.customizeNavigationDrawer(HomeActivity.STATE_TRIAL_MEMBER_SIGNED_IN);
+            homeActivity.customizeNavigationDrawer();
             Toast.makeText(homeActivity, "trial member created", Toast.LENGTH_LONG).show();
             homeActivity.onBackPressed();
         }
@@ -477,21 +467,10 @@ public class UserController implements
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        /* ******************* Clear the member data from the app ***********************/
-                        homeActivity.signedInMember=null;
-                        SharedPreferences.Editor editor=homeActivity.getSharedPreferences(homeActivity.getString(R.string.preference_file_key),
-                                Context.MODE_PRIVATE).edit();
-                        editor.clear();
-                        editor.commit();
                         SessionManager.getInstance().destroySession();
-                        /* **************************************************************************/
 
-                        homeActivity.customizeNavigationDrawer(HomeActivity.STATE_DEFAULT);
+                        homeActivity.customizeNavigationDrawer();
                         homeActivity.displayHomePage();
-                        for(HomeActivityStateChangeListener listener:homeActivity.stateChangeListeners) {
-                            System.out.println("calling statechange listener callbacks logout");
-                            listener.onMemberLogout();
-                        }
                         Toast.makeText(homeActivity,"Successfully Logged Out",
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -514,7 +493,8 @@ public class UserController implements
                 .commit();
 
         FragmentTransaction ft = homeActivity.getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame_layout, EditProfileFragment.newInstance(homeActivity.signedInMember),
+        ft.replace(R.id.frame_layout, EditProfileFragment
+                        .newInstance(SessionManager.getInstance().getLoggedInMember()),
                 homeActivity.getString(R.string.fragment_tag_edit_profile));
         ft.commit();
     }
@@ -524,11 +504,13 @@ public class UserController implements
     public void onPasswordChange(PasswordChangeDialogFragment fragment, int resultCode) {
         String msg;
         if(resultCode== PasswordChangeDialogFragment.PASSWORD_SUCCESSSFULLY_CHANGED) {
-            Member modifiedMember = new Member.Builder(homeActivity.signedInMember)
+            Member modifiedMember = new Member
+                    .Builder(SessionManager.getInstance().getLoggedInMember())
                     .setPassword(fragment.getNewPass())
                     .build();
 
-            homeActivity.signedInMember = modifiedMember;
+            SessionManager.getInstance().destroySession();
+            SessionManager.getInstance().createMemberSession(modifiedMember);
             msg="Password Successfully Changed";
         }
         else if(resultCode == PasswordChangeDialogFragment.INCORRECT_OLD_PASSWORD) {
@@ -552,8 +534,8 @@ public class UserController implements
         switch (resultCode) {
             case EditProfileFragment.SUCESSFULLY_SAVED_NEW_DATA : {
                 msg="Saved";
-                homeActivity.signedInMember = member;
-                homeActivity.setUpMemberProfile(member);
+                SessionManager.getInstance().destroySession();
+                SessionManager.getInstance().createMemberSession(member);
                 break;
             }
 
@@ -568,7 +550,8 @@ public class UserController implements
 
         }
         homeActivity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, UserProfileFragment.newInstance(homeActivity.signedInMember),
+                .replace(R.id.frame_layout, UserProfileFragment
+                                .newInstance(SessionManager.getInstance().getLoggedInMember()),
                         homeActivity.getString(R.string.fragment_tag_user_profile))
                 .commit();
         Toast.makeText(homeActivity,msg,Toast.LENGTH_SHORT).show();

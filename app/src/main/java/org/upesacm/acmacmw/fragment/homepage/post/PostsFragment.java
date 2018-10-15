@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
+import android.media.MediaCas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,6 +41,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.activity.SessionManager;
 import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
@@ -77,7 +79,6 @@ public class PostsFragment extends Fragment
         implements OnLoadMoreListener,
         Callback<HashMap<String,Post>>,
         ValueEventListener,
-        HomeActivityStateChangeListener,
         View.OnClickListener,
         OnRecyclerItemSelectListener<Post> {
 
@@ -97,8 +98,6 @@ public class PostsFragment extends Fragment
     SwipeRefreshLayout swipeContainer;
     RecyclerView.OnScrollListener scrollListener;
     Call<HashMap<String,Post>> loadMoreCall;
-    Member signedInMember;
-    TrialMember trialMember;
     private Uri fileUri;
     HomeActivity callback;
     FragmentInteractionListener interactionListener;
@@ -182,8 +181,6 @@ public class PostsFragment extends Fragment
 
         progressBar.setVisibility(View.VISIBLE);
 
-        callback.addHomeActivityStateChangeListener(this);
-
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -203,7 +200,6 @@ public class PostsFragment extends Fragment
 
     @Override
     public void onDestroyView() {
-        callback.removeHomeActivityStateChangeListener(this);
         postsReference.removeEventListener(this);
 
         floatingActionButton.setOnClickListener(null);
@@ -251,11 +247,11 @@ public class PostsFragment extends Fragment
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.cameraButton) {
-            System.out.println("cameraButton pressed"+trialMember);
-            if (signedInMember != null ) {
+            if (SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
                 onCameraButtonClick();
             }
-            else if(trialMember!=null) {
+            else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+                TrialMember trialMember = SessionManager.getInstance().getGuestMember();
                 long trialPeriod=30*24*60*60*(1000L);
                 long elapsedTime = Calendar.getInstance().getTimeInMillis() - Long.parseLong(trialMember.getCreationTimeStamp());
                 System.out.println("trialPerion : "+trialPeriod);
@@ -539,13 +535,13 @@ public class PostsFragment extends Fragment
 
         String ownerName=null;
         String ownerSapId=null;
-        if(signedInMember!=null) {
-            ownerSapId=signedInMember.getSap();
-            ownerName=signedInMember.getName();
+        if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
+            ownerSapId=SessionManager.getInstance().getUserSap();
+            ownerName=SessionManager.getInstance().getLoggedInMember().getName();
         }
-        else if(trialMember!=null) {
-            ownerSapId=trialMember.getSap();
-            ownerName=trialMember.getName();
+        else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+            ownerSapId=SessionManager.getInstance().getUserSap();
+            ownerName=SessionManager.getInstance().getGuestMember().getName();
 
             System.out.println("trial memeber : "+ownerSapId);
             System.out.println("trial member : "+ownerName);
@@ -580,56 +576,6 @@ public class PostsFragment extends Fragment
             System.out.println("still loading");
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @Override
-    public void onSignedInMemberStateChange(@NonNull Member signedInMember) {
-        System.out.println("postfragment onSignedInMemberStateChange : "+signedInMember);
-        this.signedInMember=signedInMember;
-    }
-
-    @Override
-    public void onMemberLogout() {
-        System.out.println("postfragment onMemberLogout : ");
-        this.signedInMember=null;
-    }
-
-    @Override
-    public void onTrialMemberStateChange(TrialMember trialMember) {
-        System.out.println("post fragment on google sign in callback called"+trialMember);
-        this.trialMember=trialMember;
-    }
-
-    @Override
-    public void onGoogleSignOut() {
-        System.out.println("post fragment on google sign out");
-        this.trialMember=null;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public String compressImage(String imageUri) {
 

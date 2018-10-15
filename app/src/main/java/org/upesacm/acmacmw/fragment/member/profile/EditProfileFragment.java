@@ -74,6 +74,7 @@ public class EditProfileFragment extends Fragment
     @Override
     public void onAttach(Context context) {
         if(context instanceof HomeActivity) {
+            super.onAttach(context);
             callback = (HomeActivity)context;
             listener = callback.getUserController();
         }

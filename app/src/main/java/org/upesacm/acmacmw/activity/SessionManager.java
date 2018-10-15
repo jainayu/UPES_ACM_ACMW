@@ -6,6 +6,11 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.TrialMember;
 
@@ -19,6 +24,7 @@ public class SessionManager  {
     public static final int GUEST_SESSION_ID = 1;
     private static final String MEMBER_SAP_KEY = "member sap preferences key" ;
     private static final String GUEST_MEMBER_SAP_KEY = "guest member sap preference key";
+    private static final String SESSION_ID_STORE_KEY = "session id preference key";
 
     private static SessionManager sessionManager;
     /* ********************************************************************************************************* */
@@ -26,8 +32,8 @@ public class SessionManager  {
 
     private SharedPreferences preferences;
     private int sessionID;
-    private String memberSap;
-    private String guestMemberSap;
+
+    private String userSap;
 
     private Member loggedInMember;
     private TrialMember guestMember;
@@ -39,9 +45,47 @@ public class SessionManager  {
     public static void init(Context context) {
         if(sessionManager == null)
             sessionManager = new SessionManager();
+        else
+            return;
 
         sessionManager.preferences = context.getSharedPreferences(SESSION_DATA_PREFERENCE_FILE_KEY,
                 Context.MODE_PRIVATE);
+
+        sessionManager.sessionID = sessionManager.preferences.getInt(SESSION_ID_STORE_KEY,NONE);
+        switch (sessionManager.sessionID) {
+            case MEMBER_SESSION_ID : {
+                sessionManager.userSap = sessionManager.preferences.getString(MEMBER_SAP_KEY,null);
+                break;
+            }
+            case GUEST_SESSION_ID : {
+                sessionManager.userSap = sessionManager.preferences.getString(GUEST_MEMBER_SAP_KEY,null);
+            }
+            default : {
+                System.out.println("no session has been in progress");
+            }
+        }
+
+        if(sessionManager.userSap != null) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child("acm_acmw_members")
+                    .child(sessionManager.userSap)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(sessionManager.sessionID == MEMBER_SESSION_ID) {
+                                sessionManager.loggedInMember = dataSnapshot.getValue(Member.class);
+                                System.out.println("session manager : data fetched");
+                            } else {
+                                sessionManager.guestMember = dataSnapshot.getValue(TrialMember.class);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            System.out.println("session manager : cancelled");
+                        }
+                    });
+        }
     }
 
     public static SessionManager getInstance() {
@@ -73,8 +117,6 @@ public class SessionManager  {
         return sessionID!=SessionManager.NONE;
     }
 
-
-
     /** This method returns the sessionID for the session which is alive
      * @return sessionID or SessionManager.NONE
      * @See SessionManager.MEMBER_SESSION_ID and SessionManager.GUEST_MEMEBER_SESSION_ID
@@ -87,13 +129,12 @@ public class SessionManager  {
         return sessionID;
     }
 
-
     /**
      * This method creates a new Member Session if it has not already been created
      * @param memberSap - The Sap ID of the member for whom the session is being created
      * @return true - if the session has been created and false if a session is already alive
      */
-    public boolean  createMemberSession(@NonNull String memberSap) {
+    private boolean  createMemberSession(@NonNull String memberSap) {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
@@ -104,9 +145,10 @@ public class SessionManager  {
         //create the memeber session
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(MEMBER_SAP_KEY,memberSap);
+        editor.putInt(SESSION_ID_STORE_KEY,MEMBER_SESSION_ID);
         editor.commit();
 
-        this.memberSap = memberSap;
+        this.userSap = memberSap;
 
         sessionID = SessionManager.MEMBER_SESSION_ID;
 
@@ -122,13 +164,12 @@ public class SessionManager  {
         return created;
     }
 
-
     /**
      * This method creates a new Guest Session if it has not already been created
      * @param trialMemberSap - The Sap ID of the guest for whom the session is being created
      * @return true - if the session has been created and - false if a session is already alive
-     */
-    public boolean createGuestSession(@NonNull String trialMemberSap) {
+ createMemberSession    */
+    private boolean createGuestSession(@NonNull String trialMemberSap) {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
@@ -139,9 +180,10 @@ public class SessionManager  {
         //create the guest session
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(GUEST_MEMBER_SAP_KEY,trialMemberSap);
+        editor.putInt(SESSION_ID_STORE_KEY,GUEST_SESSION_ID);
         editor.commit();
 
-        this.guestMemberSap = trialMemberSap;
+        this.userSap = trialMemberSap;
 
         sessionID = SessionManager.GUEST_SESSION_ID;
 
@@ -149,7 +191,7 @@ public class SessionManager  {
     }
 
     public boolean createGuestSession(@NonNull TrialMember guestMember) {
-        boolean created = createMemberSession(guestMember.getSap());
+        boolean created = createGuestSession(guestMember.getSap());
         if(created) {
             this.guestMember = guestMember;
         }
@@ -157,43 +199,63 @@ public class SessionManager  {
         return created;
     }
 
-
     /**
      * @return The sap id of the member if a Member Session is alive otherwise null
      */
-    @Nullable
     private String retriveMemberSap() {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
-        if(memberSap==null)
-            memberSap = preferences.getString(MEMBER_SAP_KEY,null);
+        if(userSap==null)
+            userSap = preferences.getString(MEMBER_SAP_KEY,null);
 
-        if(memberSap == null)
+        if(userSap == null)
             throw new IllegalStateException("Member Sap stored by SessionManager was null");
 
-        return memberSap;
+        return userSap;
     }
-
 
     /**
      * @return The Sap id of the guest if a Guest Session is alive otherwise null
      */
-    @Nullable
     private String retrieveGuestMemberSap() {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
 
-        if(guestMemberSap == null) //fetch the questMemberSap from the preference file
-            guestMemberSap = preferences.getString(GUEST_MEMBER_SAP_KEY,null);
+        if(userSap == null) //fetch the guestMemberSap from the preference file
+            userSap = preferences.getString(GUEST_MEMBER_SAP_KEY,null);
 
-        if(guestMemberSap == null)
-            throw new IllegalStateException("Guest Member Sap stored by SessionManager was null");
+        if(userSap == null)
+            throw new IllegalStateException("Guest Sap stored by SessionManager was null");
 
-        return guestMemberSap;
+        return userSap;
     }
 
+    /**
+     * This method destroys any alive session
+     * @return true - if destroyed - false - if no session is alive
+     */
+    public boolean destroySession() {
+        if(!isSharedPreferencesSet())
+            throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
+                    "to function");
+        System.out.println("Session destroyed");
+        if(!isSessionAlive())
+            return false;
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+
+        userSap = null;
+        loggedInMember = null;
+        guestMember = null;
+        sessionID = SessionManager.NONE;
+
+        return true;
+    }
+    /* ******************************************************************************************/
 
     @Nullable
     public String getUserSap() {
@@ -212,26 +274,13 @@ public class SessionManager  {
         }
     }
 
-
-    /**
-     * This method destroys any alive session
-     * @return true - if destroyed - false - if no session is alive
-     */
-    public boolean destroySession() {
-        if(!isSharedPreferencesSet())
-            throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
-                    "to function");
-        System.out.println("Session destroyed");
-        if(!isSessionAlive())
-            return false;
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.clear();
-        editor.commit();
-
-        sessionID = SessionManager.NONE;
-
-        return true;
+    @Nullable
+    public Member getLoggedInMember() {
+        return loggedInMember;
     }
-    /* ******************************************************************************************/
+
+    @Nullable
+    public TrialMember getGuestMember() {
+        return guestMember;
+    }
 }

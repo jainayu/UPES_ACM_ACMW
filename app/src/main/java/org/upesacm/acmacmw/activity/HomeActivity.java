@@ -87,9 +87,6 @@ public class HomeActivity extends AppCompatActivity implements
 
     public static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     protected static final int MEMBER_PROFILE_MENU_ID = 1;
-    protected static final int STATE_MEMBER_SIGNED_IN=1;
-    protected static final int STATE_TRIAL_MEMBER_SIGNED_IN=2;
-    protected static final int STATE_DEFAULT=3;
     protected static final int CHOOSE_PROFILE_PICTURE = 4;
 
     private Toolbar toolbar;
@@ -102,33 +99,24 @@ public class HomeActivity extends AppCompatActivity implements
     private MembershipClient membershipClient;
     private View headerLayout;
 
-    protected Member signedInMember;
-    protected TrialMember trialMember;
     protected String newMemberSap;
 
-    private FirebaseDatabase database;
-    protected ArrayList<HomeActivityStateChangeListener> stateChangeListeners;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_main);
-        SessionManager.init(this);
 
         toolbar = findViewById(R.id.my_toolbar);
         drawerLayout=findViewById(R.id.drawer_layout);
         navigationView=findViewById(R.id.nav_view);
-
-
-        database = FirebaseDatabase.getInstance();
         retrofit=new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
         homePageClient =retrofit.create(HomePageClient.class);
         membershipClient=retrofit.create(MembershipClient.class);
-
-        stateChangeListeners=new ArrayList<>();
 
         /* *************************Setting the the action bar *****************************/
         setSupportActionBar(toolbar);
@@ -150,42 +138,12 @@ public class HomeActivity extends AppCompatActivity implements
         Button signin=headerLayout.findViewById(R.id.button_sign_in);
         signin.setOnClickListener(this);
 
-
-        Bundle bundle = getIntent().getExtras();
-        if(bundle!=null) {
-            signedInMember = (Member)bundle.get(getString(R.string.logged_in_member_details_key));
-            if(signedInMember!=null) {
-                setUpMemberProfile(signedInMember);
-            }
-        }
+        customizeNavigationDrawer();
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        SharedPreferences preferences=getSharedPreferences(getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE);
-        final String trialMemberSap=preferences.getString(getString(R.string.trial_member_sap),null);
-        if(account!=null && trialMemberSap!=null) {
-            homePageClient.getTrialMember(trialMemberSap)
-                    .enqueue(new Callback<TrialMember>() {
-                        @Override
-                        public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
-                            trialMember = response.body();
-                            System.out.println("get trial member  : "+trialMember);
-                            for(HomeActivityStateChangeListener listener:stateChangeListeners) {
-                                listener.onTrialMemberStateChange(trialMember);
-                                customizeNavigationDrawer(HomeActivity.STATE_TRIAL_MEMBER_SIGNED_IN);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<TrialMember> call, Throwable t) {
-
-                        }
-                    });
-        }
-        else if(account!=null) {
+        if(account!=null && SessionManager.getInstance().getSessionID() != SessionManager.GUEST_SESSION_ID) {
             getUserController().signOutFromGoogle();
         }
-        System.out.println("signedInMember : "+signedInMember);
 
     }
 
@@ -211,7 +169,6 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         System.out.println("onNaviagationItemSelected");
-        stateChangeListeners = new ArrayList<HomeActivityStateChangeListener>();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (item.getItemId() == R.id.action_home) {
             ft.replace(R.id.frame_layout, new HomePageFragment(), getString(R.string.fragment_tag_homepage));
@@ -231,7 +188,8 @@ public class HomeActivity extends AppCompatActivity implements
             ft.replace(R.id.frame_layout,new AboutFragment());
         }
         else if(item.getItemId() == MEMBER_PROFILE_MENU_ID) {
-            UserProfileFragment userProfileFragment= UserProfileFragment.newInstance(signedInMember);
+            UserProfileFragment userProfileFragment= UserProfileFragment
+                    .newInstance(SessionManager.getInstance().getLoggedInMember());
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout,userProfileFragment)
                     .commit();
@@ -258,14 +216,10 @@ public class HomeActivity extends AppCompatActivity implements
                     .setPositiveButton("Sure", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            SharedPreferences.Editor editor=getSharedPreferences(getString(R.string.preference_file_key),
-                                    Context.MODE_PRIVATE).edit();
-                            editor.remove(getString(R.string.trial_member_sap));
-                            editor.commit();
                             SessionManager.getInstance().destroySession();
                             getUserController().signOutFromGoogle();
                             drawerLayout.closeDrawer(GravityCompat.START);
-                            customizeNavigationDrawer(STATE_DEFAULT);
+                            customizeNavigationDrawer();
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -284,39 +238,10 @@ public class HomeActivity extends AppCompatActivity implements
                 LOCK_MODE_LOCKED_CLOSED;
         drawerLayout.setDrawerLockMode(lockMode);
         toggle.setDrawerIndicatorEnabled(enable);
-
     }
 
     public void setActionBarTitle(String title) {
         toolbar.setTitle(title);
-    }
-
-
-
-    void setUpMemberProfile(@NonNull Member member){
-        System.out.println("setting up member profile");
-        /* ************************** Saving sign in info in locallly *********************  */
-        SharedPreferences.Editor editor=getSharedPreferences(getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE).edit();
-        editor.clear(); // clear the trial member data if any
-        editor.putString(getString(R.string.logged_in_member_key),member.getSap());
-        editor.commit();
-        /* ************************************************************************************/
-
-        /* *********************** Clearing the trial member data before loggin in ***********/
-        this.trialMember=null;
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(account!=null) {
-            getUserController().signOutFromGoogle();
-        }
-        /* *************************************************************************************/
-        this.signedInMember=member;
-        customizeNavigationDrawer(STATE_MEMBER_SIGNED_IN);
-
-        for(HomeActivityStateChangeListener listener:stateChangeListeners) {
-            System.out.println("calling statechange listener callbacks");
-            listener.onSignedInMemberStateChange(signedInMember);
-        }
     }
 
     private long getCurrentFragmentUid(int containerId) {
@@ -388,7 +313,8 @@ public class HomeActivity extends AppCompatActivity implements
         }
         else if(isVisible(getString(R.string.fragment_tag_edit_profile))) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, UserProfileFragment.newInstance(signedInMember),
+                    .replace(R.id.frame_layout, UserProfileFragment
+                                    .newInstance(SessionManager.getInstance().getLoggedInMember()),
                             getString(R.string.fragment_tag_user_profile))
                     .commit();
         }
@@ -417,23 +343,24 @@ public class HomeActivity extends AppCompatActivity implements
     ImageButton imageButtonProfile;
     public static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 10;
     @SuppressLint("CheckResult")
-    void customizeNavigationDrawer(int state) {
+    void customizeNavigationDrawer() {
         navigationView.removeHeaderView(headerLayout);
         Menu navDrawerMenu = navigationView.getMenu();
         navDrawerMenu.clear();
         getMenuInflater().inflate(R.menu.navigationdrawer,navDrawerMenu);
-        if(state == STATE_MEMBER_SIGNED_IN) {
+        if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
             headerLayout = navigationView.inflateHeaderView(R.layout.signed_in_header);
             /* *********************************Setting the new header components**************************/
              imageButtonProfile=headerLayout.findViewById(R.id.image_button_profile_pic);
-            if(signedInMember.getProfilePicture()!=null)
+            if(SessionManager.getInstance().getLoggedInMember().getProfilePicture()!=null)
             {
-                Glide.with(getBaseContext()).load(signedInMember.getProfilePicture()).into(imageButtonProfile);
+                Glide.with(getBaseContext()).load(SessionManager.getInstance().getLoggedInMember().getProfilePicture()).into(imageButtonProfile);
             }
             imageButtonProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    UserProfileFragment userProfileFragment=UserProfileFragment.newInstance(signedInMember);
+                    UserProfileFragment userProfileFragment=UserProfileFragment
+                            .newInstance(SessionManager.getInstance().getLoggedInMember());
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.frame_layout,userProfileFragment)
                             .commit();
@@ -444,7 +371,7 @@ public class HomeActivity extends AppCompatActivity implements
 
 
             TextView textViewUsername = headerLayout.findViewById(R.id.text_view_username);
-            textViewUsername.setText(signedInMember.getName());
+            textViewUsername.setText(SessionManager.getInstance().getLoggedInMember().getName());
             /* *****************************************************************************************/
 
             /* ************ Adding the personalized corner *********************************************/
@@ -453,48 +380,33 @@ public class HomeActivity extends AppCompatActivity implements
                     .setCheckable(true);
             /* ************************************************************************************************/
         }
-        else if(state == STATE_DEFAULT){
+        else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE){
             headerLayout = navigationView.inflateHeaderView(R.layout.nav_drawer_header);
             Button signin=headerLayout.findViewById(R.id.button_sign_in);
             signin.setOnClickListener(HomeActivity.this);
         }
-        else if(state == STATE_TRIAL_MEMBER_SIGNED_IN) {
+        else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
             headerLayout = navigationView.inflateHeaderView(R.layout.trial_member_nav_header);
             ImageButton imageButtonProfile = headerLayout.findViewById(R.id.image_button_trial_pic);
             TextView textViewUserName = headerLayout.findViewById(R.id.text_view_trial_username);
             TextView textViewSignOut = headerLayout.findViewById(R.id.text_view_trial_signout);
 
-            System.out.println("trial member image url : " + trialMember.getImageUrl());
-            textViewUserName.setText(trialMember.getName());
-            if (trialMember.getImageUrl() != null) {
+            textViewUserName.setText(SessionManager.getInstance().getGuestMember().getName());
+            if (SessionManager.getInstance().getGuestMember().getImageUrl() != null) {
                 RequestOptions requestOptions=new RequestOptions();
                 requestOptions
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         ;
                 Glide.with(this)
-                        .load(trialMember.getImageUrl())
+                        .load(SessionManager.getInstance().getGuestMember().getImageUrl())
                         .apply(requestOptions)
                         .into(imageButtonProfile);
             }
-            textViewSignOut.setText(trialMember.getEmail());
+            textViewSignOut.setText(SessionManager.getInstance().getGuestMember().getEmail());
             textViewSignOut.setOnClickListener(this);
         }
         navigationView.invalidate();
     }
-
-    public void addHomeActivityStateChangeListener(HomeActivityStateChangeListener listener) {
-        System.out.println("addHomeActivityStateChangeListener");
-        stateChangeListeners.add(listener);
-        //call the listener once after intially adding it
-        listener.onSignedInMemberStateChange(signedInMember);
-        listener.onTrialMemberStateChange(trialMember);
-    }
-
-    public void removeHomeActivityStateChangeListener(HomeActivityStateChangeListener listener) {
-        stateChangeListeners.remove(listener);
-    }
-
-
 
     public HomePageClient getHomePageClient() {
         return homePageClient;
@@ -507,32 +419,6 @@ public class HomeActivity extends AppCompatActivity implements
     public MembershipClient getMembershipClient() {return membershipClient;}
 
     public Toolbar getToolbar() {return toolbar;}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public void sendIDCard(String recipientEmail,String subject,String mailBody) {
         OTPSender sender=new OTPSender();
