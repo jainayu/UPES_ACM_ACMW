@@ -106,6 +106,8 @@ public class SessionManager  {
         editor.putString(MEMBER_SAP_KEY,memberSap);
         editor.commit();
 
+        this.memberSap = memberSap;
+
         sessionID = SessionManager.MEMBER_SESSION_ID;
 
         return true;
@@ -138,6 +140,8 @@ public class SessionManager  {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(GUEST_MEMBER_SAP_KEY,trialMemberSap);
         editor.commit();
+
+        this.guestMemberSap = trialMemberSap;
 
         sessionID = SessionManager.GUEST_SESSION_ID;
 

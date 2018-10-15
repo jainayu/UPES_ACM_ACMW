@@ -816,6 +816,10 @@ public class PostsFragment extends Fragment
         recyclerViewAdapter.removePost(post.getPostId());
     }
 
+    public void modifyPost(Post newPost) {
+        recyclerViewAdapter.modifyPost(newPost);
+    }
+
     public boolean isViewAlive() {
         return viewAlive;
     }

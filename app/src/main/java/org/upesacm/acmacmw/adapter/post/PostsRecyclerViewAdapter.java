@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.media.MediaCas;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.activity.SessionManager;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Member;
@@ -175,87 +177,20 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             textViewTime.setText(post.getTime());
             /* **************************************************************************************/
 
-            imageButtonLike.setOnClickListener(this);
-
-            boolean deleteButtonVisible = (signedInMember!=null && post.getOwnerSapId().equals(signedInMember.getSap()))
-                    || (trialMember!=null && post.getOwnerSapId().equals(trialMember.getSap()));
+            /*boolean deleteButtonVisible = (signedInMember!=null && post.getOwnerSapId().equals(signedInMember.getSap()))
+                    || (trialMember!=null && post.getOwnerSapId().equals(trialMember.getSap()));*/
+            boolean deleteButtonVisible = post.getOwnerSapId().equals(SessionManager.getInstance().getUserSap());
             if(deleteButtonVisible)
                 imageButtonDelete.setVisibility(View.VISIBLE);
             else
                 imageButtonDelete.setVisibility(View.GONE);
-            imageButtonDelete.setOnClickListener(this);
 
         }
 
         @Override
         public void onClick(View view) {
-            itemSelectListener.onRecyclerItemSelect(view,post,position);
-
             System.out.println("Liked button pressed");
-            if (view.getId() == R.id.image_button_post_like) {
-                if(signedInMember != null || trialMember!=null) {
-                    System.out.println("like button signedInMember is not null");
-                    boolean previouslyLiked = false;
-                    int pos = 0;
-
-                    String signedInUserSap = (signedInMember==null)?trialMember.getSap():signedInMember.getSap();
-                    for (String ownerSapId : post.getLikesIds()) {
-                        System.out.println("member id : " + ownerSapId);
-                        if (ownerSapId.equals(signedInUserSap)) {
-                            previouslyLiked = true;
-
-                            break;
-                        }
-                        pos++;
-                        imageButtonLike.setImageResource(R.drawable.ic_thumb_up_blue_24dp);
-                    }
-                    if (previouslyLiked){
-                        post.getLikesIds().remove(pos);
-                        imageButtonLike.setImageResource(R.drawable.like);}
-                    else
-                        post.getLikesIds().add(signedInUserSap);
-                    textViewLikeCount.setText(String.valueOf(post.getLikesIds().size()));
-                    postReference.setValue(post);
-                }
-                else {
-//                    AppCompatActivity activity = (AppCompatActivity)recyclerView.getContext();
-                  /*  LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
-                    loginDialogFragment.show(callback.getSupportFragmentManager(),
-                            callback.getString(R.string.dialog_fragment_tag_login));
-                    Toast.makeText(callback,"Please log in to like the post",Toast.LENGTH_LONG).show();
-                    System.out.println("like button User not signed in"); */
-                }
-
-            }
-            else if(view.getId() == R.id.image_button_post_delete) {
-                System.out.println("deleting post");
-              /*  if (itemView != null) {
-                    final Context context = itemView.getContext();
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                    alertDialog.setTitle("Delete this Post");
-                    alertDialog.setMessage("Are you Sure ? ");
-                    alertDialog.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Post nullPost = new Post();
-                            postReference.setValue(nullPost);
-                            PostsRecyclerViewAdapter.this.removePost(position);
-                            Toast.makeText(context,"Deleted Sucessfully",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            // DO SOMETHING HERE
-
-                        }
-                    });
-                    AlertDialog dialog = alertDialog.create();
-                    dialog.show();
-
-                } */
-            }
+            itemSelectListener.onRecyclerItemSelect(view,post,position);
         }
     }
 
@@ -265,7 +200,7 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
         }
     }
 
-    synchronized public void removePost() {
+    synchronized public void removePost() { //removes the last element
         int pos=posts.size()-1;
         posts.remove(pos);
         notifyItemRemoved(pos);
@@ -288,7 +223,6 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             }
         }
     }
-
 
     synchronized public void addPost(Post post) {
         posts.add(post);
@@ -314,10 +248,29 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
         }
     }
 
+    synchronized public void addPosts(ArrayList<Post> posts) {
+        if(posts!=null) {
+            int prevLast = this.posts.size() - 1;
+            this.posts.addAll(posts);
+            notifyItemRangeInserted(prevLast + 1, posts.size());
+        }
+    }
+
     synchronized public void setPosts(ArrayList<Post> posts) {
         System.out.println("set Posts called : "+posts.size());
         this.posts=posts;
         notifyDataSetChanged();
+    }
+
+    synchronized public void modifyPost(Post post) {
+        if(post!=null) {
+            for(int i=0;i<posts.size();i++) {
+                if(posts.get(i)!=null && posts.get(i).getPostId().equals(post.getPostId())) {
+                    posts.set(i,post);
+                    notifyItemChanged(i);
+                }
+            }
+        }
     }
 
     public void setSignedInMember(Member signedInMember) {
@@ -330,13 +283,6 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    public void addPosts(ArrayList<Post> posts) {
-        if(posts!=null) {
-            int prevLast = this.posts.size() - 1;
-            this.posts.addAll(posts);
-            notifyItemRangeInserted(prevLast + 1, posts.size());
-        }
-    }
 
     public void setItemSelectListener(OnRecyclerItemSelectListener<Post> listener) {
         this.itemSelectListener = listener;

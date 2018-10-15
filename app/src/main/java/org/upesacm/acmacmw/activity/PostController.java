@@ -16,6 +16,8 @@ import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.model.Post;
 
+import java.util.ArrayList;
+
 
 public class PostController implements
         ImageUploadFragment.UploadResultListener,
@@ -73,7 +75,28 @@ public class PostController implements
         Log.i(TAG,"Post by "+post.getPostId()+"Liked");
         SessionManager sessionManager = SessionManager.getInstance();
         if(sessionManager.isSessionAlive()) {
+            String loggedInUserSap = SessionManager.getInstance().getUserSap();
+            int noOfLikes = post.getLikesIds().size();
+            int i = 0;
+            while(i<noOfLikes) {
+                if(post.getLikesIds().get(i).equals(loggedInUserSap)) {
+                    post.getLikesIds().remove(i);
+                    break;
+                }
+                i++;
+            }
+            // if no current user id is not present in likesIds then add
+            if(i==noOfLikes) {
+                System.out.println("liked");
+                post.getLikesIds().add(loggedInUserSap);
+            }
             //save the like in database
+            String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
+            DatabaseReference postReference = FirebaseDatabase.getInstance().getReference(postUrl);
+            postReference.setValue(post);
+
+            //update the UI
+            postsFragment.modifyPost(post);
 
         } else {
             Log.i(TAG,"unable to like as user session is not in progress");
