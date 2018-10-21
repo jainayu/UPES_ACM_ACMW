@@ -15,10 +15,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
@@ -124,7 +120,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                     if (isWhatsappNoValid) {
                                         if(!branch.isEmpty())
                                         {
-                                            List<String> events=new ArrayList<>();
+                                            final List<String> events=new ArrayList<>();
                                             events.add(event.getEventID());
                                             final NonAcmParticipant nonAcmParticipant=new NonAcmParticipant.Builder()
                                                     .setEventsList(events)
@@ -139,24 +135,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialogInterface, int i) {
-                                                            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("event_db");
-                                                            progressBar.setVisibility(View.VISIBLE);
-                                                            ref.child("NonACMParticipants").child(sap).setValue(nonAcmParticipant).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    NonAcmParticipant participant = new NonAcmParticipant.Builder(nonAcmParticipant)
-                                                                            .setEventsList(null)
-                                                                            .build();
-                                                                    ref.child("events").child(event.getEventID()).child("Participants").child(sap).setValue(participant).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            progressBar.setVisibility(View.INVISIBLE);
-                                                                            listener.onParticipantDetailsAvailable(nonAcmParticipant);
-                                                                        }
-                                                                    });
-
-                                                                }
-                                                            });
+                                                            listener.onParticipantDetailsAvailable(nonAcmParticipant,events,progressBar);
                                                         }
                                                     })
                                                     .setNegativeButton("Edit", new DialogInterface.OnClickListener() {
@@ -196,6 +175,6 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     }
 
     public interface FragmentInteractionListener {
-        void onParticipantDetailsAvailable(NonAcmParticipant nonAcmParticipant);
+        void onParticipantDetailsAvailable(NonAcmParticipant nonAcmParticipant, List<String> events, ProgressBar progressBar);
     }
 }

@@ -3,6 +3,10 @@ package org.upesacm.acmacmw.activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.view.View;
+import android.widget.ProgressBar;
+
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,7 +39,6 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
             eventController = new EventController();
             eventController.homeActivity = homeActivity;
         }
-
         return eventController;
     }
 
@@ -82,7 +85,6 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
                             Bundle args = new Bundle();
                             args.putParcelableArrayList(Event.LIST_PARCEL_KEY,(ArrayList<Event>)selectedEvents);
                             fragment.setArguments(args);
-
                             homeActivity.setCurrentFragment(fragment);
                         }
                     }
@@ -95,7 +97,25 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
     }
 
     @Override
-    public void onParticipantDetailsAvailable(NonAcmParticipant nonAcmParticipant) {
+    public void onParticipantDetailsAvailable(final NonAcmParticipant nonAcmParticipant, final List<String> events, final ProgressBar progressBar) {
+        progressBar.setVisibility(View.VISIBLE);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("event_db");
+        ref.child("NonACMParticipants").child(nonAcmParticipant.getSap()).setValue(nonAcmParticipant)
+        .addOnSuccessListener(new OnSuccessListener<Void>() {
+        @Override
+        public void onSuccess(Void aVoid) {
+            NonAcmParticipant participant = new NonAcmParticipant.Builder(nonAcmParticipant)
+                .setEventsList(null)
+                .build();
+            for (String event:events)
+                ref.child("events").child(event).child("ACMParticipants").child(nonAcmParticipant.getSap()).setValue(participant).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        progressBar.setVisibility(View.GONE);
+                        }
+                });
 
+            }
+        });
     }
 }
