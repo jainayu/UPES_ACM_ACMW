@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class NonAcmParticipant implements Parcelable {
+    public static final String PARCEL_KEY = "Nonacm Participant key";
     public static final Creator<NonAcmParticipant> CREATOR = new Creator<NonAcmParticipant>() {
         @Override
         public NonAcmParticipant createFromParcel(Parcel in) {

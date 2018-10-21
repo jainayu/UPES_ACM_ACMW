@@ -26,7 +26,6 @@ import org.upesacm.acmacmw.util.Config;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -107,7 +106,7 @@ public class EventDetailFragment extends Fragment {
         buttonEventDetailRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            fragmentInteractionListener.onRegisterEvent(event);
+            fragmentInteractionListener.onClickRegister(event);
             }
         });
         updateUI();
@@ -144,6 +143,6 @@ public class EventDetailFragment extends Fragment {
         }
     }
     public interface FragmentInteractionListener {
-        public void onRegisterEvent(Event event);
+        void onClickRegister(Event event);
     }
 }

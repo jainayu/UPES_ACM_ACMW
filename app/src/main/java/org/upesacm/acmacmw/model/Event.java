@@ -12,6 +12,7 @@ import java.util.Date;
 
 public class Event implements Comparable<Event>, Parcelable {
     public static final String PARCEL_KEY = "Event";
+    public static final String LIST_PARCEL_KEY = "Event list";
     public static final Creator<Event> CREATOR = new Creator<Event>() {
 
         @NonNull
@@ -32,7 +33,7 @@ public class Event implements Comparable<Event>, Parcelable {
     @JsonProperty("eventName")
     private String eventName="";
 
-    @JsonProperty("minParticipant")
+    @JsonProperty("minTeam")
     private int minParticipant;
 
     @JsonProperty("entryFees")

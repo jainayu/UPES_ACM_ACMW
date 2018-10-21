@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Member implements Parcelable{
-
+    public static final String PARCEL_KEY = "Member Parcel Key";
     private String memberId;
     private String name;
     private String password;

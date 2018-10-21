@@ -1,31 +1,19 @@
 package org.upesacm.acmacmw.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,42 +27,30 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.event.EventRegistration;
-import org.upesacm.acmacmw.retrofit.ApiClient;
-import org.upesacm.acmacmw.retrofit.ResponseModel;
+import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AlumniFragment;
-import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.HomePageFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
-import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
-import org.upesacm.acmacmw.fragment.member.registration.RecipientsFragment;
-import org.upesacm.acmacmw.fragment.member.trial.TrialMemberOTPVerificationFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
-import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
 import org.upesacm.acmacmw.model.Member;
-import org.upesacm.acmacmw.model.NewMember;
-import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.util.Config;
-import org.upesacm.acmacmw.util.UploadService;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Queue;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -252,7 +228,7 @@ public class HomeActivity extends AppCompatActivity implements
             return Config.HOME_PAGE_FRAGMENT_UID;
         if(fragment instanceof EventDetailFragment)
             return Config.EVENT_DETAIL_FRAGMENT_UID;
-        if(fragment instanceof EventRegistration)
+        if(fragment instanceof ParticipantDetailFragment)
             return Config.EVENT_REGISTRATION_FRAGMENT_UID;
 
         return -1;
@@ -265,14 +241,7 @@ public class HomeActivity extends AppCompatActivity implements
             drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
-        if(getCurrentFragmentUid(R.id.frame_layout) == EventDetailFragment.UID) {
-            getSupportFragmentManager().popBackStack();
-            return;
-        }
-        if(getCurrentFragmentUid(R.id.frame_layout) == EventRegistration.UID) {
-            getSupportFragmentManager().popBackStack();
-            return;
-        }
+
         if(isVisible(getString(R.string.fragment_tag_homepage))) {
             System.out.println("homepage is visible");
             new AlertDialog.Builder(this)
@@ -319,7 +288,10 @@ public class HomeActivity extends AppCompatActivity implements
                     .commit();
         }
         else {
-            displayHomePage();
+            if(getSupportFragmentManager().getBackStackEntryCount()!=0)
+                getSupportFragmentManager().popBackStack();
+            else
+                displayHomePage();
         }
     }
 
@@ -486,4 +458,5 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
     }
+
 }
