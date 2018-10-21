@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -340,10 +341,11 @@ public class HomeActivity extends AppCompatActivity implements
         navigationView.setCheckedItem(R.id.action_home);
     }
 
-    ImageButton imageButtonProfile;
+    ImageView imageButtonProfile;
     public static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 10;
     @SuppressLint("CheckResult")
     void customizeNavigationDrawer() {
+        if(SessionManager.getInstance().getLoggedInMember()!=null){
         navigationView.removeHeaderView(headerLayout);
         Menu navDrawerMenu = navigationView.getMenu();
         navDrawerMenu.clear();
@@ -354,7 +356,8 @@ public class HomeActivity extends AppCompatActivity implements
              imageButtonProfile=headerLayout.findViewById(R.id.image_button_profile_pic);
             if(SessionManager.getInstance().getLoggedInMember().getProfilePicture()!=null)
             {
-                Glide.with(getBaseContext()).load(SessionManager.getInstance().getLoggedInMember().getProfilePicture()).into(imageButtonProfile);
+                Glide.with(getBaseContext())
+                        .load(SessionManager.getInstance().getLoggedInMember().getProfilePicture()).thumbnail(0.9f).into(imageButtonProfile);
             }
             imageButtonProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -406,6 +409,7 @@ public class HomeActivity extends AppCompatActivity implements
             textViewSignOut.setOnClickListener(this);
         }
         navigationView.invalidate();
+        }
     }
 
     public HomePageClient getHomePageClient() {

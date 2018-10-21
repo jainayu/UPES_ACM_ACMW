@@ -498,6 +498,11 @@ public class UserController implements
                 homeActivity.getString(R.string.fragment_tag_edit_profile));
         ft.commit();
     }
+
+    @Override
+    public void updateProfilePicture() {
+        homeActivity.customizeNavigationDrawer();
+    }
     /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
     @Override

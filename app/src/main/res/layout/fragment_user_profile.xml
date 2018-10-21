@@ -408,7 +408,6 @@
                 android:layout_width="0dp"
                 android:layout_height="250dp"
                 android:background="#44449a"
-                android:padding="2dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/userrrrrrr"
                 app:layout_constraintEnd_toEndOf="parent"

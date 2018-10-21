@@ -205,6 +205,7 @@ public class UserProfileFragment extends Fragment implements
     public interface FragmentInteractionListener {
         void onSignOutClicked(UserProfileFragment fragment);
         void onEditClicked(UserProfileFragment fragment);
+        void updateProfilePicture();
     }
     Bitmap imageBitmap;
     private File destination;
@@ -304,6 +305,10 @@ public class UserProfileFragment extends Fragment implements
                                        {
                                            Glide.with(getContext()).load(newMember.getProfilePicture()).into(imageViewProfilePic);
 
+                                            if(listener!=null)
+                                            {
+                                                listener.updateProfilePicture();
+                                            }
                                        }
 
                                     }
