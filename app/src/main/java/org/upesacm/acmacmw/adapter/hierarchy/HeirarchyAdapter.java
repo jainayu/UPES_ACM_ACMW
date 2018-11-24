@@ -55,7 +55,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             holder.whatsapp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                   Uri uri = Uri.parse("smsto:"+heirarchyModels.get(position).getWhatsapp());
+//                   Uri uri = Uri.parse("smsto:"+heirarchyModels.get(position).getWhatsappNo());
 //                   Intent i = new Intent(Intent.ACTION_SENDTO, uri);
 //                   i.setPackage("com.whatsapp");
 //                   context.startActivity(i);

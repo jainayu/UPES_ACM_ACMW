@@ -2,8 +2,16 @@ package org.upesacm.acmacmw.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-public class Member implements Parcelable{
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.upesacm.acmacmw.model.abstracts.Participant;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Member implements Participant {
     public static final String PARCEL_KEY = "Member Parcel Key";
     private String memberId;
     private String name;
@@ -19,8 +27,10 @@ public class Member implements Parcelable{
     private String recepientSap;
     private Boolean premium;
     private String membershipType;
-
     private String profilePicture;
+
+    @JsonIgnore
+    private List<String> eventsList;
 
     Member() {}
 
@@ -39,6 +49,7 @@ public class Member implements Parcelable{
         currentAdd = in.readString();
         recepientSap = in.readString();
         profilePicture=in.readString();
+        eventsList = in.createStringArrayList();
         boolean array[]=new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
@@ -108,6 +119,20 @@ public class Member implements Parcelable{
         return recepientSap;
     }
 
+    @Override
+    public boolean isACMMember() {
+        return true;
+    }
+
+    @Override
+    public List<String> getEventsList() {
+        if(this.eventsList == null) {
+            this.eventsList = new ArrayList<>();
+        }
+        List<String> eventsList = new ArrayList<>(this.eventsList); //create a new copy of events list
+        return eventsList;
+    }
+
     public String getMembershipType() {
         return membershipType;
     }
@@ -136,6 +161,7 @@ public class Member implements Parcelable{
         parcel.writeString(currentAdd);
         parcel.writeString(recepientSap);
         parcel.writeString(profilePicture);
+        parcel.writeList(eventsList);
         parcel.writeBooleanArray(new boolean[]{premium});
     }
 
@@ -155,6 +181,7 @@ public class Member implements Parcelable{
         private Boolean premium;
         private String membershipType;
         private String profilePicture;
+        private List<String> eventsList;
 
         public Builder() {
             //default constructor
@@ -176,6 +203,7 @@ public class Member implements Parcelable{
             this.premium = member.isPremium();
             this.membershipType = member.getMembershipType();
             this.profilePicture = member.getProfilePicture();
+            this.eventsList = member.getEventsList();
         }
 
         public Member build() {
@@ -195,6 +223,7 @@ public class Member implements Parcelable{
             member.premium = premium;
             member.membershipType = membershipType;
             member.profilePicture=profilePicture;
+            member.eventsList = eventsList;
             return member;
         }
 
@@ -270,6 +299,14 @@ public class Member implements Parcelable{
 
         public Builder setMembershipType(String membershipType) {
             this.membershipType = membershipType;
+            return this;
+        }
+
+        public Builder setEventsList(List<String> eventsList) {
+            if(eventsList == null) {
+                eventsList = new ArrayList<>();
+            }
+            this.eventsList = new ArrayList(eventsList);
             return this;
         }
     }

@@ -88,25 +88,6 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/editText_sap"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="15dp"
-                    android:drawableStart="@drawable/ic_label_black_24dp"
-                    android:drawablePadding="10dp"
-                    android:hint="SAP ID"
-                    android:inputType="number"
-                    android:shadowColor="@color/onSeconadry"
-                    android:textSize="16sp" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
                     android:id="@+id/editText_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

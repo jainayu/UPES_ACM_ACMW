@@ -13,6 +13,7 @@ import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NonAcmParticipant;
+import org.upesacm.acmacmw.model.abstracts.Participant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +25,8 @@ public class SelectedEventsFragment extends Fragment {
 
     ParticipantDetailFragment.FragmentInteractionListener listener;
     HomeActivity homeActivity;
-    List<Event> selectedEvents = new ArrayList<>();
-    Member acmParticipant;
-    NonAcmParticipant nonAcmParticipant;
+    Participant participant;
+
     public SelectedEventsFragment() {
         // Required empty public constructor
     }
@@ -54,9 +54,7 @@ public class SelectedEventsFragment extends Fragment {
         if(args == null) {
             throw new IllegalStateException("no arguments passed ");
         }
-        selectedEvents = args.getParcelableArrayList(Event.LIST_PARCEL_KEY);
-        acmParticipant = args.getParcelable(Member.PARCEL_KEY);
-        nonAcmParticipant = args.getParcelable(NonAcmParticipant.PARCEL_KEY);
+        participant = args.getParcelable(Participant.PARCEL_KEY);
         super.onCreate(savedInstanceState);
     }
 
@@ -69,8 +67,7 @@ public class SelectedEventsFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle savedState) {
-        savedState.putParcelableArrayList(Event.LIST_PARCEL_KEY,(ArrayList<Event>)selectedEvents);
+        savedState.putParcelable(Participant.PARCEL_KEY,participant);
     }
-
 
 }

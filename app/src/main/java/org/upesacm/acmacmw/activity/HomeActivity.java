@@ -304,9 +304,10 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     void displayHomePage() {
-        FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+        /*FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout,new HomePageFragment(),getString(R.string.fragment_tag_homepage));
-        ft.commitAllowingStateLoss();
+        ft.commitAllowingStateLoss();*/
+        setCurrentFragment(new HomePageFragment());
 
         getSupportActionBar().show();
         setDrawerEnabled(true);
@@ -420,47 +421,4 @@ public class HomeActivity extends AppCompatActivity implements
     public UserController getUserController() {
         return UserController.getInstance(this);
     }
-    Member member;
-
-    public Member getMember(String sapid) {
-        Call<Member> memberCall=membershipClient.getMember(sapid);
-        memberCall.enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
-                 member=response.body();
-                String msg="";
-                if(member!=null) {
-                }
-                else {
-                    msg="Incorrect Username or password";
-                }
-                Toast.makeText(getBaseContext(),msg,Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-
-            }
-        });
-        return member;
-    }
-
-    public void changePassword(Member member) {
-        membershipClient.createMember(member.getSap(),member).enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
-                if(response.code()==200)
-                {
-                    Toast.makeText(getBaseContext(), "Password changed successfully", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                Toast.makeText(getBaseContext(), "Failed changing passsword", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-    }
-
 }

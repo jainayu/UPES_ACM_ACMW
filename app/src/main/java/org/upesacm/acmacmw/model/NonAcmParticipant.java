@@ -6,9 +6,12 @@ import android.support.annotation.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.upesacm.acmacmw.model.abstracts.Participant;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class NonAcmParticipant implements Parcelable {
+public class NonAcmParticipant implements Participant {
     public static final String PARCEL_KEY = "Nonacm Participant key";
     public static final Creator<NonAcmParticipant> CREATOR = new Creator<NonAcmParticipant>() {
         @Override
@@ -58,7 +61,7 @@ public class NonAcmParticipant implements Parcelable {
     @JsonProperty("year")
     String year;
 
-    @JsonProperty("eventsList")
+    @JsonProperty("EVENTS_LIST")
     List<String> eventsList;
 
 
@@ -70,6 +73,28 @@ public class NonAcmParticipant implements Parcelable {
         return name;
     }
 
+
+
+    @Override
+    public String getDob() {
+        return null;
+    }
+
+    @Override
+    public String getCurrentAdd() {
+        return null;
+    }
+
+    @Override
+    public String getRecepientSap() {
+        return null;
+    }
+
+    @Override
+    public boolean isACMMember() {
+        return false;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -78,7 +103,8 @@ public class NonAcmParticipant implements Parcelable {
         return contact;
     }
 
-    public String getWhatsapp() {
+    @Override
+    public String getWhatsappNo() {
         return whatsapp;
     }
 
@@ -90,7 +116,12 @@ public class NonAcmParticipant implements Parcelable {
         return year;
     }
 
+    @Override
     public List<String> getEventsList() {
+        if(this.eventsList == null) {
+            this.eventsList = new ArrayList<>();
+        }
+        List<String> eventsList = new ArrayList<>(this.eventsList);
         return eventsList;
     }
 
@@ -131,7 +162,7 @@ public class NonAcmParticipant implements Parcelable {
             this.branch = participant.branch;
             this.contact = participant.contact;
             this.email = participant.email;
-            this.eventsList = participant.eventsList;
+            this.eventsList = participant.getEventsList();
             this.name = participant.name;
             this.sap = participant.sap;
             this.whatsapp = participant.whatsapp;
@@ -173,7 +204,11 @@ public class NonAcmParticipant implements Parcelable {
         }
 
         public Builder setEventsList(List<String> eventsList) {
-            this.eventsList = eventsList;
+            if(eventsList == null) {
+                this.eventsList = new ArrayList<>();
+            } else {
+                this.eventsList = new ArrayList<>(eventsList);
+            }
             return this;
         }
 
