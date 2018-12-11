@@ -21,13 +21,13 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SelectedEventsFragment extends Fragment {
+public class PaymentDetailsFragment extends Fragment {
 
     ParticipantDetailFragment.FragmentInteractionListener listener;
     HomeActivity homeActivity;
     Participant participant;
 
-    public SelectedEventsFragment() {
+    public PaymentDetailsFragment() {
         // Required empty public constructor
     }
 

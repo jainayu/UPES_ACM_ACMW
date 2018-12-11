@@ -2,6 +2,8 @@ package org.upesacm.acmacmw.model.abstracts;
 
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public interface Participant extends Parcelable {
@@ -28,6 +30,7 @@ public interface Participant extends Parcelable {
 
     String getRecepientSap();
 
+    @JsonIgnore
     boolean isACMMember();
 
     List<String> getEventsList();

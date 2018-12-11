@@ -3,7 +3,6 @@ package org.upesacm.acmacmw.activity;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -21,17 +20,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
@@ -43,18 +38,10 @@ import org.upesacm.acmacmw.fragment.navdrawer.HomePageFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
-import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.util.Config;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Queue;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -307,7 +294,7 @@ public class HomeActivity extends AppCompatActivity implements
         /*FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout,new HomePageFragment(),getString(R.string.fragment_tag_homepage));
         ft.commitAllowingStateLoss();*/
-        setCurrentFragment(new HomePageFragment());
+        setCurrentFragment(new HomePageFragment(), true);
 
         getSupportActionBar().show();
         setDrawerEnabled(true);
@@ -403,10 +390,11 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
 
-    void setCurrentFragment(Fragment fragment) {
+    void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout,fragment);
-        ft.addToBackStack(null);
+        if(addToBackStack)
+            ft.addToBackStack(null);
         ft.commit();
     }
 
