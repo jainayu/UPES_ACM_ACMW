@@ -33,7 +33,7 @@ public class Event implements Comparable<Event>, Parcelable {
     @JsonProperty("eventName")
     private String eventName="";
 
-    @JsonProperty("minTeam")
+    @JsonProperty("minParticipant")
     private int minParticipant;
 
     @JsonProperty("entryFees")

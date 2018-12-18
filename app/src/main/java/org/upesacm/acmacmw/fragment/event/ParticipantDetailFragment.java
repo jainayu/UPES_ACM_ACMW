@@ -37,7 +37,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     private static final String TAG = "EventRegisterFragment";
     public static final long UID = Config.EVENT_REGISTRATION_FRAGMENT_UID;
     Event event;
-    String sap;
+    List<String> sapIds;
     Participant participant;
     EditText editTextName,editTextContact,editTextEmail,
             editTextYear,editTextBranch,editTextWhatsappNo;
@@ -72,7 +72,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
         if(args == null)
             throw new IllegalArgumentException("null arguments supplied to ParticipantDetailFragment");
 
-        sap = args.getString(Participant.PARTICIPANT_SAP_KEY);
+        sapIds = args.getStringArrayList(Participant.PARTICIPANT_SAP_KEY_LIST);
         event = args.getParcelable(Event.PARCEL_KEY);
         fetchParticipantDetails();
     }
@@ -142,7 +142,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                             .setName(name)
                                             .setBranch(branch).setContact(contact)
                                             .setEmail(email)
-                                            .setSap(sap)
+                                            .setSap(sapIds.get(0))
                                             .setWhatsapp(whatsapp)
                                             .build();
                                     new AlertDialog.Builder(getContext())
@@ -189,7 +189,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     void fetchParticipantDetails() {
         FirebaseDatabase.getInstance().getReference()
                 .child("acm_acmw_members")
-                .child(sap)
+                .child(sapIds.get(0))
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -197,7 +197,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                         FirebaseDatabase.getInstance().getReference()
                                 .child(FirebaseConfig.EVENTS_DB)
                                 .child(FirebaseConfig.PARTICIPANTS)
-                                .child(sap)
+                                .child(sapIds.get(0))
                                 .child(FirebaseConfig.EVENTS_LIST)
                                 .addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
@@ -230,7 +230,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                             FirebaseDatabase.getInstance().getReference()
                                                     .child(FirebaseConfig.EVENTS_DB)
                                                     .child(FirebaseConfig.PARTICIPANTS)
-                                                    .child(sap)
+                                                    .child(sapIds.get(0))
                                                     .addListenerForSingleValueEvent(new ValueEventListener() { //check if already registered for some event
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

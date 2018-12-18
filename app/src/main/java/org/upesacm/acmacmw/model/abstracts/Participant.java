@@ -9,6 +9,7 @@ import java.util.List;
 public interface Participant extends Parcelable {
     String PARCEL_KEY = "Participant Parcel Key";
     String PARTICIPANT_SAP_KEY = "Participant SAP Key";
+    String PARTICIPANT_SAP_KEY_LIST = "Participant SAP Key list";
 
     String getBranch();
 

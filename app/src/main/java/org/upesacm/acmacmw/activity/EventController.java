@@ -20,6 +20,9 @@ import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.abstracts.Participant;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EventController implements EventsListFragment.FragmentInteractionListener,
         EventDetailFragment.FragmentInteractionListener,
         ParticipantDetailFragment.FragmentInteractionListener,
@@ -59,10 +62,10 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
     }
 
     @Override
-    public void onSAPIDAvailable(final Event selectedEvent,final String sap) {
+    public void onSAPIDAvailable(final Event selectedEvent,final List<String> sapIds) {
         Fragment fragment = new ParticipantDetailFragment();
         Bundle args = new Bundle();
-        args.putString(Participant.PARTICIPANT_SAP_KEY,sap);
+        args.putStringArrayList(Participant.PARTICIPANT_SAP_KEY_LIST,(ArrayList<String>)sapIds);
         args.putParcelable(Event.PARCEL_KEY,selectedEvent);
         fragment.setArguments(args);
         homeActivity.setCurrentFragment(fragment, true);
