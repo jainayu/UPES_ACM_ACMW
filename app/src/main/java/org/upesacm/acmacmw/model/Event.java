@@ -66,6 +66,9 @@ public class Event implements Comparable<Event>, Parcelable {
     @JsonProperty("phone")
     private String phone;
 
+    @JsonProperty("maxParticipants")
+    private int maxParticipant;
+
 
 
     protected Event(@NonNull Parcel in) {
@@ -85,6 +88,7 @@ public class Event implements Comparable<Event>, Parcelable {
             eventTimeStamp = in.readLong();
         }
         in.readList(prizeMoney,this.getClass().getClassLoader());
+        maxParticipant = in.readInt();
     }
 
 
@@ -148,7 +152,9 @@ public class Event implements Comparable<Event>, Parcelable {
         return phone;
     }
 
-
+    public int getMaxParticipant() {
+        return maxParticipant;
+    }
 
     @Override
     public int describeContents() {
@@ -174,6 +180,7 @@ public class Event implements Comparable<Event>, Parcelable {
             parcel.writeLong(eventTimeStamp);
         }
         parcel.writeList(prizeMoney);
+        parcel.writeInt(maxParticipant);
     }
 
 
@@ -196,7 +203,7 @@ public class Event implements Comparable<Event>, Parcelable {
         private String eventDescription;
         private String whatsapp;
         private String phone;
-
+        private int maxParticipant;
         public Builder() {
 
         }
@@ -208,6 +215,7 @@ public class Event implements Comparable<Event>, Parcelable {
             this.entryFees = event.getEntryFees();
             this.prizeMoney = event.getPrizeMoney();
             this.eventTimeStamp = event.eventTimeStamp;
+            this.maxParticipant = event.maxParticipant;
         }
 
         public Event build() {
@@ -224,6 +232,7 @@ public class Event implements Comparable<Event>, Parcelable {
             event.eventDescription = this.eventDescription;
             event.whatsapp = this.whatsapp;
             event.phone = this.phone;
+            event.maxParticipant = this.maxParticipant;
 
             return event;
         }
@@ -285,6 +294,11 @@ public class Event implements Comparable<Event>, Parcelable {
 
         public Builder setPhone(String phone) {
             this.phone = phone;
+            return this;
+        }
+
+        public Builder setMaxParticipant(int maxParticipant) {
+            this.maxParticipant = maxParticipant;
             return this;
         }
     }

@@ -6,12 +6,10 @@ import android.support.annotation.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.upesacm.acmacmw.model.abstracts.Participant;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class Member implements Participant {
+public class Member implements Parcelable {
     public static final String PARCEL_KEY = "Member Parcel Key";
     private String memberId;
     private String name;
@@ -119,12 +117,6 @@ public class Member implements Participant {
         return recepientSap;
     }
 
-    @Override
-    public boolean isACMMember() {
-        return true;
-    }
-
-    @Override
     public List<String> getEventsList() {
         if(this.eventsList == null) {
             this.eventsList = new ArrayList<>();

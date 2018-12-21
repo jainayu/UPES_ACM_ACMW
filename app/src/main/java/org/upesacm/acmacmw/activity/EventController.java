@@ -17,11 +17,13 @@ import org.upesacm.acmacmw.fragment.event.SAPIDFragment;
 import org.upesacm.acmacmw.fragment.event.PaymentDetailsFragment;
 import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
 import org.upesacm.acmacmw.model.Event;
-import org.upesacm.acmacmw.model.abstracts.Participant;
+import org.upesacm.acmacmw.model.Participant;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventController implements EventsListFragment.FragmentInteractionListener,
         EventDetailFragment.FragmentInteractionListener,
@@ -63,6 +65,10 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
 
     @Override
     public void onSAPIDAvailable(final Event selectedEvent,final List<String> sapIds) {
+        System.out.println("onSAPIDAvailable");
+        for(String sap:sapIds) {
+            System.out.println("id : "+sap);
+        }
         Fragment fragment = new ParticipantDetailFragment();
         Bundle args = new Bundle();
         args.putStringArrayList(Participant.PARTICIPANT_SAP_KEY_LIST,(ArrayList<String>)sapIds);
@@ -72,9 +78,22 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
     }
 
     @Override
-    public void onParticipantDetailsAvailable(boolean alreadyRegisteredForEvent,final Participant participant,final Event event) {
+    public void onParticipantDetailsAvailable(List<String> newSapIds,List<String> acmParticipantsSap,
+            List<String> alreadyRegistered, final Map<String,Participant> participants, final Event event) {
         System.out.println("onParticipant details avaliable");
-        if(!alreadyRegisteredForEvent) {
+        System.out.println("new sap ids");
+        for(String s:newSapIds) {
+            System.out.println(s);
+        }
+        System.out.println("acm participants");
+        for(String s:acmParticipantsSap) {
+            System.out.println(s);
+        }
+        System.out.println("already registered");
+        for(String s:alreadyRegistered) {
+            System.out.println(s);
+        }
+        /*if(!alreadyRegisteredForEvent) {
             final Fragment fragment = new PaymentDetailsFragment();
             Bundle args = new Bundle();
             args.putParcelable(Participant.PARCEL_KEY, participant);
@@ -97,33 +116,11 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
                                         .child(FirebaseConfig.EVENTS_DB)
                                         .child(FirebaseConfig.PARTICIPANTS)
                                         .child(participant.getSap());
-                                if(participant.isACMMember())
-                                    ref = ref.child(FirebaseConfig.EVENTS_LIST);
-
-                                ref.setValue((participant.isACMMember())?
-                                        participant.getEventsList():
-                                        participant).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                ref.setValue(participant).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    if(participant.isACMMember()) {
-                                                        FirebaseDatabase.getInstance().getReference()
-                                                                .child(FirebaseConfig.ACM_ACMW_MEMBERS)
-                                                                .child(participant.getSap())
-                                                                .setValue(participant)
-                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                        if (task.isSuccessful()) {
-                                                                            homeActivity.setCurrentFragment(fragment, true);
-                                                                        } else {
-                                                                            Log.e("event controller", "FAiled to update the db acm_acmw_members db");
-                                                                        }
-                                                                    }
-                                                                });
-                                                    } else {
-                                                        homeActivity.setCurrentFragment(fragment, false);
-                                                    }
+                                                    homeActivity.setCurrentFragment(fragment, false);
                                                 } else {
                                                     Log.e("event controller", "FAiled to update the participants db");
                                                 }
@@ -137,6 +134,6 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
 
         } else {
             Toast.makeText(homeActivity,"Already Registered for this event",Toast.LENGTH_LONG).show();
-        }
+        }*/
     }
 }

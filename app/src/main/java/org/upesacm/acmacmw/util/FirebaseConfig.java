@@ -7,4 +7,6 @@ public interface FirebaseConfig {
     String PARTICIPANTS = "participants";
     String EVENTS_LIST = "eventsList";
     String EVENTS = "events";
+    String EVENT_TEAMS_LIST = "teamsList";
+    String EVENT_TEAMS_COUNT = "teamsCount";
 }

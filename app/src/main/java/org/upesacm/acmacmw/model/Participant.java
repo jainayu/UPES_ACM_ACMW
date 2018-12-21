@@ -4,28 +4,29 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.upesacm.acmacmw.model.abstracts.Participant;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NonAcmParticipant implements Participant {
-    public static final String PARCEL_KEY = "Nonacm Participant key";
-    public static final Creator<NonAcmParticipant> CREATOR = new Creator<NonAcmParticipant>() {
+public class Participant implements Parcelable {
+    public static final String PARCEL_KEY = "Participant Parcel Key";
+    public static final String PARTICIPANT_SAP_KEY = "Participant SAP Key";
+    public static final String PARTICIPANT_SAP_KEY_LIST = "Participant SAP Key list";
+    public static final Creator<Participant> CREATOR = new Creator<Participant>() {
         @Override
-        public NonAcmParticipant createFromParcel(Parcel in) {
-            return new NonAcmParticipant(in);
+        public Participant createFromParcel(Parcel in) {
+            return new Participant(in);
         }
 
         @Override
-        public NonAcmParticipant[] newArray(int size) {
-            return new NonAcmParticipant[size];
+        public Participant[] newArray(int size) {
+            return new Participant[size];
         }
     };
 
-    protected NonAcmParticipant(@NonNull  Parcel in) {
+    protected Participant(@NonNull  Parcel in) {
         sap = in.readString();
         name = in.readString();
         email = in.readString();
@@ -34,9 +35,13 @@ public class NonAcmParticipant implements Participant {
         branch = in.readString();
         year = in.readString();
         eventsList = in.createStringArrayList();
+        boolean[] array = new boolean[1];
+        in.readBooleanArray(array);
+        isACMMember = array[0];
+        teamId = in.readString();
     }
 
-    public NonAcmParticipant() {
+    public Participant() {
         //empty constructor
     }
 
@@ -64,6 +69,11 @@ public class NonAcmParticipant implements Participant {
     @JsonProperty("EVENTS_LIST")
     List<String> eventsList;
 
+    @JsonProperty("acmmember")
+    private boolean isACMMember;
+
+    @JsonProperty("teamId")
+    private String teamId;
 
     public String getSap() {
         return sap;
@@ -75,24 +85,24 @@ public class NonAcmParticipant implements Participant {
 
 
 
-    @Override
+
     public String getDob() {
         return null;
     }
 
-    @Override
+
     public String getCurrentAdd() {
         return null;
     }
 
-    @Override
+
     public String getRecepientSap() {
         return null;
     }
 
-    @Override
+
     public boolean isACMMember() {
-        return false;
+        return isACMMember;
     }
 
     public String getEmail() {
@@ -103,7 +113,7 @@ public class NonAcmParticipant implements Participant {
         return contact;
     }
 
-    @Override
+
     public String getWhatsappNo() {
         return whatsapp;
     }
@@ -116,13 +126,17 @@ public class NonAcmParticipant implements Participant {
         return year;
     }
 
-    @Override
+
     public List<String> getEventsList() {
         if(this.eventsList == null) {
             this.eventsList = new ArrayList<>();
         }
         List<String> eventsList = new ArrayList<>(this.eventsList);
         return eventsList;
+    }
+
+    public String getTeamId() {
+        return teamId;
     }
 
     @Override
@@ -140,37 +154,57 @@ public class NonAcmParticipant implements Participant {
         parcel.writeString(branch);
         parcel.writeString(year);
         parcel.writeStringList(eventsList);
+        boolean[] boolArray = new boolean[1];
+        boolArray[0] = isACMMember;
+        parcel.writeBooleanArray(boolArray);
+        parcel.writeString(teamId);
     }
 
 
     public static class Builder {
-        String sap;
-        String name;
-        String email;
-        String contact;
-        String whatsapp;
-        String branch;
-        String year;
-        List<String> eventsList;
+        private String sap;
+        private String name;
+        private String email;
+        private String contact;
+        private String whatsapp;
+        private String branch;
+        private String year;
+        private List<String> eventsList;
+        private boolean isAcmMember;
+        private String teamId;
+
 
         public Builder() {
 
         }
 
-        public Builder(NonAcmParticipant participant) {
+        public Builder(Participant participant) {
             this.sap = participant.sap;
             this.branch = participant.branch;
             this.contact = participant.contact;
             this.email = participant.email;
             this.eventsList = participant.getEventsList();
             this.name = participant.name;
-            this.sap = participant.sap;
             this.whatsapp = participant.whatsapp;
             this.year = participant.year;
+            this.isAcmMember = participant.isACMMember;
+            this.teamId = participant.teamId;
         }
 
-        public NonAcmParticipant build() {
-            NonAcmParticipant participant = new NonAcmParticipant();
+        public Builder(Member participant) {
+            this.sap = participant.getSap();
+            this.branch = participant.getBranch();
+            this.contact = participant.getContact();
+            this.email = participant.getEmail();
+            this.eventsList = participant.getEventsList();
+            this.name = participant.getName();
+            this.whatsapp = participant.getWhatsappNo();
+            this.year = participant.getYear();
+            this.isAcmMember = true;
+        }
+
+        public Participant build() {
+            Participant participant = new Participant();
             participant.branch = this.branch;
             participant.contact = this.contact;
             participant.email = this.email;
@@ -179,7 +213,8 @@ public class NonAcmParticipant implements Participant {
             participant.sap = this.sap;
             participant.whatsapp = this.whatsapp;
             participant.year = this.year;
-
+            participant.isACMMember = this.isAcmMember;
+            participant.teamId = this.teamId;
             return participant;
         }
 
@@ -224,6 +259,16 @@ public class NonAcmParticipant implements Participant {
 
         public Builder setYear(String year) {
             this.year = year;
+            return this;
+        }
+
+        public Builder setIsAcmMember(boolean isAcmMember) {
+            this.isAcmMember = isAcmMember;
+            return this;
+        }
+
+        public Builder setTeamId(String teamId) {
+            this.teamId = teamId;
             return this;
         }
     }

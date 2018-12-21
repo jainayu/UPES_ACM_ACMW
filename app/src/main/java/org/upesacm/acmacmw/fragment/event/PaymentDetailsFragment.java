@@ -10,13 +10,7 @@ import android.view.ViewGroup;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.model.Event;
-import org.upesacm.acmacmw.model.Member;
-import org.upesacm.acmacmw.model.NonAcmParticipant;
-import org.upesacm.acmacmw.model.abstracts.Participant;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.upesacm.acmacmw.model.Participant;
 
 /**
  * A simple {@link Fragment} subclass.

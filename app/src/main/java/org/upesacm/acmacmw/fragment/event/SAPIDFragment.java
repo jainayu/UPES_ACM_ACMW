@@ -3,18 +3,19 @@ package org.upesacm.acmacmw.fragment.event;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
@@ -33,9 +34,10 @@ public class SAPIDFragment extends Fragment {
     Event selectedEvent;
     HomeActivity homeActivity;
     FragmentInteractionListener listener;
-    ListView listViewSap;
+    RecyclerView recyclerView;
     Button buttonProceed;
-    private SapIdAdapter sapIdAdapter;
+    FloatingActionButton addButton;
+    private RecyclerViewAdapter sapIdAdapter;
     public SAPIDFragment() {
         // Required empty public constructor
     }
@@ -72,29 +74,39 @@ public class SAPIDFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_sapid, container, false);
-        listViewSap = view.findViewById(R.id.list_view_sapid);
+        recyclerView = view.findViewById(R.id.recycler_view_sapid);
         buttonProceed = view.findViewById(R.id.button_proceed_sapid_fragment);
+        addButton = view.findViewById(R.id.floating_action_button_sapids);
+        sapIdAdapter = new RecyclerViewAdapter();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        recyclerView.setAdapter(sapIdAdapter);
 
-        sapIdAdapter = new SapIdAdapter();
-        listViewSap.setAdapter(sapIdAdapter);
-
-        buttonProceed.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<String> sapIds = new ArrayList<>();
-                for(int i=0;i<selectedEvent.getMinParticipant();++i) {
-                    sapIds.add(sapIdAdapter.getTextInputLayout(i).getEditText().getText().toString());
-                    if(!sapIdAdapter.isSapValid(i)) {
-                        Toast.makeText(SAPIDFragment.this.getContext(),"Please check all the sap ids",Toast.LENGTH_LONG)
-                                .show();
-                        return;
+                if(view.getId() == R.id.floating_action_button_sapids) {
+                    sapIdAdapter.addInputTextLayouts(1);
+                } else if(view.getId() == R.id.button_proceed_sapid_fragment) {
+                    List<String> sapIds = new ArrayList<>();
+                    System.out.println("sap id count : "+sapIdAdapter.getCount());
+                    for(int i=0;i<sapIdAdapter.getCount();++i) {
+                        System.out.println("adding ids : "+sapIdAdapter.getSapId(i));
+                        if(!sapIdAdapter.isSapValid(i)) {
+                            Toast.makeText(SAPIDFragment.this.getContext(),"Please check all the sap ids",Toast.LENGTH_LONG)
+                                    .show();
+                            return;
+                        }
+                        sapIds.add(sapIdAdapter.getSapId(i));
                     }
+                    System.out.println(sapIds.size());
+                    Toast.makeText(SAPIDFragment.this.getContext(),"everything is valid"+sapIds.size(),Toast.LENGTH_LONG).show();
+                    listener.onSAPIDAvailable(selectedEvent,sapIds);
                 }
-                Toast.makeText(SAPIDFragment.this.getContext(),"everything is valid",Toast.LENGTH_LONG).show();
-                listener.onSAPIDAvailable(selectedEvent,sapIds);
             }
-        });
+        };
 
+        addButton.setOnClickListener(onClickListener);
+        buttonProceed.setOnClickListener(onClickListener);
         return view;
     }
 
@@ -108,37 +120,72 @@ public class SAPIDFragment extends Fragment {
         void onSAPIDAvailable(Event event,List<String> sapIds);
     }
 
-    private class SapIdAdapter extends BaseAdapter {
 
-        boolean[] sapsValid = new boolean[selectedEvent.getMinParticipant()];
-        List<TextInputLayout> inputLayouts = new ArrayList<>();
+    private class RecyclerViewAdapter extends RecyclerView.Adapter<InputViewHolder> {
+        String[] sapIds = new String[selectedEvent.getMaxParticipant()];
+        boolean[] valid = new boolean[selectedEvent.getMaxParticipant()];
+        int count = selectedEvent.getMinParticipant();
+        @NonNull
         @Override
-        public int getCount() {
-            return selectedEvent.getMinParticipant();
+        public InputViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.dynamic_layout_sap,parent,false);
+            return new InputViewHolder(view,this);
         }
 
         @Override
-        public Object getItem(int i) {
-            return null;
+        public void onBindViewHolder(@NonNull InputViewHolder holder, int position) {
+            System.out.println("on BindView holder called");
+            holder.setPosition(position);
         }
 
         @Override
-        public long getItemId(int i) {
-            return i;
+        public int getItemCount() {
+            return count;
         }
 
-        @Override
-        public View getView(final int i, View convertView, ViewGroup parent) {
-            if(convertView==null) {
-                convertView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.dynamic_layout_sap,null);
-                
+        public void afterTextChanged(int position,String sap,boolean valid) {
+            sapIds[position] = sap;
+            this.valid[position] = valid;
+        }
+
+        public boolean addInputTextLayouts(int n) {
+            if(count+n>selectedEvent.getMaxParticipant()) {
+                Toast.makeText(SAPIDFragment.this.getContext(), "max sap id " + count, Toast.LENGTH_LONG)
+                        .show();
+                return false;
             }
-            final TextInputLayout inputLayout = convertView.findViewById(R.id.text_input_layout_sap);
-            inputLayouts.add(inputLayout);
+            else {
+                count+=n;
+                notifyItemRangeInserted(count-n,n);
+                return true;
+            }
+        }
 
-            inputLayout.setHint("SAP ID of Participant "+(i+1));
-            TextWatcher tw = new TextWatcher() {
+        public boolean isSapValid(int index) {
+            return valid[index];
+        }
+
+        public String getSapId(int index) {
+            return sapIds[index];
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+    }
+
+    private class InputViewHolder extends RecyclerView.ViewHolder {
+        TextInputLayout textInputLayout;
+        TextWatcher tW;
+        int position;
+        RecyclerViewAdapter callbackRef;
+        public InputViewHolder(View itemView, final RecyclerViewAdapter callbackRef) {
+            super(itemView);
+            this.callbackRef = callbackRef;
+            textInputLayout = itemView.findViewById(R.id.text_input_layout_sap);
+            tW = new TextWatcher() {
+
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -152,25 +199,21 @@ public class SAPIDFragment extends Fragment {
                 @Override
                 public void afterTextChanged(Editable editable) {
                     String sap = editable.toString();
-                    sapsValid[i] = Pattern.compile("5000[\\d]{5}").matcher(sap).matches();
-                    if(!sapsValid[i]){
-                        inputLayout.setError("Invalid SAP ID");
-                    } else {
-                        inputLayout.setError(null);
-                    }
+                    boolean valid = Pattern.compile("5000[\\d]{5}").matcher(sap).matches();
+                    if(!valid)
+                        textInputLayout.setError("Invalid SAP ID");
+                    else
+                        textInputLayout.setError(null);
+
+                    callbackRef.afterTextChanged(position,sap,valid);
                 }
             };
 
-            inputLayout.getEditText().addTextChangedListener(tw);
-            return convertView;
+            textInputLayout.getEditText().addTextChangedListener(tW);
         }
 
-        boolean isSapValid(int index) {
-            return sapsValid[index];
-        }
-
-        TextInputLayout getTextInputLayout(int index) {
-            return inputLayouts.get(index);
+        void setPosition(int position) {
+            this.position = position;
         }
     }
 }
