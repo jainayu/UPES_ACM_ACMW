@@ -195,8 +195,6 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
 
     void fetchParticipantDetails() {
         Collections.sort(sapIds);
-        System.out.println("id 1 : "+sapIds.get(0));
-        System.out.println("id 2 : "+sapIds.get(1));
 
         //check for acm or non-acm participant
         FirebaseDatabase.getInstance().getReference()
