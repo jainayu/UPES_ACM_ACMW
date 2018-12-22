@@ -225,7 +225,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                 .child(FirebaseConfig.EVENTS_DB)
                                 .child(FirebaseConfig.PARTICIPANTS)
                                 .startAt(sapIds.get(0))
-                                .endAt(sapIds.get(nonacmSaps.size()-1))
+                                .endAt(sapIds.get(sapIds.size()-1))
                                 .orderByKey()
                                 .addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
