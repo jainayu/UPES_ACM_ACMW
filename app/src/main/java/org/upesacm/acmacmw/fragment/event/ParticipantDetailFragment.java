@@ -206,6 +206,8 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Map<String,Member> memberMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String,Member>>(){});
+                        if(memberMap==null)
+                            memberMap = new HashMap<>();
                         final List<String> nonacmSaps = new ArrayList<>();
                         for(int i=0;i<sapIds.size();++i) {
                             Member member = memberMap.get(sapIds.get(i));
