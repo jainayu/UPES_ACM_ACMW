@@ -4,12 +4,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
@@ -135,5 +140,58 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
         } else {
             Toast.makeText(homeActivity,"Already Registered for this event",Toast.LENGTH_LONG).show();
         }*/
+    }
+    boolean isAcmMember;
+    int index=0;
+    @Override
+    public void onMultipleParticipantSapIdAvailable(Event event, List<String> sapIds, final List<String> names, final ProgressBar progressBar) {
+        final Fragment fragment = new PaymentDetailsFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        final List<String> eventList=new ArrayList<>();
+        eventList.add(event.getEventID());
+        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.ACM_ACMW_MEMBERS);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.EVENTS_DB)
+                .child(FirebaseConfig.PARTICIPANTS);
+        for (final String sapId:sapIds){
+            progressBar.setVisibility(View.VISIBLE);
+            ref2.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.hasChild(sapId))
+                    {
+                       isAcmMember=true;
+                    }
+                    else {
+                       isAcmMember=false;
+                    }
+                    Participant participant=new Participant.Builder()
+                            .setIsAcmMember(isAcmMember)
+                            .setSap(sapId)
+                            .setTeamId(names+"")
+                            .setEventsList(eventList)
+                            .setName(names.get(index)).build();
+                    ref.child(sapId).setValue(participant).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+
+                            if(index==names.size()&&task.isSuccessful())
+                            {
+                                progressBar.setVisibility(View.GONE);
+
+                                homeActivity.setCurrentFragment(fragment, false);
+                            }
+                        }
+                    });
+                    index++;
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }

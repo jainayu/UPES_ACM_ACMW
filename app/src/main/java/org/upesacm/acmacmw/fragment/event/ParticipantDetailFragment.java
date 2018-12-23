@@ -3,9 +3,14 @@ package org.upesacm.acmacmw.fragment.event;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +18,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -49,6 +56,9 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
 
     EditText editTextName,editTextContact,editTextEmail,
             editTextYear,editTextBranch,editTextWhatsappNo;
+    TextInputLayout textInputLayoutName,textInputLayoutContact,textInputLayoutEmail,
+            textInputLayoutYear,textInputLayoutBranch,textInputLayoutWhatsappNo;
+    LinearLayout dynamicName;
     private Button buttonRegister;
     HomeActivity callback;
     private ProgressBar progressBar;
@@ -96,22 +106,84 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
         editTextWhatsappNo=view.findViewById(R.id.editText_whatsappno);
         buttonRegister=view.findViewById(R.id.button_register);
         progressBar=view.findViewById(R.id.progress_bar_registration);
+        textInputLayoutName=view.findViewById(R.id.text_input_layout_name);
+        textInputLayoutBranch=view.findViewById(R.id.text_input_layout_branch);
+        textInputLayoutContact=view.findViewById(R.id.text_input_layout_contact);
+        textInputLayoutEmail=view.findViewById(R.id.text_input_layout_email);
+        textInputLayoutYear=view.findViewById(R.id.text_input_layout_year);
+        textInputLayoutWhatsappNo=view.findViewById(R.id.text_input_layout_whatsappno);
+        dynamicName=view.findViewById(R.id.dynamic_name);
         buttonRegister.setOnClickListener(this);
         callback.setActionBarTitle(event.getEventName()+" Registration");
-
         showProgress(true);
+        TeamDetails();
         return view;
     }
+    void TeamDetails()
+    {
+        progressBar.setVisibility(View.GONE);
+        int len=sapIds.size();
+        ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        final Button button=new Button(getContext());
+        button.setLayoutParams(lparams);
+        button.setText("Proceed");
+        button.setTextColor(Color.WHITE);
+        button.setPadding(250,50,250,50);
+        button.setBackgroundResource(R.drawable.round_button_blue);
+        final List<EditText> editTextNames=new ArrayList<>();
+        for(int i=0;i<len;i++)
+        {
+            EditText editText=new EditText(getContext());
+            editText.setLayoutParams(lparams);
+            TextView textView=new TextView(getContext());
+            textView.setLayoutParams(lparams);
+            textView.setTextColor(Color.BLACK);
+            textView.setPadding(0,50,50,50);
+            textView.setText(sapIds.get(i));
+            editText.setHint("Enter Name");
+            editText.setPadding(0,50,50,50);
+            dynamicName.addView(textView);
+            dynamicName.addView(editText);
+            editTextNames.add(editText);
+        }
+            dynamicName.addView(button);
+            final List<String> names=new ArrayList<>();
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    for(EditText editTextName:editTextNames)
+                    {
+                        if(editTextName.getText().toString().equals(""))
+                        {
+                            Toast.makeText(getContext(), "Enter Names of all participants", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        names.add(editTextName.getText().toString());
 
+                    }
+                    listener.onMultipleParticipantSapIdAvailable(event,sapIds,names,progressBar);
+                   button.setEnabled(false);
+
+                }
+            });
+
+    }
     private void showProgress(boolean show) {
-        progressBar.setVisibility(show?View.VISIBLE:View.INVISIBLE);
-        editTextBranch.setVisibility(show?View.INVISIBLE:View.VISIBLE);
-        editTextContact.setVisibility(show?View.INVISIBLE:View.VISIBLE);
-        editTextName.setVisibility(show?View.INVISIBLE:View.VISIBLE);
-        editTextEmail.setVisibility(show?View.INVISIBLE:View.VISIBLE);
-        editTextYear.setVisibility(show?View.INVISIBLE:View.VISIBLE);
-        editTextWhatsappNo.setVisibility(show?View.INVISIBLE:View.VISIBLE);
-        buttonRegister.setVisibility(show?View.INVISIBLE:View.VISIBLE);
+        progressBar.setVisibility(show?View.VISIBLE:View.GONE);
+        editTextBranch.setVisibility(show?View.GONE:View.VISIBLE);
+        editTextContact.setVisibility(show?View.GONE:View.VISIBLE);
+        editTextName.setVisibility(show?View.GONE:View.VISIBLE);
+        editTextEmail.setVisibility(show?View.GONE:View.VISIBLE);
+        editTextYear.setVisibility(show?View.GONE:View.VISIBLE);
+        editTextWhatsappNo.setVisibility(show?View.GONE:View.VISIBLE);
+        textInputLayoutName.setVisibility(show?View.GONE:View.VISIBLE);
+        textInputLayoutEmail.setVisibility(show?View.GONE:View.VISIBLE);
+        textInputLayoutBranch.setVisibility(show?View.GONE:View.VISIBLE);
+        textInputLayoutContact.setVisibility(show?View.GONE:View.VISIBLE);
+        textInputLayoutYear.setVisibility(show?View.GONE:View.VISIBLE);
+        textInputLayoutWhatsappNo.setVisibility(show?View.GONE:View.VISIBLE);
+        buttonRegister.setVisibility(show?View.GONE:View.VISIBLE);
 
     }
 
@@ -303,5 +375,6 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     }
     public interface FragmentInteractionListener {
         void onParticipantDetailsAvailable(List<String> newSapIds,List<String> acmParticipants,List<String> alreadyRegistered,Map<String,Participant> participants, Event event);
+        void onMultipleParticipantSapIdAvailable(Event event,List<String> sapIds,List<String> names,ProgressBar progressBar);
     }
 }
