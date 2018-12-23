@@ -48,7 +48,7 @@ public class PaymentDetailsFragment extends Fragment {
         if(args == null) {
             throw new IllegalStateException("no arguments passed ");
         }
-        participant = args.getParcelable(Participant.PARCEL_KEY);
+      //  participant = args.getParcelable(Participant.PARCEL_KEY);
         super.onCreate(savedInstanceState);
     }
 
