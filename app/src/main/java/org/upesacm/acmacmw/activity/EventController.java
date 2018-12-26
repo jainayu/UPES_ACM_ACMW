@@ -88,15 +88,15 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
         System.out.println("onParticipant details avaliable");
         System.out.println("new sap ids");
         for(String s:newSapIds) {
-            System.out.println(s);
+            System.out.println(s+" "+participants.get(s).getName());
         }
         System.out.println("acm participants");
         for(String s:acmParticipantsSap) {
-            System.out.println(s);
+            System.out.println(s+" "+participants.get(s).getName());
         }
         System.out.println("already registered");
         for(String s:alreadyRegistered) {
-            System.out.println(s);
+            System.out.println(s+" "+participants.get(s).getName());
         }
         /*if(!alreadyRegisteredForEvent) {
             final Fragment fragment = new PaymentDetailsFragment();
@@ -140,58 +140,5 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
         } else {
             Toast.makeText(homeActivity,"Already Registered for this event",Toast.LENGTH_LONG).show();
         }*/
-    }
-    boolean isAcmMember;
-    int index=0;
-    @Override
-    public void onMultipleParticipantSapIdAvailable(Event event, List<String> sapIds, final List<String> names, final ProgressBar progressBar) {
-        final Fragment fragment = new PaymentDetailsFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        final List<String> eventList=new ArrayList<>();
-        eventList.add(event.getEventID());
-        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseConfig.ACM_ACMW_MEMBERS);
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseConfig.EVENTS_DB)
-                .child(FirebaseConfig.PARTICIPANTS);
-        for (final String sapId:sapIds){
-            progressBar.setVisibility(View.VISIBLE);
-            ref2.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.hasChild(sapId))
-                    {
-                       isAcmMember=true;
-                    }
-                    else {
-                       isAcmMember=false;
-                    }
-                    Participant participant=new Participant.Builder()
-                            .setIsAcmMember(isAcmMember)
-                            .setSap(sapId)
-                            .setTeamId(names+"")
-                            .setEventsList(eventList)
-                            .setName(names.get(index)).build();
-                    ref.child(sapId).setValue(participant).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-
-                            if(index==names.size()&&task.isSuccessful())
-                            {
-                                progressBar.setVisibility(View.GONE);
-
-                                homeActivity.setCurrentFragment(fragment, false);
-                            }
-                        }
-                    });
-                    index++;
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
     }
 }

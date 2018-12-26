@@ -1,11 +1,7 @@
 package org.upesacm.acmacmw.adapter.post;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Typeface;
-import android.media.MediaCas;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,22 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.activity.SessionManager;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
-import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Post;
-import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 
 import java.util.ArrayList;
@@ -55,7 +45,7 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
         //      we have set as match_constraint) is 0dp.
         View viewitem = LayoutInflater.from(parent.getContext()).inflate(viewType, parent,
                 false);
-        if(viewType== R.layout.post_layout)
+        if(viewType== R.layout.item_layout_post)
             return new PostViewHolder(viewitem);
         else
             return new LoadingViewHolder(viewitem);
@@ -82,8 +72,8 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(final int position) {
         if(posts.get(position)==null && isLoading)
-                return R.layout.loading_post_layout;
-        return R.layout.post_layout;
+                return R.layout.item_layout_post_loading;
+        return R.layout.item_layout_post;
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder

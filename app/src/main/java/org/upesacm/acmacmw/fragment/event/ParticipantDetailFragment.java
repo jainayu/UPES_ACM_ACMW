@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -52,16 +54,15 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     List<String> sapIds;
     List<String> newSapIds = new ArrayList<>();
     List<String> acmParticipantsSap = new ArrayList<>();
+    List<String> alreadyRegistered;
     Map<String,Participant> participants = new HashMap<>();
-
-    EditText editTextName,editTextContact,editTextEmail,
-            editTextYear,editTextBranch,editTextWhatsappNo;
-    TextInputLayout textInputLayoutName,textInputLayoutContact,textInputLayoutEmail,
-            textInputLayoutYear,textInputLayoutBranch,textInputLayoutWhatsappNo;
-    LinearLayout dynamicName;
-    private Button buttonRegister;
+    Map<String,ItemInputHolder> inputMap = new HashMap<>();
+    Toolbar toolbar;
+    RecyclerView recyclerView;
+    Button buttonNext;
+    ProgressBar progressBar;
+    RecyclerViewAdpater recyclerViewAdpater;
     HomeActivity callback;
-    private ProgressBar progressBar;
     FragmentInteractionListener listener;
 
     @Override
@@ -97,94 +98,24 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_participant_details, container, false);
-        editTextName=view.findViewById(R.id.editText_name);
-        editTextEmail=view.findViewById(R.id.editText_email);
-        editTextContact=view.findViewById(R.id.editText_contact);
-        editTextYear=view.findViewById(R.id.editText_year);
-        editTextBranch=view.findViewById(R.id.editText_branch);
-        editTextWhatsappNo=view.findViewById(R.id.editText_whatsappno);
-        buttonRegister=view.findViewById(R.id.button_register);
-        progressBar=view.findViewById(R.id.progress_bar_registration);
-        textInputLayoutName=view.findViewById(R.id.text_input_layout_name);
-        textInputLayoutBranch=view.findViewById(R.id.text_input_layout_branch);
-        textInputLayoutContact=view.findViewById(R.id.text_input_layout_contact);
-        textInputLayoutEmail=view.findViewById(R.id.text_input_layout_email);
-        textInputLayoutYear=view.findViewById(R.id.text_input_layout_year);
-        textInputLayoutWhatsappNo=view.findViewById(R.id.text_input_layout_whatsappno);
-        dynamicName=view.findViewById(R.id.dynamic_name);
-        buttonRegister.setOnClickListener(this);
-        callback.setActionBarTitle(event.getEventName()+" Registration");
+        View view= inflater.inflate(R.layout.fragment_participant_details_v2, container, false);
+        toolbar = view.findViewById(R.id.toolbar_participant_details);
+        recyclerView = view.findViewById(R.id.recycler_view_participant_details);
+        buttonNext = view.findViewById(R.id.button_participant_details_next);
+        progressBar = view.findViewById(R.id.progress_bar_participant_details);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        recyclerViewAdpater = new RecyclerViewAdpater();
+        recyclerView.setAdapter(recyclerViewAdpater);
+        toolbar.setTitle("Enter Participant Details");
+        buttonNext.setOnClickListener(this);
         showProgress(true);
-        TeamDetails();
         return view;
     }
-    void TeamDetails()
-    {
-        progressBar.setVisibility(View.GONE);
-        int len=sapIds.size();
-        ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        final Button button=new Button(getContext());
-        button.setLayoutParams(lparams);
-        button.setText("Proceed");
-        button.setTextColor(Color.WHITE);
-        button.setPadding(250,50,250,50);
-        button.setBackgroundResource(R.drawable.round_button_blue);
-        final List<EditText> editTextNames=new ArrayList<>();
-        for(int i=0;i<len;i++)
-        {
-            EditText editText=new EditText(getContext());
-            editText.setLayoutParams(lparams);
-            TextView textView=new TextView(getContext());
-            textView.setLayoutParams(lparams);
-            textView.setTextColor(Color.BLACK);
-            textView.setPadding(0,50,50,50);
-            textView.setText(sapIds.get(i));
-            editText.setHint("Enter Name");
-            editText.setPadding(0,50,50,50);
-            dynamicName.addView(textView);
-            dynamicName.addView(editText);
-            editTextNames.add(editText);
-        }
-            dynamicName.addView(button);
-            final List<String> names=new ArrayList<>();
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    for(EditText editTextName:editTextNames)
-                    {
-                        if(editTextName.getText().toString().equals(""))
-                        {
-                            Toast.makeText(getContext(), "Enter Names of all participants", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        names.add(editTextName.getText().toString());
 
-                    }
-                    listener.onMultipleParticipantSapIdAvailable(event,sapIds,names,progressBar);
-                   button.setEnabled(false);
-
-                }
-            });
-
-    }
     private void showProgress(boolean show) {
         progressBar.setVisibility(show?View.VISIBLE:View.GONE);
-        editTextBranch.setVisibility(show?View.GONE:View.VISIBLE);
-        editTextContact.setVisibility(show?View.GONE:View.VISIBLE);
-        editTextName.setVisibility(show?View.GONE:View.VISIBLE);
-        editTextEmail.setVisibility(show?View.GONE:View.VISIBLE);
-        editTextYear.setVisibility(show?View.GONE:View.VISIBLE);
-        editTextWhatsappNo.setVisibility(show?View.GONE:View.VISIBLE);
-        textInputLayoutName.setVisibility(show?View.GONE:View.VISIBLE);
-        textInputLayoutEmail.setVisibility(show?View.GONE:View.VISIBLE);
-        textInputLayoutBranch.setVisibility(show?View.GONE:View.VISIBLE);
-        textInputLayoutContact.setVisibility(show?View.GONE:View.VISIBLE);
-        textInputLayoutYear.setVisibility(show?View.GONE:View.VISIBLE);
-        textInputLayoutWhatsappNo.setVisibility(show?View.GONE:View.VISIBLE);
-        buttonRegister.setVisibility(show?View.GONE:View.VISIBLE);
-
+        buttonNext.setVisibility(show?View.GONE:View.VISIBLE);
+        recyclerView.setVisibility(show?View.GONE:View.VISIBLE);;
     }
 
     @Override
@@ -194,75 +125,29 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
 
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
-        if(v.getId() == R.id.button_register) {
-            String name=editTextName.getText().toString().trim();
-            String email=editTextEmail.getText().toString().trim();
-            String contact=editTextContact.getText().toString().trim();
-            String whatsapp=editTextWhatsappNo.getText().toString().trim();
-            String branch=editTextBranch.getText().toString().trim();
-            String year=editTextYear.getText().toString().trim();
-            boolean isNameValid=Pattern.compile("[a-zA-Z\\s]+").matcher(name).matches();
-            boolean isEmailValid=Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
-                    .matcher(email).matches();
-            boolean isContactValid=Pattern.compile("[\\d]{10}").matcher(contact).matches();
-            boolean isWhatsappNoValid=Pattern.compile("[\\d]{10}").matcher(whatsapp).matches();
-            boolean isYearValid=Pattern.compile("[\\d]{1}").matcher(year).matches();
-            String message="";
-            if(isNameValid) {
-                if(isYearValid) {
-                    if (isEmailValid) {
-                        if (isContactValid) {
-                            if (isWhatsappNoValid) {
-                                if(!branch.isEmpty()) {
-                                    List<String> events=new ArrayList<>();
-                                    events.add(event.getEventID());
-                                    final Participant participant =new Participant.Builder()
-                                            .setEventsList(events)
-                                            .setName(name)
-                                            .setBranch(branch).setContact(contact)
-                                            .setEmail(email)
-                                            .setSap(sapIds.get(0))
-                                            .setWhatsapp(whatsapp)
-                                            .build();
-                                    new AlertDialog.Builder(getContext())
-                                            .setMessage("Confirm details ?")
-                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                           // listener.onParticipantDetailsAvailable(false, participant,event);
-                                                        }
-                                                    })
-                                                    .setNegativeButton("Edit", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                                        }
-                                                    })
-                                                    .create()
-                                                    .show();
-                                        }
-                                        else
-                                            message = "Invalid Branch";
-                                    } else
-                                        message = "Invalid Whatsapp no";
-                                } else
-                                    message = "Invalid Contact";
-                            } else
-                                message = "Invalid Email";
-                }
-                else
-                    message="Invalid year";
-            }
-            else
-                message="Invalid Name";
+        boolean allValid = true;
+        for(String sapId:newSapIds)
+            allValid = allValid && inputMap.get(sapId).isDataValid();
 
-            if (!message.equals(""))
-            Toast.makeText(getContext(),message,Toast.LENGTH_LONG).show();
+        if(allValid) {
+            for(String sapId:newSapIds) {
+                participants.put(sapId, new Participant.Builder()
+                        .setName(inputMap.get(sapId).getName())
+                        .setContact(inputMap.get(sapId).getContact())
+                        .setBranch(inputMap.get(sapId).getBranch())
+                        .setYear(inputMap.get(sapId).getYear())
+                        .setEmail(inputMap.get(sapId).getEmail())
+                        .setWhatsapp(inputMap.get(sapId).getWhatsappNo())
+                        .build());
+            }
+            listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap,alreadyRegistered,participants,event);
+        } else {
+            Toast.makeText(this.getContext(),"Please check all the fields",Toast.LENGTH_SHORT).show();
         }
     }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        callback.setActionBarTitle(event.getEventName());
     }
 
     void fetchParticipantDetails() {
@@ -330,12 +215,13 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                                         if(participantPayMap == null) // to avoid null pointer exception cases
                                                             participantPayMap = new HashMap<>();
 
-                                                        List<String> alreadyRegistered = new ArrayList<>();// list to store sap ids which
+                                                        alreadyRegistered = new ArrayList<>();// list to store sap ids which
                                                         //are already registered
                                                         Set<String> sapSet = participantPayMap.keySet();
                                                         boolean valid = true;
                                                         for(int i=0;i<sapIds.size();++i) {
-                                                            valid = !sapSet.contains(sapIds.get(i));
+                                                            valid = !sapSet.contains(sapIds.get(i)); //transaction is invalid if at least on of the participants
+                                                                                                    //has already registered for the event
                                                             if(!valid)
                                                                 alreadyRegistered.add(sapIds.get(0));
                                                         }
@@ -344,16 +230,20 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                                             // OR if the details of all the members is already present in the events Database
                                                             // THEN there is no need to accept user input again, so just skip that part
                                                             listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap,alreadyRegistered,participants,event);
-                                                        } else {
+                                                        } else { //Prepare fragment to accept user input
                                                             Toast.makeText(ParticipantDetailFragment.this.getContext()," New Registrations",Toast.LENGTH_LONG)
                                                                     .show();
+                                                            recyclerViewAdpater.notifyDataSetChanged();
                                                         }
+                                                        showProgress(false);
                                                     }
 
                                                     @Override
                                                     public void onCancelled(@NonNull DatabaseError databaseError) {
                                                         Log.e(TAG,"Error while checking for verifying duplicate participants");
                                                         Log.e(TAG,databaseError.getDetails());
+                                                        listener.onParticipantDetailsAvailable(null,null,null,null,event);
+                                                        showProgress(false);
                                                     }
                                                 });
                                     }
@@ -362,6 +252,8 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                     public void onCancelled(@NonNull DatabaseError databaseError) {
                                         Log.e(TAG,"Error while accessing Participants database");
                                         Log.e(TAG,databaseError.getDetails());
+                                        listener.onParticipantDetailsAvailable(null,null,null,null,event);
+                                        showProgress(false);
                                     }
                                 });
                     }
@@ -370,11 +262,281 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         Log.e(TAG,"Error while accessing ACM-ACMW members database");
                         Log.e(TAG,databaseError.getDetails());
+                        listener.onParticipantDetailsAvailable(null,null,null,null,event);
+                        showProgress(false);
                     }
                 });
     }
     public interface FragmentInteractionListener {
         void onParticipantDetailsAvailable(List<String> newSapIds,List<String> acmParticipants,List<String> alreadyRegistered,Map<String,Participant> participants, Event event);
-        void onMultipleParticipantSapIdAvailable(Event event,List<String> sapIds,List<String> names,ProgressBar progressBar);
+        //void onMultipleParticipantSapIdAvailable(Event event,List<String> sapIds,List<String> names,ProgressBar progressBar);
+    }
+
+    private class RecyclerViewAdpater extends RecyclerView.Adapter<ItemViewHolder> {
+        @NonNull
+        @Override
+        public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout_participant_details,parent,false);
+            return new ItemViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
+            holder.bindData(newSapIds.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return newSapIds.size();
+        }
+    }
+
+    private class ItemInputHolder {
+        String name;
+        String contact;
+        String email;
+        String year;
+        String branch;
+        String whatsappNo;
+        boolean nameValid;
+        boolean contactValid;
+        boolean emailValid;
+        boolean yearValid;
+        boolean branchValid;
+        boolean whatsappNoValid;
+
+        public boolean isNameValid() {
+            return nameValid;
+        }
+
+        public void setNameValid(boolean nameValid) {
+            this.nameValid = nameValid;
+        }
+
+        public boolean isContactValid() {
+            return contactValid;
+        }
+
+        public void setContactValid(boolean contactValid) {
+            this.contactValid = contactValid;
+        }
+
+        public boolean isEmailValid() {
+            return emailValid;
+        }
+
+        public void setEmailValid(boolean emailValid) {
+            this.emailValid = emailValid;
+        }
+
+        public boolean isYearValid() {
+            return yearValid;
+        }
+
+        public void setYearValid(boolean yearValid) {
+            this.yearValid = yearValid;
+        }
+
+        public boolean isBranchValid() {
+            return branchValid;
+        }
+
+        public void setBranchValid(boolean branchValid) {
+            this.branchValid = branchValid;
+        }
+
+        public boolean isWhatsappNoValid() {
+            return whatsappNoValid;
+        }
+
+        public void setWhatsappNoValid(boolean whatsappNoValid) {
+            this.whatsappNoValid = whatsappNoValid;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getContact() {
+            return contact;
+        }
+
+        public void setContact(String contact) {
+            this.contact = contact;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getYear() {
+            return year;
+        }
+
+        public void setYear(String year) {
+            this.year = year;
+        }
+
+        public String getBranch() {
+            return branch;
+        }
+
+        public void setBranch(String branch) {
+            this.branch = branch;
+        }
+
+        public String getWhatsappNo() {
+            return whatsappNo;
+        }
+
+        public void setWhatsappNo(String whatsappNo) {
+            this.whatsappNo = whatsappNo;
+        }
+
+        public boolean isDataValid() {
+            return nameValid && contactValid && emailValid
+                    && branchValid && yearValid && whatsappNoValid;
+        }
+    }
+
+    private class ItemViewHolder extends RecyclerView.ViewHolder {
+        TextView textViewParticipantSap;
+        TextInputLayout textInputLayoutName;
+        TextInputLayout textInputLayoutContact;
+        TextInputLayout textInputLayoutEmail;
+        TextInputLayout textInputLayoutYear;
+        TextInputLayout textInputLayoutBranch;
+        TextInputLayout textInputLayoutWhatsappNo;
+        private String sapId;
+        public ItemViewHolder(View itemView) {
+            super(itemView);
+            textViewParticipantSap = itemView.findViewById(R.id.text_view_participant_details_sap);
+            textInputLayoutName = itemView.findViewById(R.id.text_input_layout_participant_name);
+            textInputLayoutContact = itemView.findViewById(R.id.text_input_layout_participant_contact);
+            textInputLayoutEmail = itemView.findViewById(R.id.text_input_layout_participant_email);
+            textInputLayoutYear = itemView.findViewById(R.id.text_input_layout_participant_year);
+            textInputLayoutBranch = itemView.findViewById(R.id.text_input_layout_participant_branch);
+            textInputLayoutWhatsappNo = itemView.findViewById(R.id.text_input_layout_participant_whatsappno);
+        }
+
+        public void bindData(String sapId) {
+            this.sapId = sapId;
+            textViewParticipantSap.setText(sapId);
+            inputMap.put(sapId,new ItemInputHolder());
+
+            textInputLayoutName.getEditText()
+                    .addTextChangedListener(new InputTextWatcher(sapId,R.id.text_input_layout_participant_name));
+            textInputLayoutContact.getEditText()
+                    .addTextChangedListener(new InputTextWatcher(sapId,R.id.text_input_layout_participant_contact));
+            textInputLayoutEmail.getEditText()
+                    .addTextChangedListener(new InputTextWatcher(sapId,R.id.text_input_layout_participant_email));
+            textInputLayoutYear.getEditText()
+                    .addTextChangedListener(new InputTextWatcher(sapId,R.id.text_input_layout_participant_year));
+            textInputLayoutBranch.getEditText()
+                    .addTextChangedListener(new InputTextWatcher(sapId,R.id.text_input_layout_participant_branch));
+            textInputLayoutWhatsappNo.getEditText()
+                    .addTextChangedListener(new InputTextWatcher(sapId,R.id.text_input_layout_participant_whatsappno));
+        }
+
+        private class InputTextWatcher implements TextWatcher {
+            private String sapId;
+            int viewId;
+            InputTextWatcher(String sapId,int viewId) {
+                this.sapId = sapId;
+                this.viewId = viewId;
+            }
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                switch (viewId) {
+                    case R.id.text_input_layout_participant_name : {
+                        if(Pattern.compile("[a-zA-Z\\s]+").matcher(editable.toString()).matches()) {
+                            inputMap.get(sapId).setName(editable.toString());
+                            inputMap.get(sapId).setNameValid(true);
+                            textInputLayoutName.setError(null);
+                        }
+                        else {
+                            textInputLayoutName.setError("Invalid Name");
+                            inputMap.get(sapId).setNameValid(false);
+                        }
+                        break;
+                    }
+                    case R.id.text_input_layout_participant_contact : {
+                        if(Pattern.compile("[\\d]{10}").matcher(editable.toString()).matches()) {
+                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setContactValid(true);
+                            textInputLayoutContact.setError(null);
+                        }
+                        else {
+                            textInputLayoutContact.setError("Invalid Contact");
+                            inputMap.get(sapId).setContactValid(false);
+                        }
+                        break;
+                    }
+                    case R.id.text_input_layout_participant_email : {
+                        if(Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
+                                .matcher(editable.toString()).matches()) {
+                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setEmailValid(true);
+                            textInputLayoutEmail.setError(null);
+                        }
+                        else {
+                            textInputLayoutEmail.setError("Invalid Email");
+                            inputMap.get(sapId).setEmailValid(false);
+                        }
+                        break;
+                    }
+                    case R.id.text_input_layout_participant_year : {
+                        if(Pattern.compile("[\\d]{1}").matcher(editable.toString()).matches()) {
+                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setYearValid(true);
+                            textInputLayoutYear.setError(null);
+                        }
+                        else {
+                            textInputLayoutYear.setError("Invalid Year");
+                            inputMap.get(sapId).setYearValid(false);
+                        }
+                        break;
+                    }
+                    case R.id.text_input_layout_participant_branch : {
+                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setBranchValid(true);
+                        break;
+                    }
+                    case R.id.text_input_layout_participant_whatsappno : {
+                        if(Pattern.compile("[\\d]{10}").matcher(editable.toString()).matches()) {
+                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setWhatsappNoValid(true);
+                            textInputLayoutWhatsappNo.setError(null);
+                        }
+                        else {
+                            textInputLayoutWhatsappNo.setError("Invalid WhatsApp Number");
+                            inputMap.get(sapId).setWhatsappNoValid(false);
+                        }
+                        break;
+                    }
+                    default : {
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

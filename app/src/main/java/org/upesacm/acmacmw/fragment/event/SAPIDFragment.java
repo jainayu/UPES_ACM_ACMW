@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -100,6 +101,14 @@ public class SAPIDFragment extends Fragment {
                     }
                     System.out.println(sapIds.size());
                     Toast.makeText(SAPIDFragment.this.getContext(),"everything is valid"+sapIds.size(),Toast.LENGTH_LONG).show();
+                    //Hide the keyboard if it is visible
+                    InputMethodManager inputManager = (InputMethodManager)
+                            getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+
+                    //call the callback method
                     listener.onSAPIDAvailable(selectedEvent,sapIds);
                 }
             }
