@@ -3,19 +3,9 @@ package org.upesacm.acmacmw.activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
 import org.upesacm.acmacmw.fragment.event.SAPIDFragment;
@@ -23,6 +13,7 @@ import org.upesacm.acmacmw.fragment.event.PaymentDetailsFragment;
 import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Participant;
+
 import org.upesacm.acmacmw.util.FirebaseConfig;
 
 import java.util.ArrayList;
@@ -81,64 +72,79 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
         fragment.setArguments(args);
         homeActivity.setCurrentFragment(fragment, true);
     }
-
     @Override
-    public void onParticipantDetailsAvailable(List<String> newSapIds,List<String> acmParticipantsSap,
-            List<String> alreadyRegistered, final Map<String,Participant> participants, final Event event) {
+    public void onParticipantDetailsAvailable(final List<String> newSapIds, final List<String> acmParticipantsSap,
+                                              final List<String> alreadyRegistered, final Map<String,Participant> participants, final Event event,boolean error) {
+        if(error)
+        {
+            final Fragment fragment = new EventsListFragment();
+            homeActivity.setCurrentFragment(fragment,false);
+            return;
+        }
+        List<String> eventList=new ArrayList<>();
+        eventList.add(event.getEventID());
         System.out.println("onParticipant details avaliable");
         System.out.println("new sap ids");
         for(String s:newSapIds) {
             System.out.println(s+" "+participants.get(s).getName());
+            participants.put(s,new Participant.Builder(participants.get(s)).setEventsList(eventList).build());
         }
         System.out.println("acm participants");
         for(String s:acmParticipantsSap) {
             System.out.println(s+" "+participants.get(s).getName());
+            participants.put(s,new Participant.Builder(participants.get(s)).setEventsList(eventList).build());
+
         }
         System.out.println("already registered");
         for(String s:alreadyRegistered) {
             System.out.println(s+" "+participants.get(s).getName());
+            List<String> tempEventList=new ArrayList<>();
+            tempEventList.addAll(participants.get(s).getEventsList());
+            tempEventList.addAll(eventList);
+            participants.put(s,new Participant.Builder(participants.get(s)).setEventsList(tempEventList).build());
         }
-        /*if(!alreadyRegisteredForEvent) {
-            final Fragment fragment = new PaymentDetailsFragment();
-            Bundle args = new Bundle();
-            args.putParcelable(Participant.PARCEL_KEY, participant);
-            fragment.setArguments(args);
 
-            FirebaseDatabase.getInstance().getReference()
-                    .child(FirebaseConfig.EVENTS_DB)
-                    .child(FirebaseConfig.EVENTS)
-                    .child(event.getEventID())
-                    .child(FirebaseConfig.PARTICIPANTS)
-                    .child(participant.getSap())
-                    .setValue(false)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() { //write participant details under the particular event
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                homeActivity.setCurrentFragment(fragment, false);
-                                Toast.makeText(homeActivity, "written to events db", Toast.LENGTH_LONG).show();
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                                        .child(FirebaseConfig.EVENTS_DB)
-                                        .child(FirebaseConfig.PARTICIPANTS)
-                                        .child(participant.getSap());
-                                ref.setValue(participant).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    homeActivity.setCurrentFragment(fragment, false);
-                                                } else {
-                                                    Log.e("event controller", "FAiled to update the participants db");
-                                                }
-                                            }
-                                        });
-                            } else {
-                                Log.e("event controller", "failed to write to under event");
+        final Map<String ,Object> appendParticipants=new HashMap<>();
+        appendParticipants.putAll(participants);
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.EVENTS_DB)
+                .child(FirebaseConfig.PARTICIPANTS)
+                .updateChildren(appendParticipants)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful())
+                        {
+                            HashMap<String ,Object> addToEventsObject=new HashMap<>();
+                            for(Map.Entry<String,Participant> participant:participants.entrySet())
+                            {
+                                addToEventsObject.put(participant.getKey(),participant.getValue().getName());
                             }
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child(FirebaseConfig.EVENTS_DB)
+                                    .child(FirebaseConfig.EVENTS)
+                                    .child(event.getEventID())
+                                    .child(FirebaseConfig.TEAMS)
+                                    .child("team"+addToEventsObject.keySet().toString()
+                                            .replace(","," ")
+                                            .replace("["," ")
+                                            .replace("]"," ")
+                                            )
+                                    .setValue(addToEventsObject)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful())
+                                            {
+                                                final Fragment fragment = new PaymentDetailsFragment();
+                                                Bundle args = new Bundle();
+                                                fragment.setArguments(args);
+                                                homeActivity.setCurrentFragment(fragment,false);
+                                            }
+                                        }
+                                    });
                         }
-                    });
-
-        } else {
-            Toast.makeText(homeActivity,"Already Registered for this event",Toast.LENGTH_LONG).show();
-        }*/
+                    }
+                });
     }
 }

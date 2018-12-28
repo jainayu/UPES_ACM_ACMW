@@ -140,7 +140,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                         .setWhatsapp(inputMap.get(sapId).getWhatsappNo())
                         .build());
             }
-            listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap,alreadyRegistered,participants,event);
+            listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap,alreadyRegistered,participants,event,false);
         } else {
             Toast.makeText(this.getContext(),"Please check all the fields",Toast.LENGTH_SHORT).show();
         }
@@ -152,124 +152,97 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
 
     void fetchParticipantDetails() {
         Collections.sort(sapIds);
-
-        //check for acm or non-acm participant
+        //check for already registered to participant database and create a list of already registered members
         FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseConfig.ACM_ACMW_MEMBERS)
+                .child(FirebaseConfig.EVENTS_DB)
+                .child(FirebaseConfig.PARTICIPANTS)
                 .startAt(sapIds.get(0))
                 .endAt(sapIds.get(sapIds.size()-1))
                 .orderByKey()
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Map<String,Member> memberMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String,Member>>(){});
-                        if(memberMap==null)
-                            memberMap = new HashMap<>();
-                        final List<String> nonacmSaps = new ArrayList<>();
-                        for(int i=0;i<sapIds.size();++i) {
-                            Member member = memberMap.get(sapIds.get(i));
-                            if(member==null)
-                                nonacmSaps.add(sapIds.get(i));
-                            else {
-                                //add participant to the acm participant list
-                                participants.put(sapIds.get(i),new Participant.Builder(member).build());
-                                //add the sap Id to the list of acm participants
-                                acmParticipantsSap.add(sapIds.get(i));
+                        Map<String,Participant> participantMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String,Participant>>(){});
+                        if(participantMap==null)
+                        {
+                            participantMap=new HashMap<>();
+                        }
+                        alreadyRegistered=new ArrayList<>();
+                        for (String sapid:sapIds)
+                        {
+                            Participant participant=participantMap.get(sapid);
+                            if(participant!=null)
+                            {
+                                participants.put(sapid,new Participant.Builder(participant).build());
+                                alreadyRegistered.add(sapid);
+                                // Check for any dublicate member in the event if found return with toast and end registration process
+                                if(participant.getEventsList().contains(event.getEventID()))
+                                {
+                                    Toast.makeText(getContext(), sapid+" is already registered for this event", Toast.LENGTH_LONG).show();
+                                    listener.onParticipantDetailsAvailable(null,null,null,null,null,true);
+                                    getActivity().getFragmentManager().popBackStack();
+                                    return;
+                                }
+
                             }
                         }
-                        //check if information about participant is already present in events database
-                        FirebaseDatabase.getInstance().getReference()
-                                .child(FirebaseConfig.EVENTS_DB)
-                                .child(FirebaseConfig.PARTICIPANTS)
-                                .startAt(sapIds.get(0))
-                                .endAt(sapIds.get(sapIds.size()-1))
-                                .orderByKey()
-                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        Map<String,Participant> participantMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String,Participant>>(){});
-                                        if(participantMap==null) // to avoid null pointer exceptions
-                                            participantMap = new HashMap<>();
-
-                                        for(int i=0;i<nonacmSaps.size();++i) {
-                                            Participant participant = participantMap.get(nonacmSaps.get(i));
-                                            if(participant==null)
-                                                newSapIds.add(nonacmSaps.get(i));
-                                            else
-                                                //add the partipant details to 'participants' list
-                                                participants.put(nonacmSaps.get(i),participant);
-                                        }
-                                        //checking for duplicate registrations for the same event
-                                        FirebaseDatabase.getInstance().getReference()
-                                                .child(FirebaseConfig.EVENTS_DB)
-                                                .child(FirebaseConfig.EVENTS)
-                                                .child(event.getEventID())
-                                                .child(FirebaseConfig.EVENT_TEAMS_LIST)
-                                                .startAt(sapIds.get(0))
-                                                .endAt(sapIds.get(sapIds.size()-1))
-                                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        Map<String,Boolean> participantPayMap =
-                                                                dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Boolean>>(){});
-                                                        if(participantPayMap == null) // to avoid null pointer exception cases
-                                                            participantPayMap = new HashMap<>();
-
-                                                        alreadyRegistered = new ArrayList<>();// list to store sap ids which
-                                                        //are already registered
-                                                        Set<String> sapSet = participantPayMap.keySet();
-                                                        boolean valid = true;
-                                                        for(int i=0;i<sapIds.size();++i) {
-                                                            valid = !sapSet.contains(sapIds.get(i)); //transaction is invalid if at least on of the participants
-                                                                                                    //has already registered for the event
-                                                            if(!valid)
-                                                                alreadyRegistered.add(sapIds.get(0));
-                                                        }
-                                                        if(!valid || newSapIds.size()==0) {
-                                                            // IF There is at-least one team member who has already registered for the event
-                                                            // OR if the details of all the members is already present in the events Database
-                                                            // THEN there is no need to accept user input again, so just skip that part
-                                                            listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap,alreadyRegistered,participants,event);
-                                                        } else { //Prepare fragment to accept user input
-                                                            Toast.makeText(ParticipantDetailFragment.this.getContext()," New Registrations",Toast.LENGTH_LONG)
-                                                                    .show();
-                                                            recyclerViewAdpater.notifyDataSetChanged();
-                                                        }
-                                                        showProgress(false);
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                        Log.e(TAG,"Error while checking for verifying duplicate participants");
-                                                        Log.e(TAG,databaseError.getDetails());
-                                                        listener.onParticipantDetailsAvailable(null,null,null,null,event);
-                                                        showProgress(false);
-                                                    }
+                        //remove already registered from list of sapids and check for acm non acm members
+                        sapIds.removeAll(alreadyRegistered);
+                        if(!sapIds.isEmpty()) {
+                            //check for acm or non-acm participant
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child(FirebaseConfig.ACM_ACMW_MEMBERS)
+                                    .startAt(sapIds.get(0))
+                                    .endAt(sapIds.get(sapIds.size() - 1))
+                                    .orderByKey()
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            Map<String, Member> memberMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Member>>() {
                                                 });
-                                    }
+                                            if (memberMap == null)
+                                                memberMap = new HashMap<>();
+                                            final List<String> nonacmSaps = new ArrayList<>();
+                                            for (int i = 0; i < sapIds.size(); ++i) {
+                                                Member member = memberMap.get(sapIds.get(i));
+                                                if (member == null)
+                                                    newSapIds.add(sapIds.get(i));
+                                                else {
+                                                    //add participant to the acm participant list
+                                                    participants.put(sapIds.get(i), new Participant.Builder(member).build());
+                                                    //add the sap Id to the list of acm participants
+                                                    acmParticipantsSap.add(sapIds.get(i));
+                                                    }
+                                            }
+                                            if(!newSapIds.isEmpty())
+                                            {
+                                                recyclerViewAdpater.notifyDataSetChanged();
+                                            }
+                                            showProgress(false);
+                                        }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        Log.e(TAG,"Error while accessing Participants database");
-                                        Log.e(TAG,databaseError.getDetails());
-                                        listener.onParticipantDetailsAvailable(null,null,null,null,event);
-                                        showProgress(false);
-                                    }
-                                });
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            }
+                                    });
+                            }
+                            else {
+                            buttonNext.callOnClick();
+                        }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         Log.e(TAG,"Error while accessing ACM-ACMW members database");
+                        Toast.makeText(callback, "Unable to register", Toast.LENGTH_SHORT).show();
                         Log.e(TAG,databaseError.getDetails());
-                        listener.onParticipantDetailsAvailable(null,null,null,null,event);
+                        listener.onParticipantDetailsAvailable(null,null,null,null,event,true);
                         showProgress(false);
                     }
                 });
     }
     public interface FragmentInteractionListener {
-        void onParticipantDetailsAvailable(List<String> newSapIds,List<String> acmParticipants,List<String> alreadyRegistered,Map<String,Participant> participants, Event event);
-        //void onMultipleParticipantSapIdAvailable(Event event,List<String> sapIds,List<String> names,ProgressBar progressBar);
+        void onParticipantDetailsAvailable(List<String> newSapIds,List<String> acmParticipants,List<String> alreadyRegistered,Map<String,Participant> participants, Event event,boolean error);
     }
 
     private class RecyclerViewAdpater extends RecyclerView.Adapter<ItemViewHolder> {
@@ -493,7 +466,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                     case R.id.text_input_layout_participant_email : {
                         if(Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
                                 .matcher(editable.toString()).matches()) {
-                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setEmail(editable.toString());
                             inputMap.get(sapId).setEmailValid(true);
                             textInputLayoutEmail.setError(null);
                         }
@@ -505,7 +478,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                     }
                     case R.id.text_input_layout_participant_year : {
                         if(Pattern.compile("[\\d]{1}").matcher(editable.toString()).matches()) {
-                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setYear(editable.toString());
                             inputMap.get(sapId).setYearValid(true);
                             textInputLayoutYear.setError(null);
                         }
@@ -516,13 +489,13 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                         break;
                     }
                     case R.id.text_input_layout_participant_branch : {
-                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setBranch(editable.toString());
                             inputMap.get(sapId).setBranchValid(true);
                         break;
                     }
                     case R.id.text_input_layout_participant_whatsappno : {
                         if(Pattern.compile("[\\d]{10}").matcher(editable.toString()).matches()) {
-                            inputMap.get(sapId).setContact(editable.toString());
+                            inputMap.get(sapId).setWhatsappNo(editable.toString());
                             inputMap.get(sapId).setWhatsappNoValid(true);
                             textInputLayoutWhatsappNo.setError(null);
                         }
