@@ -137,7 +137,7 @@ public class SAPIDFragment extends Fragment {
         @NonNull
         @Override
         public InputViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.dynamic_layout_sap,parent,false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout_sap,parent,false);
             return new InputViewHolder(view,this);
         }
 
