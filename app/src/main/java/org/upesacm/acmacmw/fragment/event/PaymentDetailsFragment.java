@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,6 +21,7 @@ import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Participant;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +32,6 @@ public class PaymentDetailsFragment extends Fragment {
 
     ParticipantDetailFragment.FragmentInteractionListener listener;
     HomeActivity homeActivity;
-    Participant participant;
 
     public PaymentDetailsFragment() {
         // Required empty public constructor
@@ -68,10 +69,35 @@ public class PaymentDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        registerToDatabase();
+        int amount=calculateAmountToPay();
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_selected_events, container, false);
+        View view= inflater.inflate(R.layout.fragment_selected_events, container, false);
+        TextView textView=view.findViewById(R.id.text);
+        textView.setText("Pay :"+amount);
+        registerToDatabase();
+        return view;
 
+    }
+
+    private int calculateAmountToPay() {
+        int amount=0;
+        if(event.getEntryFeesTeam()==0)
+        {
+            for(Map.Entry<String, Participant> participantMap:participants.entrySet())
+            {
+                if(participantMap.getValue().isACMMember())
+                {
+                    amount=amount+event.getEntryFeesAcm();
+                }
+                else {
+                    amount=amount+event.getEntryFeesNonAcm();
+                }
+            }
+        }
+        else {
+            amount=event.getEntryFeesTeam();
+        }
+        return amount;
     }
 
     private void registerToDatabase() {
@@ -118,7 +144,8 @@ public class PaymentDetailsFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle savedState) {
-        savedState.putParcelable(Participant.PARCEL_KEY,participant);
+        savedState.putParcelable(Event.PARCEL_KEY,event);
+        savedState.putSerializable(Participant.PARCEL_KEY, (Serializable) participants);
     }
 
 }

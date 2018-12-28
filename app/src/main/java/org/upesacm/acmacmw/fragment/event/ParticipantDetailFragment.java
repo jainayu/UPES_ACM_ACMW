@@ -209,7 +209,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                                     newSapIds.add(sapIds.get(i));
                                                 else {
                                                     //add participant to the acm participant list
-                                                    participants.put(sapIds.get(i), new Participant.Builder(member).build());
+                                                    participants.put(sapIds.get(i), new Participant.Builder(member).setIsAcmMember(true).build());
                                                     //add the sap Id to the list of acm participants
                                                     acmParticipantsSap.add(sapIds.get(i));
                                                     }
