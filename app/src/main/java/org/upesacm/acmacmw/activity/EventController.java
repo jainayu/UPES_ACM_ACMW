@@ -1,6 +1,7 @@
 package org.upesacm.acmacmw.activity;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -16,6 +17,7 @@ import org.upesacm.acmacmw.model.Participant;
 
 import org.upesacm.acmacmw.util.FirebaseConfig;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,48 +105,12 @@ public class EventController implements EventsListFragment.FragmentInteractionLi
             tempEventList.addAll(eventList);
             participants.put(s,new Participant.Builder(participants.get(s)).setEventsList(tempEventList).build());
         }
+        final Fragment fragment = new PaymentDetailsFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(Event.PARCEL_KEY,event);
+        args.putSerializable(Participant.PARCEL_KEY, (Serializable) participants);
+        fragment.setArguments(args);
+        homeActivity.setCurrentFragment(fragment,false);
 
-        final Map<String ,Object> appendParticipants=new HashMap<>();
-        appendParticipants.putAll(participants);
-        FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseConfig.EVENTS_DB)
-                .child(FirebaseConfig.PARTICIPANTS)
-                .updateChildren(appendParticipants)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful())
-                        {
-                            HashMap<String ,Object> addToEventsObject=new HashMap<>();
-                            for(Map.Entry<String,Participant> participant:participants.entrySet())
-                            {
-                                addToEventsObject.put(participant.getKey(),participant.getValue().getName());
-                            }
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child(FirebaseConfig.EVENTS_DB)
-                                    .child(FirebaseConfig.EVENTS)
-                                    .child(event.getEventID())
-                                    .child(FirebaseConfig.TEAMS)
-                                    .child("team"+addToEventsObject.keySet().toString()
-                                            .replace(","," ")
-                                            .replace("["," ")
-                                            .replace("]"," ")
-                                            )
-                                    .setValue(addToEventsObject)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful())
-                                            {
-                                                final Fragment fragment = new PaymentDetailsFragment();
-                                                Bundle args = new Bundle();
-                                                fragment.setArguments(args);
-                                                homeActivity.setCurrentFragment(fragment,false);
-                                            }
-                                        }
-                                    });
-                        }
-                    }
-                });
     }
 }

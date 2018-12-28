@@ -3,14 +3,25 @@ package org.upesacm.acmacmw.fragment.event;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Participant;
+import org.upesacm.acmacmw.util.FirebaseConfig;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +47,8 @@ public class PaymentDetailsFragment extends Fragment {
             throw new IllegalStateException(context+" must be instance of HomeActivity");
         }
     }
-
+    Map<String,Participant> participants;
+    Event event;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle args;
@@ -48,15 +60,60 @@ public class PaymentDetailsFragment extends Fragment {
         if(args == null) {
             throw new IllegalStateException("no arguments passed ");
         }
-      //  participant = args.getParcelable(Participant.PARCEL_KEY);
+        event=args.getParcelable(Event.PARCEL_KEY);
+       participants = (Map<String, Participant>) args.getSerializable(Participant.PARCEL_KEY);
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        registerToDatabase();
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_selected_events, container, false);
+
+    }
+
+    private void registerToDatabase() {
+                final Map<String ,Object> appendParticipants=new HashMap<>();
+        appendParticipants.putAll(participants);
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.EVENTS_DB)
+                .child(FirebaseConfig.PARTICIPANTS)
+                .updateChildren(appendParticipants)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful())
+                        {
+                            HashMap<String ,Object> addToEventsObject=new HashMap<>();
+                            for(Map.Entry<String,Participant> participant:participants.entrySet())
+                            {
+                                addToEventsObject.put(participant.getKey(),participant.getValue().getName());
+                            }
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child(FirebaseConfig.EVENTS_DB)
+                                    .child(FirebaseConfig.EVENTS)
+                                    .child(event.getEventID())
+                                    .child(FirebaseConfig.TEAMS)
+                                    .child("Team"+addToEventsObject.keySet().toString()
+                                            .replace(","," ")
+                                            .replace("["," ")
+                                            .replace("]"," ")
+                                            )
+                                    .setValue(addToEventsObject)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful())
+                                            {
+                                                Toast.makeText(getContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                });
     }
 
     @Override
