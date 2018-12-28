@@ -36,8 +36,26 @@ public class Event implements Comparable<Event>, Parcelable {
     @JsonProperty("minParticipant")
     private int minParticipant;
 
-    @JsonProperty("entryFees")
-    private int entryFees;
+    public int getEntryFeesAcm() {
+        return entryFeesAcm;
+    }
+
+    public int getEntryFeesNonAcm() {
+        return entryFeesNonAcm;
+    }
+
+    public int getEntryFeesTeam() {
+        return entryFeesTeam;
+    }
+
+    @JsonProperty("entryFeesAcm")
+    private int entryFeesAcm;
+
+    @JsonProperty("entryFeesNonAcm")
+    private int entryFeesNonAcm;
+
+    @JsonProperty("entryFeesTeam")
+    private int entryFeesTeam;
 
     @JsonProperty("prizeMoney")
     private ArrayList<Integer> prizeMoney;
@@ -75,7 +93,9 @@ public class Event implements Comparable<Event>, Parcelable {
         eventID = in.readString();
         eventName = in.readString();
         minParticipant = in.readInt();
-        entryFees = in.readInt();
+        entryFeesAcm=in.readInt();
+        entryFeesNonAcm=in.readInt();
+        entryFeesTeam=in.readInt();
         cover=in.readString();
         posterUrl =in.readString();
         tagline=in.readString();
@@ -107,10 +127,6 @@ public class Event implements Comparable<Event>, Parcelable {
 
     public int getMinParticipant() {
         return minParticipant;
-    }
-
-    public int getEntryFees() {
-        return entryFees;
     }
 
     public ArrayList<Integer> getPrizeMoney() {
@@ -166,7 +182,9 @@ public class Event implements Comparable<Event>, Parcelable {
         parcel.writeString(eventID);
         parcel.writeString(eventName);
         parcel.writeInt(minParticipant);
-        parcel.writeInt(entryFees);
+        parcel.writeInt(entryFeesAcm);
+        parcel.writeInt(entryFeesNonAcm);
+        parcel.writeInt(entryFeesTeam);
         parcel.writeString(cover);
         parcel.writeString(posterUrl);
         parcel.writeString(tagline);
@@ -194,7 +212,9 @@ public class Event implements Comparable<Event>, Parcelable {
         private String eventID;
         private String eventName;
         private int minParticipant;
-        private int entryFees;
+        private int entryFeesAcm;
+        private int entryFeesNonAcm;
+        private int entryFeesTeam;
         private ArrayList<Integer> prizeMoney;
         private Long eventTimeStamp;
         private String cover;
@@ -212,7 +232,9 @@ public class Event implements Comparable<Event>, Parcelable {
             this.eventID = event.getEventID();
             this.eventName = event.getEventName();
             this.minParticipant = event.getMinParticipant();
-            this.entryFees = event.getEntryFees();
+            this.entryFeesAcm = event.getEntryFeesAcm();
+            this.entryFeesNonAcm=event.getEntryFeesNonAcm();
+            this.entryFeesTeam=event.getEntryFeesTeam();
             this.prizeMoney = event.getPrizeMoney();
             this.eventTimeStamp = event.eventTimeStamp;
             this.maxParticipant = event.maxParticipant;
@@ -221,7 +243,9 @@ public class Event implements Comparable<Event>, Parcelable {
         public Event build() {
             Event event = new Event();
             event.eventID = this.eventID;
-            event.entryFees = this.entryFees;
+            event.entryFeesAcm=this.entryFeesAcm;
+            event.entryFeesNonAcm=this.entryFeesNonAcm;
+            event.entryFeesTeam=this.entryFeesTeam;
             event.minParticipant = this.minParticipant;
             event.eventName = this.eventName;
             event.prizeMoney = this.prizeMoney;
@@ -252,10 +276,6 @@ public class Event implements Comparable<Event>, Parcelable {
             return this;
         }
 
-        public Builder setEntryFees(int entryFees) {
-            this.entryFees = entryFees;
-            return this;
-        }
 
         public Builder setPrizeMoney(ArrayList<Integer> prizeMoney) {
             this.prizeMoney = prizeMoney;
