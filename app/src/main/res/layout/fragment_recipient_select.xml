@@ -17,7 +17,6 @@
             android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
-            app:title="Select OTP Recipient"
             app:titleTextColor="@android:color/white"/>
 
         <ProgressBar

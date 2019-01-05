@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +40,7 @@ public class RecipientSelectFragment extends Fragment {
     private RecyclerViewAdapter recyclerViewAdapter;
     private List<String> recipientSapList;
     private ProgressBar progressBar;
+    private Toolbar toolbar;
     public RecipientSelectFragment() {
         // Required empty public constructor
     }
@@ -78,6 +80,7 @@ public class RecipientSelectFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_recipient_select, container, false);
         recyclerView = view.findViewById(R.id.recycler_view_recipient_select);
         progressBar = view.findViewById(R.id.progress_bar_recipient_select);
+        toolbar = view.findViewById(R.id.toolbar_fragment_recipient_select);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerViewAdapter = new RecyclerViewAdapter();
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -122,6 +125,8 @@ public class RecipientSelectFragment extends Fragment {
         }
         if(recyclerView!=null)
             recyclerView.setVisibility(show?View.INVISIBLE:View.VISIBLE);
+        if(toolbar!=null)
+            toolbar.setTitle(show?null:"Select Recipient");
     }
 
     @Override

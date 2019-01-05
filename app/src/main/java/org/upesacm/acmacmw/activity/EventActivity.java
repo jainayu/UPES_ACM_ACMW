@@ -3,6 +3,7 @@ package org.upesacm.acmacmw.activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -62,7 +63,7 @@ public class EventActivity extends AppCompatActivity implements
             Event event = args.getParcelable(Event.PARCEL_KEY);
             switch (fragmentId) {
                 case R.layout.fragment_event_detail : {
-                    setCurrentFragment(EventDetailFragment.newInstance(event),true);
+                    setCurrentFragment(EventDetailFragment.newInstance(event),false);
                     break;
                 }
                 default: {
@@ -85,6 +86,7 @@ public class EventActivity extends AppCompatActivity implements
         super.onSaveInstanceState(state);
 
     }
+
 
     @Override
     public void onClickRegister(Event event) {
@@ -232,10 +234,32 @@ public class EventActivity extends AppCompatActivity implements
 
     @Override
     public void onOtpConfirmationResult(boolean confirmed) {
+        Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        int teamId = tempStorage.getInt(CONTEXT_TEAM_KEY);
         Log.i(TAG,"confirmed : "+confirmed);
         Toast.makeText(this,confirmed+"",Toast.LENGTH_SHORT).show();
         if(confirmed) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child(FirebaseConfig.EVENTS_DB)
+                    .child(FirebaseConfig.EVENTS)
+                    .child(event.getEventID())
+                    .child(FirebaseConfig.EVENT_OTPS)
+                    .child(""+teamId)
+                    .child(FirebaseConfig.TEAM_OTP_CONFIRMED)
+                    .setValue(true)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(EventActivity.this, "Registration Successful", Toast.LENGTH_SHORT)
+                                        .show();
 
+                                int entryId = getSupportFragmentManager().getBackStackEntryAt(0)
+                                        .getId();
+                                getSupportFragmentManager().popBackStack(entryId,FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                            }
+                        }
+                    });
         }
     }
 }

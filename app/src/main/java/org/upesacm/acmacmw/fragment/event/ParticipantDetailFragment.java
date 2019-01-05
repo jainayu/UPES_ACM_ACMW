@@ -105,17 +105,25 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerViewAdpater = new RecyclerViewAdpater();
         recyclerView.setAdapter(recyclerViewAdpater);
-        toolbar.setTitle("Enter Participant Details");
         buttonNext.setOnClickListener(this);
+        buttonNext.setVisibility(View.GONE);
         showProgress(true);
         return view;
     }
 
     private void showProgress(boolean show) {
-        progressBar.setVisibility(show?View.VISIBLE:View.GONE);
-        buttonNext.setVisibility(show?View.GONE:View.VISIBLE);
-        recyclerView.setVisibility(show?View.GONE:View.VISIBLE);
-        progressBar.setIndeterminate(show);
+        if(progressBar!=null) {
+            progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            progressBar.setIndeterminate(show);
+        }
+        if(buttonNext!=null)
+            buttonNext.setVisibility(show?View.GONE:View.VISIBLE);
+        if(recyclerView!=null)
+            recyclerView.setVisibility(show?View.GONE:View.VISIBLE);
+        if(toolbar!=null)
+            toolbar.setTitle(show?null:"Fill Participant Details");
+        if(buttonNext!=null)
+            buttonNext.setVisibility(show?View.GONE:View.VISIBLE);
     }
 
     @Override
@@ -125,6 +133,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
 
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);*/
+        showProgress(true);
         boolean allValid = true;
         for(String sapId:newSapIds)
             allValid = allValid && inputMap.get(sapId).isDataValid();
@@ -234,11 +243,11 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                             if(!newSapIds.isEmpty())
                                             {
                                                 recyclerViewAdpater.notifyDataSetChanged();
+                                                showProgress(false);
                                             } else {
                                                 Toast.makeText(getContext(),"calling callback",Toast.LENGTH_SHORT).show();
                                                 listener.onParticipantDetailsAvailable(newSapIds,acmParticipantsSap,alreadyRegistered,participants,event,false);
                                             }
-                                            showProgress(false);
                                         }
 
                                         @Override

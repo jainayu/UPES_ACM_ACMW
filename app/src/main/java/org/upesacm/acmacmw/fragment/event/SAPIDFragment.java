@@ -9,6 +9,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class SAPIDFragment extends Fragment {
     RecyclerView recyclerView;
     Button buttonProceed;
     FloatingActionButton addButton;
+    private Toolbar toolbar;
     private RecyclerViewAdapter sapIdAdapter;
     public SAPIDFragment() {
         // Required empty public constructor
@@ -77,9 +79,11 @@ public class SAPIDFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view_sapid);
         buttonProceed = view.findViewById(R.id.button_proceed_sapid_fragment);
         addButton = view.findViewById(R.id.floating_action_button_sapids);
+        toolbar = view.findViewById(R.id.toolbar_frag_sapid);
         sapIdAdapter = new RecyclerViewAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerView.setAdapter(sapIdAdapter);
+        toolbar.setTitle("Enter SAP ID of the Participant/s");
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
