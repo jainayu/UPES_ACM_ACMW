@@ -69,7 +69,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
         View view=inflater.inflate(R.layout.fragment_home_page, container, false);
 
         bottomNavigationView=view.findViewById(R.id.bottomNavigationView);
-        disableShiftMode(bottomNavigationView);
+        //disableShiftMode(bottomNavigationView);
 
 
         /* ********************** Setting up listener for bottom navigation view ********/
@@ -132,7 +132,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
         callback=null;
     }
 
-    @SuppressLint("RestrictedApi")
+    /*@SuppressLint("RestrictedApi")
     void disableShiftMode(BottomNavigationView view) {
         BottomNavigationMenuView menuView = (BottomNavigationMenuView) view.getChildAt(0);
         try {
@@ -163,7 +163,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
         } catch (IllegalAccessException e) {
             Log.e("BNVHelper", "Unable to change value of shift mode", e);
         }
-    }
+    }*/
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

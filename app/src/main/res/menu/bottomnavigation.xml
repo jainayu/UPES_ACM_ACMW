@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
 
     <item
         android:id="@+id/action_posts"
         android:icon="@drawable/round_home_black_24dp"
-        android:title="" />
+        android:title="Home"
+        app:showAsAction="withText" />
     <item
         android:id="@+id/action_upcoming_events"
-        android:title=""
         android:icon="@drawable/ic_event_note_black_24dp"
-    />
+        android:title="Events"
+        app:showAsAction="withText" />
 
     <item
         android:id="@+id/action_heirarchy"
         android:icon="@drawable/ic_supervisor_account_black_24dp"
-        android:title="" />
+        android:title="Hierarchy"
+        app:showAsAction="withText" />
 
-    <item android:id="@+id/action_contact"
-        android:title=""
-        android:icon="@drawable/ic_call_black_24dp"/>
+    <item
+        android:id="@+id/action_contact"
+        android:icon="@drawable/ic_call_black_24dp"
+        android:title="Contact Us"
+        app:showAsAction="withText" />
 
  <!--   <item
         android:id="@+id/action_posts"

@@ -22,13 +22,15 @@ import com.google.firebase.database.ValueEventListener;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
+import org.upesacm.acmacmw.fragment.payment.PaymentDetailsFragment;
 import org.upesacm.acmacmw.fragment.event.SAPIDFragment;
-import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
+import org.upesacm.acmacmw.fragment.payment.OtpConfirmationFragment;
 import org.upesacm.acmacmw.fragment.payment.RecipientSelectFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
 import org.upesacm.acmacmw.util.FirebaseConfig;
+import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,10 +41,13 @@ public class EventActivity extends AppCompatActivity implements
         EventDetailFragment.FragmentInteractionListener,
         ParticipantDetailFragment.FragmentInteractionListener,
         SAPIDFragment.FragmentInteractionListener,
-        RecipientSelectFragment.FragmentInteractionListener{
+        RecipientSelectFragment.FragmentInteractionListener,
+        OtpConfirmationFragment.OnFragmentInteractionListener,
+        PaymentDetailsFragment.OnFragmentInteractionListener {
     public static final String TAG = "EventActivity";
     private static final String REGISTERED_EVENT_KEY = "registered event key";
     private static final String PARTICIPANTS_KEY = "participants key";
+    private static final String CONTEXT_TEAM_KEY = "team key";
     Bundle tempStorage = new Bundle();
     FrameLayout frameLayout;
     @Override
@@ -176,8 +181,7 @@ public class EventActivity extends AppCompatActivity implements
                                                         }
                                                     }
                                                 });
-
-
+                                        tempStorage.putInt(CONTEXT_TEAM_KEY,teamId);
                                     }
                                 });
                         }
@@ -189,7 +193,49 @@ public class EventActivity extends AppCompatActivity implements
 
     @Override
     public void onRecipientSelect(Member recipient) {
-        Log.i(TAG,"OnRecipientSelect called");
+       Log.i(TAG,"onRecipientSelect called");
+       setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,10),true);
+    }
+
+    @Override
+    public void onClickNext(Member recipient) {
+        Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        int teamId = tempStorage.getInt(CONTEXT_TEAM_KEY);
+        Log.i(TAG,"OnClicknext called "+event.getEventID());
         Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
+
+        //generate otp
+        String otp = RandomOTPGenerator.generate(teamId,6);
+        Log.i(TAG,"OTP : "+otp);
+        final String otpUrl = FirebaseConfig.EVENTS_DB+"/"+
+                FirebaseConfig.EVENTS+"/"+
+                event.getEventID()+"/"+
+                FirebaseConfig.EVENT_OTPS+"/"+
+                teamId+"/"+
+                FirebaseConfig.TEAM_OTP;
+        Log.i(TAG,otpUrl);
+        FirebaseDatabase.getInstance().getReference()
+                .child(otpUrl)
+                .setValue(otp)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()) {
+                            setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl),true);
+                        } else {
+                            Log.e(TAG,"Failed to save the generated otp");
+                            Toast.makeText(EventActivity.this,"network error",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onOtpConfirmationResult(boolean confirmed) {
+        Log.i(TAG,"confirmed : "+confirmed);
+        Toast.makeText(this,confirmed+"",Toast.LENGTH_SHORT).show();
+        if(confirmed) {
+
+        }
     }
 }

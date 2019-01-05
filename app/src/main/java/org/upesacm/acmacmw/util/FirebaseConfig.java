@@ -10,4 +10,7 @@ public interface FirebaseConfig {
     String TEAMS = "teams";
     String EVENT_TEAMS_COUNT = "teamsCount";
     String EVENT_OTP_RECIPIENT = "otpRecipients";
+    String EVENT_OTPS = "otps";
+    String TEAM_OTP = "otp";
+    String TEAM_OTP_CONFIRMED = "confirmed";
 }

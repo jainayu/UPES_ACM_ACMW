@@ -1,52 +1,55 @@
-package org.upesacm.acmacmw.fragment.event;
+package org.upesacm.acmacmw.fragment.payment;
 
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventActivity;
-import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.model.Event;
-import org.upesacm.acmacmw.model.Participant;
-import org.upesacm.acmacmw.util.FirebaseConfig;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import org.upesacm.acmacmw.model.Member;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PaymentDetailsFragment extends Fragment {
-
-    ParticipantDetailFragment.FragmentInteractionListener listener;
-    Map<String,Participant> participants;
-    Event event;
-
+public class PaymentDetailsFragment extends Fragment implements
+        View.OnClickListener{
+    private static final String AMOUNT_KEY = "amount key";
+    OnFragmentInteractionListener listener;
+    private Member recipient;
+    private int amount;
+    private TextView textViewAmount;
+    private TextView textViewName;
+    private TextView textViewContact;
+    private TextView textViewEmail;
+    private Button buttonProceed;
     public PaymentDetailsFragment() {
         // Required empty public constructor
+    }
+
+    public static PaymentDetailsFragment newInstance(Member recipient,int amount) {
+        PaymentDetailsFragment fragment = new PaymentDetailsFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(Member.PARCEL_KEY,recipient);
+        args.putInt(AMOUNT_KEY,amount);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
     public void onAttach(Context context) {
         if(context instanceof EventActivity) {
-            listener = (ParticipantDetailFragment.FragmentInteractionListener)context;
+            listener = (OnFragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of HomeActivity");
+            throw new IllegalStateException(context+" must be implement OnFragmentInteractionListener");
         }
     }
 
@@ -58,28 +61,35 @@ public class PaymentDetailsFragment extends Fragment {
         } else {
             args = getArguments();
         }
-        if(args == null) {
-            throw new IllegalStateException("no arguments passed ");
-        }
-        event=args.getParcelable(Event.PARCEL_KEY);
-        participants = (Map<String, Participant>) args.getSerializable(Participant.PARCEL_KEY);
+        recipient = args.getParcelable(Member.PARCEL_KEY);
+        amount = args.getInt(AMOUNT_KEY);
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        int amount=calculateAmountToPay();
+       // int amount=calculateAmountToPay();
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_selected_events, container, false);
-        TextView textView=view.findViewById(R.id.text);
-        textView.setText("Pay :"+amount);
-        registerToDatabase();
+        View view= inflater.inflate(R.layout.fragment_payment_details, container, false);
+        textViewAmount = view.findViewById(R.id.text_view_frag_payment_details_amount);
+        textViewName = view.findViewById(R.id.text_view_frag_payment_details_recip_name);
+        textViewContact = view.findViewById(R.id.text_view_frag_payment_details_recip_contact_no);
+        textViewEmail = view.findViewById(R.id.text_view_frag_payment_details_recip_email);
+        buttonProceed = view.findViewById(R.id.button_frag_payment_details_proceed);
+
+        textViewAmount.setText(""+amount);
+        textViewName.setText(recipient.getName());
+        textViewContact.setText(recipient.getContact());
+        textViewEmail.setText(recipient.getEmail());
+        buttonProceed.setOnClickListener(this);
+        //textView.setText("Pay :"+amount);
+        //registerToDatabase();
         return view;
 
     }
 
-    private int calculateAmountToPay() {
+    /*private int calculateAmountToPay() {
         int amount=0;
         if(event.getEntryFeesTeam()==0)
         {
@@ -98,9 +108,9 @@ public class PaymentDetailsFragment extends Fragment {
             amount=event.getEntryFeesTeam();
         }
         return amount;
-    }
+    } */
 
-    private void registerToDatabase() {
+   /* private void registerToDatabase() {
         final Map<String ,Object> appendParticipants=new HashMap<>();
         appendParticipants.putAll(participants);
         FirebaseDatabase.getInstance().getReference()
@@ -140,12 +150,21 @@ public class PaymentDetailsFragment extends Fragment {
                         }
                     }
                 });
-    }
+    } */
+
+
 
     @Override
     public void onSaveInstanceState(Bundle savedState) {
-        savedState.putParcelable(Event.PARCEL_KEY,event);
-        savedState.putSerializable(Participant.PARCEL_KEY, (Serializable) participants);
+    }
+
+    @Override
+    public void onClick(View v) {
+        listener.onClickNext(recipient);
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onClickNext(Member recipient);
     }
 
 }
