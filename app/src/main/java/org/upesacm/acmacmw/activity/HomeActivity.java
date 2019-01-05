@@ -2,6 +2,7 @@ package org.upesacm.acmacmw.activity;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -30,6 +31,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
+import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
+import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
@@ -46,10 +49,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class HomeActivity extends AppCompatActivity implements
+        EventsListFragment.FragmentInteractionListener,
         NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener {
 
     public static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
+    public static final String EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY = "event activity current fragment key";
     protected static final int MEMBER_PROFILE_MENU_ID = 1;
     protected static final int CHOOSE_PROFILE_PICTURE = 4;
 
@@ -398,15 +403,19 @@ public class HomeActivity extends AppCompatActivity implements
         ft.commit();
     }
 
-    public EventController getEventController() {
-        return EventController.getInstance(this);
-    }
-
     public PostController getPostController() {
         return PostController.getInstance(this);
     }
 
     public UserController getUserController() {
         return UserController.getInstance(this);
+    }
+
+    @Override
+    public void onClickEventDetails(Event event) {
+        Intent eventActIntent = new Intent(this,EventActivity.class);
+        eventActIntent.putExtra(Event.PARCEL_KEY,event);
+        eventActIntent.putExtra(EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY,R.layout.fragment_event_detail);
+        startActivity(eventActIntent);
     }
 }

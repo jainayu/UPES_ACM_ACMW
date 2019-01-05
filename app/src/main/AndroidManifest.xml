@@ -34,10 +34,6 @@
         <activity
             android:name=".activity.HomeActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".Diversion.Activity.LoginActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Diversion.Activity.MainActivity"
-            android:screenOrientation="portrait"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -49,12 +45,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".Diversion.Activity.FeedbackActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Diversion.Activity.RulesActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Diversion.Activity.FinalActivity"
-            android:screenOrientation="portrait"></activity>
+
+        <activity android:name=".activity.EventActivity"
+            android:parentActivityName=".activity.HomeActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

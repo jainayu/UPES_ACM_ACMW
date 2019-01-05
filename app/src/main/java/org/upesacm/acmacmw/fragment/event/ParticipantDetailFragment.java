@@ -32,6 +32,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.EventActivity;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
@@ -51,10 +52,10 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     private static final String TAG = "EventRegisterFragment";
     public static final long UID = Config.EVENT_REGISTRATION_FRAGMENT_UID;
     Event event;
-    List<String> sapIds;
-    List<String> newSapIds = new ArrayList<>();
-    List<String> acmParticipantsSap = new ArrayList<>();
-    List<String> alreadyRegistered;
+    List<String> sapIds; //stores the sap ids of participants taking part in the event
+    List<String> newSapIds = new ArrayList<>(); //stores the sap ids of participants which are registering in an event for first time
+    List<String> acmParticipantsSap = new ArrayList<>(); //stores the sap ids of participants who are acm members;
+    List<String> alreadyRegistered; //stores the sap ids of participants whose data is avaliable in the database
     Map<String,Participant> participants = new HashMap<>();
     Map<String,ItemInputHolder> inputMap = new HashMap<>();
     Toolbar toolbar;
@@ -62,18 +63,16 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     Button buttonNext;
     ProgressBar progressBar;
     RecyclerViewAdpater recyclerViewAdpater;
-    HomeActivity callback;
     FragmentInteractionListener listener;
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
-            listener = callback.getEventController();
+        if(context instanceof EventActivity) {
+            listener = (FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of HomeActivity");
+            throw new IllegalStateException(context+" must be instance of EventActivity");
         }
     }
 
@@ -115,22 +114,25 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     private void showProgress(boolean show) {
         progressBar.setVisibility(show?View.VISIBLE:View.GONE);
         buttonNext.setVisibility(show?View.GONE:View.VISIBLE);
-        recyclerView.setVisibility(show?View.GONE:View.VISIBLE);;
+        recyclerView.setVisibility(show?View.GONE:View.VISIBLE);
+        progressBar.setIndeterminate(show);
     }
 
     @Override
     public void onClick(View v) {
-        InputMethodManager inputManager = (InputMethodManager)
+        /*InputMethodManager inputManager = (InputMethodManager)
                 getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+                InputMethodManager.HIDE_NOT_ALWAYS);*/
         boolean allValid = true;
         for(String sapId:newSapIds)
             allValid = allValid && inputMap.get(sapId).isDataValid();
 
         if(allValid) {
             for(String sapId:newSapIds) {
+                List<String> eventList = new ArrayList<>();
+                eventList.add(event.getEventID());
                 participants.put(sapId, new Participant.Builder()
                         .setName(inputMap.get(sapId).getName())
                         .setContact(inputMap.get(sapId).getContact())
@@ -138,6 +140,7 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                         .setYear(inputMap.get(sapId).getYear())
                         .setEmail(inputMap.get(sapId).getEmail())
                         .setWhatsapp(inputMap.get(sapId).getWhatsappNo())
+                        .setEventsList(eventList)
                         .build());
             }
             listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap,alreadyRegistered,participants,event,false);
@@ -173,15 +176,23 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                             Participant participant=participantMap.get(sapid);
                             if(participant!=null)
                             {
-                                participants.put(sapid,new Participant.Builder(participant).build());
-                                alreadyRegistered.add(sapid);
                                 // Check for any dublicate member in the event if found return with toast and end registration process
                                 if(participant.getEventsList().contains(event.getEventID()))
                                 {
                                     Toast.makeText(getContext(), sapid+" is already registered for this event", Toast.LENGTH_LONG).show();
                                     listener.onParticipantDetailsAvailable(null,null,null,null,null,true);
-                                    getActivity().getFragmentManager().popBackStack();
+                                    //getActivity().getFragmentManager().popBackStack();
                                     return;
+                                } else {
+                                    List<String> eventIdList = participant.getEventsList();
+                                    eventIdList.add(event.getEventID());
+                                    Participant modifiedParticipant = new Participant.Builder(participant)
+                                            .setEventsList(eventIdList)
+                                            .build();
+                                    participants.put(sapid,modifiedParticipant);
+                                    alreadyRegistered.add(sapid);
+                                    //add the event id to the participant event list
+                                    participants.get(sapid).getEventsList().add(event.getEventID());
                                 }
 
                             }
@@ -198,49 +209,59 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            Map<String, Member> memberMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Member>>() {
-                                                });
+                                            Map<String, Member> memberMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Member>>() {});
                                             if (memberMap == null)
                                                 memberMap = new HashMap<>();
-                                            final List<String> nonacmSaps = new ArrayList<>();
+
                                             for (int i = 0; i < sapIds.size(); ++i) {
                                                 Member member = memberMap.get(sapIds.get(i));
-                                                if (member == null)
+                                                if (member == null) { // not an acm member
                                                     newSapIds.add(sapIds.get(i));
-                                                else {
+                                                } else {
+                                                    List<String> eventIdList = new ArrayList<>();
+                                                    eventIdList.add(event.getEventID());
+                                                    Participant newAcmParticipant = new Participant.Builder(member)
+                                                            .setEventsList(eventIdList)
+                                                            .setIsAcmMember(true)
+                                                            .build();
                                                     //add participant to the acm participant list
-                                                    participants.put(sapIds.get(i), new Participant.Builder(member).setIsAcmMember(true).build());
+                                                    participants.put(sapIds.get(i),newAcmParticipant);
                                                     //add the sap Id to the list of acm participants
                                                     acmParticipantsSap.add(sapIds.get(i));
-                                                    }
+                                                }
                                             }
+
                                             if(!newSapIds.isEmpty())
                                             {
                                                 recyclerViewAdpater.notifyDataSetChanged();
+                                            } else {
+                                                Toast.makeText(getContext(),"calling callback",Toast.LENGTH_SHORT).show();
+                                                listener.onParticipantDetailsAvailable(newSapIds,acmParticipantsSap,alreadyRegistered,participants,event,false);
                                             }
                                             showProgress(false);
                                         }
 
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError databaseError) {
-                                            }
+                                            databaseError.toException().printStackTrace();
+                                            Log.e(TAG,databaseError.getMessage());
+                                        }
                                     });
                             }
                             else {
-                            buttonNext.callOnClick();
+                            listener.onParticipantDetailsAvailable(newSapIds,acmParticipantsSap,alreadyRegistered,participants,event,false);
                         }
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e(TAG,"Error while accessing ACM-ACMW members database");
-                        Toast.makeText(callback, "Unable to register", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Unable to register", Toast.LENGTH_SHORT).show();
                         Log.e(TAG,databaseError.getDetails());
                         listener.onParticipantDetailsAvailable(null,null,null,null,event,true);
                         showProgress(false);
                     }
                 });
     }
+
     public interface FragmentInteractionListener {
         void onParticipantDetailsAvailable(List<String> newSapIds,List<String> acmParticipants,List<String> alreadyRegistered,Map<String,Participant> participants, Event event,boolean error);
     }

@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.EventActivity;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 
@@ -33,7 +34,6 @@ import java.util.regex.Pattern;
 public class SAPIDFragment extends Fragment {
 
     Event selectedEvent;
-    HomeActivity homeActivity;
     FragmentInteractionListener listener;
     RecyclerView recyclerView;
     Button buttonProceed;
@@ -45,13 +45,12 @@ public class SAPIDFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            homeActivity = (HomeActivity)context;
-            listener = homeActivity.getEventController();
+        if(context instanceof EventActivity) {
+            listener = (FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of HomeActivity");
+            throw new IllegalStateException(context+" must be instance of EventActivity");
         }
     }
 

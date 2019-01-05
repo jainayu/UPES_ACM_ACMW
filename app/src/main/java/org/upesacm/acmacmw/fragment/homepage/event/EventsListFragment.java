@@ -37,9 +37,6 @@ public class EventsListFragment extends Fragment implements
     ProgressBar progressBar;
     RecyclerView recyclerView;
     EventsRecyclerViewAdapter adapter;
-
-
-    HomeActivity callback;
     FragmentInteractionListener listener;
     public EventsListFragment() {
         // Required empty public constructor
@@ -47,9 +44,8 @@ public class EventsListFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
-            listener = (FragmentInteractionListener)callback.getEventController();
+        if(context instanceof FragmentInteractionListener) {
+            listener = (FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
@@ -59,7 +55,6 @@ public class EventsListFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        callback.getSupportActionBar().show();
     }
 
     @Override

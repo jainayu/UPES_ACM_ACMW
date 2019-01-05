@@ -8,6 +8,8 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.EventActivity;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Config;
@@ -33,11 +36,10 @@ import java.util.Calendar;
 public class EventDetailFragment extends Fragment {
     private static final String TAG = "EventDetailsFragment";
     public static final long UID = Config.EVENT_DETAIL_FRAGMENT_UID;
-    HomeActivity callback;
     FragmentInteractionListener fragmentInteractionListener;
     Button buttonEventDetailRegister;
     Event event;
-    TextView textViewId;
+    Toolbar toolbar;
     TextView textViewDate;
     ImageView poster,phone,whatsapp;
     private TextView textViewEventName,textViewDay,textViewMonth,textViewTagline,textViewEventDescription;
@@ -46,16 +48,23 @@ public class EventDetailFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static EventDetailFragment newInstance(Event event) {
+        EventDetailFragment fragment = new EventDetailFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(Event.PARCEL_KEY,event);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
-            fragmentInteractionListener = callback.getEventController();
+        if(context instanceof EventActivity) {
+            fragmentInteractionListener = (FragmentInteractionListener)context;
 
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of HomeActivity");
+            throw new IllegalStateException(context+" must be instance of EventActivity");
         }
     }
 
@@ -75,6 +84,7 @@ public class EventDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_detail, container, false);
+        toolbar = view.findViewById(R.id.toolbar_fragment_event_details);
         buttonEventDetailRegister=view.findViewById(R.id.button_event_detail_register);
         textViewEventName = view.findViewById(R.id.text_view_event_name);
         textViewDate = view.findViewById(R.id.text_view_event_date);
@@ -91,7 +101,7 @@ public class EventDetailFragment extends Fragment {
                 Intent callIntent = new Intent(Intent.ACTION_DIAL);
                 String temp = "tel:" + event.getPhone();
                 callIntent.setData(Uri.parse(temp));
-                callback.startActivity(callIntent);
+                getActivity().startActivity(callIntent);
             }
         });
         whatsapp.setOnClickListener(new View.OnClickListener() {
@@ -100,7 +110,7 @@ public class EventDetailFragment extends Fragment {
                 Intent sendIntent = new Intent("android.intent.action.MAIN");
                 sendIntent.setComponent(new ComponentName("com.whatsapp", "com.whatsapp.Conversation"));
                 sendIntent.putExtra("jid", PhoneNumberUtils.stripSeparators("91" + event.getWhatsapp()) + "@s.whatsapp.net");//phone number without "+" prefix
-                callback.startActivity(sendIntent);
+                getActivity().startActivity(sendIntent);
             }
         });
         buttonEventDetailRegister.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +119,8 @@ public class EventDetailFragment extends Fragment {
             fragmentInteractionListener.onClickRegister(event);
             }
         });
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         updateUI();
         return view;
     }
@@ -116,7 +128,6 @@ public class EventDetailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        callback.setActionBarTitle(getString(R.string.app_name));
     }
 
     private void updateUI() {
@@ -138,8 +149,7 @@ public class EventDetailFragment extends Fragment {
                     .load(event.getPosterUrl())
                     .thumbnail(Glide.with(getContext()).load(R.drawable.post_image_holder))
                     .into(poster);
-            callback.setActionBarTitle(event.getEventName());
-            callback.getSupportActionBar().hide();
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(event.getEventName());
         }
     }
     public interface FragmentInteractionListener {

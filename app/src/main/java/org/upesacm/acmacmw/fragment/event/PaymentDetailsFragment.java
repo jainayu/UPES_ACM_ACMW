@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.EventActivity;
 import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Participant;
@@ -31,7 +32,8 @@ import java.util.Map;
 public class PaymentDetailsFragment extends Fragment {
 
     ParticipantDetailFragment.FragmentInteractionListener listener;
-    HomeActivity homeActivity;
+    Map<String,Participant> participants;
+    Event event;
 
     public PaymentDetailsFragment() {
         // Required empty public constructor
@@ -39,17 +41,15 @@ public class PaymentDetailsFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            homeActivity = (HomeActivity)context;
-            listener = homeActivity.getEventController();
+        if(context instanceof EventActivity) {
+            listener = (ParticipantDetailFragment.FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
             throw new IllegalStateException(context+" must be instance of HomeActivity");
         }
     }
-    Map<String,Participant> participants;
-    Event event;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle args;
@@ -62,7 +62,7 @@ public class PaymentDetailsFragment extends Fragment {
             throw new IllegalStateException("no arguments passed ");
         }
         event=args.getParcelable(Event.PARCEL_KEY);
-       participants = (Map<String, Participant>) args.getSerializable(Participant.PARCEL_KEY);
+        participants = (Map<String, Participant>) args.getSerializable(Participant.PARCEL_KEY);
         super.onCreate(savedInstanceState);
     }
 
@@ -101,7 +101,7 @@ public class PaymentDetailsFragment extends Fragment {
     }
 
     private void registerToDatabase() {
-                final Map<String ,Object> appendParticipants=new HashMap<>();
+        final Map<String ,Object> appendParticipants=new HashMap<>();
         appendParticipants.putAll(participants);
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseConfig.EVENTS_DB)

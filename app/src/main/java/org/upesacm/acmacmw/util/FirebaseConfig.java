@@ -9,4 +9,5 @@ public interface FirebaseConfig {
     String EVENTS = "events";
     String TEAMS = "teams";
     String EVENT_TEAMS_COUNT = "teamsCount";
+    String EVENT_OTP_RECIPIENT = "otpRecipients";
 }
