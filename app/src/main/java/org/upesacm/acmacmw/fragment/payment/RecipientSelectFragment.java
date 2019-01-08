@@ -126,7 +126,7 @@ public class RecipientSelectFragment extends Fragment {
         if(recyclerView!=null)
             recyclerView.setVisibility(show?View.INVISIBLE:View.VISIBLE);
         if(toolbar!=null)
-            toolbar.setTitle(show?null:"Select Recipient");
+            toolbar.setTitle(show?"Processing...":"Select Recipient");
     }
 
     @Override

@@ -195,8 +195,28 @@ public class EventActivity extends AppCompatActivity implements
 
     @Override
     public void onRecipientSelect(Member recipient) {
-       Log.i(TAG,"onRecipientSelect called");
-       setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,10),true);
+        Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        Map<String,Participant> participants = (HashMap<String,Participant>)tempStorage.getSerializable(PARTICIPANTS_KEY);
+        Log.i(TAG,"onRecipientSelect called");
+        int amount=0;
+        if(event.getEntryFeesTeam()==0)
+        {
+            for(Map.Entry<String, Participant> participantMap:participants.entrySet())
+            {
+                if(participantMap.getValue().isACMMember())
+                {
+                    amount=amount+event.getEntryFeesAcm();
+                }
+                else {
+                    amount=amount+event.getEntryFeesNonAcm();
+                }
+            }
+        }
+        else {
+            amount=event.getEntryFeesTeam();
+        }
+       setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,amount),true);
+
     }
 
     @Override
