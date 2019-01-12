@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage.hierarchy;
+package org.upesacm.acmacmw.fragment.homepage;
 
 
 import android.graphics.Typeface;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import org.upesacm.acmacmw.adapter.hierarchy.PagerAdapter;
 public class HierarchyFragment extends Fragment {
     ViewPager viewPager;
     PagerAdapter mPagerAdapter;
+    Toolbar toolbar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -30,6 +32,8 @@ public class HierarchyFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tablayout);
         TextView textViewAvailable = view.findViewById(R.id.text_view_hierarchy_available);
         TextView textViewNoAvailabe = view.findViewById(R.id.text_view_hierarchy_not_available);
+        toolbar = view.findViewById(R.id.toolbar_frag_hierarchy);
+        toolbar.setTitle("Hierarchy");
         Typeface regular = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
         textViewAvailable.setTypeface(regular);
         textViewNoAvailabe.setTypeface(regular);

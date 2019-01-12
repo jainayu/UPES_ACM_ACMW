@@ -1,8 +1,7 @@
-package org.upesacm.acmacmw.fragment.homepage.contactus;
+package org.upesacm.acmacmw.fragment.menu;
 
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -22,10 +21,11 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.model.HeirarchyModel;
 
 /**
@@ -52,7 +52,7 @@ public class ContactUsFragment extends Fragment implements
     ImageView imageViewMembChairPic;
     ImageView imageViewCallPrExec;
     ImageView imageViewCallMembChair;
-    HomeActivity callback;
+    MainActivity callback;
 
     DatabaseReference reference;
 
@@ -61,16 +61,6 @@ public class ContactUsFragment extends Fragment implements
         // Required empty public constructor
     }
 
-    @Override
-    public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
-            super.onAttach(context);
-        }
-        else {
-            throw new IllegalStateException("context must be instance of HomeActivity");
-        }
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -125,7 +115,7 @@ public class ContactUsFragment extends Fragment implements
         imageViewCallMembChair.setOnClickListener(this);
 
         isViewDestroyed = false;
-        reference = callback.getDatabase().getReference().child("Heirarchy");
+        reference = FirebaseDatabase.getInstance().getReference().child("Heirarchy");
         reference.addValueEventListener(this);
         return view;
     }

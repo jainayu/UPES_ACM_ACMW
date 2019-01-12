@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage.hierarchy;
+package org.upesacm.acmacmw.fragment.hierarchy;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,13 +23,13 @@ import org.upesacm.acmacmw.model.HeirarchyModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AcmWFragment extends android.support.v4.app.Fragment implements ValueEventListener {
+public class AcmFragment extends android.support.v4.app.Fragment implements ValueEventListener {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
     RecyclerView mRecyclerView;
-    List<HeirarchyModel> acmWheirarchyModels = new ArrayList<>();
+    ProgressBar mProgressBar;
+    List<HeirarchyModel> acmheirarchyModels = new ArrayList<>();
     HeirarchyAdapter heirarchyAdapter;
-    private ProgressBar mProgressBar;
 
 
     @Override
@@ -37,29 +37,28 @@ public class AcmWFragment extends android.support.v4.app.Fragment implements Val
         super.onCreate(savedInstanceState);
         mFirebaseDatabase= FirebaseDatabase.getInstance();
         mDatabaseReference=mFirebaseDatabase.getReference().child("Heirarchy");
-        heirarchyAdapter = new HeirarchyAdapter(acmWheirarchyModels);//empty list intially
+        heirarchyAdapter = new HeirarchyAdapter(acmheirarchyModels);//empty list intially
     }
 
     @Nullable
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_acm_w, container, false);
-        mRecyclerView=view.findViewById(R.id.acm_w_office_bearer);
+        View view = inflater.inflate(R.layout.fragment_acm, container, false);
+        mRecyclerView=view.findViewById(R.id.acm_office_bearer);
         mProgressBar=view.findViewById(R.id.progress_bar_heirarchy);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(heirarchyAdapter);
-        acmWheirarchyModels=new ArrayList<>();
-        if(mDatabaseReference!=null)
-        {
+       acmheirarchyModels=new ArrayList<>();
+        if(mDatabaseReference!=null) {
             mDatabaseReference.addValueEventListener(this);
         }
+
 
 
         return view;
 
     }
-
 
     @Override
     public void onDestroyView() {
@@ -81,17 +80,16 @@ public class AcmWFragment extends android.support.v4.app.Fragment implements Val
 
     @Override
     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-        acmWheirarchyModels.removeAll(acmWheirarchyModels);
-        for (DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
-        {
-            HeirarchyModel heirarchyModel=dataSnapshot1.getValue(HeirarchyModel.class);
-            if(heirarchyModel.getAcm_acmw().equals("ACMW")){
-                acmWheirarchyModels.add(heirarchyModel);
+        acmheirarchyModels.removeAll(acmheirarchyModels);
+        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+            HeirarchyModel heirarchyModel = dataSnapshot1.getValue(HeirarchyModel.class);
+            if (heirarchyModel.getAcm_acmw().equals("ACM")) {
+                acmheirarchyModels.add(heirarchyModel);
             }
-            if(acmWheirarchyModels!=null && heirarchyAdapter != null)
-            {
-                heirarchyAdapter.setHeirarchyModels(acmWheirarchyModels);
+            if (acmheirarchyModels != null && heirarchyAdapter != null) {
+                heirarchyAdapter.setHeirarchyModels(acmheirarchyModels);
                 mProgressBar.setVisibility(View.GONE);
+
             }
         }
     }

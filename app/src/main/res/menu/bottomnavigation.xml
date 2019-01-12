@@ -21,28 +21,32 @@
         app:showAsAction="withText" />
 
     <item
-        android:id="@+id/action_contact"
-        android:icon="@drawable/ic_call_black_24dp"
-        android:title="Contact Us"
+        android:id="@+id/action_profile"
+        android:icon="@drawable/ic_person_black_24dp"
+        android:title="Profile"
         app:showAsAction="withText" />
-
- <!--   <item
-        android:id="@+id/action_posts"
-        android:icon="@drawable/home_bottomnav"
-        android:title="@string/title_posts" />
-
     <item
-        android:id="@+id/action_upcoming_events"
-        android:icon="@drawable/star_bottomnav"
-        android:title="@string/title_upcmngevents" />
+        android:id="@+id/action_menu"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Menu" />
 
-    <item
-        android:id="@+id/action_heirarchy"
-        android:icon="@drawable/members_bottomnav"
-        android:title="@string/title_hierarchy" />
+    <!--   <item
+           android:id="@+id/action_posts"
+           android:icon="@drawable/home_bottomnav"
+           android:title="@string/title_posts" />
 
-    <item android:id="@+id/action_contact"
-        android:title="@string/title_contact"
-        android:icon="@drawable/contact_bottomnav"/> -->
+       <item
+           android:id="@+id/action_upcoming_events"
+           android:icon="@drawable/star_bottomnav"
+           android:title="@string/title_upcmngevents" />
+
+       <item
+           android:id="@+id/action_heirarchy"
+           android:icon="@drawable/members_bottomnav"
+           android:title="@string/title_hierarchy" />
+
+       <item android:id="@+id/action_contact"
+           android:title="@string/title_contact"
+           android:icon="@drawable/contact_bottomnav"/> -->
 
 </menu>

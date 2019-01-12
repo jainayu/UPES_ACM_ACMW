@@ -32,7 +32,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.HomeActivity"
+            android:name=".activity.MainActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <provider
@@ -45,11 +46,20 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-
-        <activity android:name=".activity.EventActivity"
-            android:parentActivityName=".activity.HomeActivity"
-            android:screenOrientation="portrait">
-        </activity>
+        <activity
+            android:name=".activity.EventActivity"
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
+            android:name=".activity.HomePageActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
+            android:name=".activity.MenuActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity android:name=".activity.MemberRegistrationActivity"></activity>
     </application>
 
 </manifest>

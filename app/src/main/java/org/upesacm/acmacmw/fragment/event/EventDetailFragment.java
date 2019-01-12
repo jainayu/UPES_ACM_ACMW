@@ -23,7 +23,6 @@ import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventActivity;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Config;
 

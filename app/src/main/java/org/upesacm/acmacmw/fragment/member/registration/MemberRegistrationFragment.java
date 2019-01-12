@@ -4,11 +4,8 @@ package org.upesacm.acmacmw.fragment.member.registration;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,23 +18,18 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.model.NewMember;
-import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
 import java.util.regex.Pattern;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-
-public class MemberRegistrationFragment extends Fragment implements View.OnClickListener {
-
-
-    HomeActivity callback;
+public class MemberRegistrationFragment extends Fragment implements
+        View.OnClickListener {
+    public static final int NEW_REGISTRATION = 1;
+    public static final int VERIFY_OTP = 2;
+    //MainActivity callback;
 
     EditText editTextName,editTextSap,editTextContact,editTextEmail,
             editTextYear,editTextBranch,editTextWhatsappNo,editTextDob,editTextCurrentAddress;
@@ -56,13 +48,12 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
+        if(context instanceof RegistrationResultListener) {
             super.onAttach(context);
-            callback = (HomeActivity)context;
-            resultListener = callback.getUserController();
+            resultListener = (RegistrationResultListener)context;
         }
         else {
-            throw new IllegalStateException("context must be instance of HomeActivity");
+            throw new IllegalStateException("context must be instance of MainActivity");
         }
 
     }
@@ -70,7 +61,6 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        callback.getSupportActionBar().setHomeButtonEnabled(true);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -111,14 +101,13 @@ public class MemberRegistrationFragment extends Fragment implements View.OnClick
 
     @Override
     public void onResume() {
-        callback.getToolbar().setTitle("New Member Registration");
         super.onResume();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        callback = null;
+
     }
 
     @Override

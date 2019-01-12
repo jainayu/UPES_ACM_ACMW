@@ -18,12 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventActivity;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;

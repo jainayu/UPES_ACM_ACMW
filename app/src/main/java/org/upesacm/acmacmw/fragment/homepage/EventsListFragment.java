@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage.event;
+package org.upesacm.acmacmw.fragment.homepage;
 
 
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,12 +22,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.adapter.events.EventsRecyclerViewAdapter;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;
+
+import static org.upesacm.acmacmw.util.FirebaseConfig.EVENTS;
+import static org.upesacm.acmacmw.util.FirebaseConfig.EVENTS_DB;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,6 +41,7 @@ public class EventsListFragment extends Fragment implements
     RecyclerView recyclerView;
     EventsRecyclerViewAdapter adapter;
     FragmentInteractionListener listener;
+    private Toolbar toolbar;
     public EventsListFragment() {
         // Required empty public constructor
     }
@@ -49,7 +53,7 @@ public class EventsListFragment extends Fragment implements
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of HomeActivity");
+            throw new IllegalStateException(context+" must be instance of MainActivity");
         }
     }
     @Override
@@ -68,15 +72,17 @@ public class EventsListFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragement_events_list,container,false);
         recyclerView = view.findViewById(R.id.recycler_view_events);
         progressBar = view.findViewById(R.id.progress_bar_events);
-
+        toolbar = view.findViewById(R.id.toolbar_frag_event_list);
+        toolbar.setTitle("Upcoming Events");
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter = new EventsRecyclerViewAdapter();
         adapter.setItemSelectListener(this);// setting the item select listener
-
         recyclerView.setAdapter(adapter);
 
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("event_db/events");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child(EVENTS_DB)
+                .child(EVENTS);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

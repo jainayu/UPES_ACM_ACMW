@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.activity;
+package org.upesacm.acmacmw.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,6 +12,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.model.Participant;
 import org.upesacm.acmacmw.model.TrialMember;
 
 
@@ -25,6 +26,23 @@ public class SessionManager  {
     private static final String MEMBER_SAP_KEY = "member sap preferences key" ;
     private static final String GUEST_MEMBER_SAP_KEY = "guest member sap preference key";
     private static final String SESSION_ID_STORE_KEY = "session id preference key";
+    private static final String MEMBER_ID = "member id key";
+    private static final String NAME_KEY = "member name key";
+    private static final String PASSWORD_KEY = "password key";
+    private static final String BRANCH_KEY = "member branch key";
+    private static final String YEAR_KEY = "member year key";
+    private static final String EMAIL_KEY = "member email key";
+    private static final String CONTACT_KEY = "member contact key";
+    private static final String WHATSAPP_NO_KEY = "member whatsapp key";
+    private static final String DOB_KEY = "member dob key";
+    private static final String ADDRESS_KEY = "member address key";
+    private static final String RECIPIENT_SAP_KEY = "recipient sap key";
+    private static final String PREMIUM_KEY = "member premium key";
+    private static final String MEMBERSHIP_TYPE_KEY = "membership type key";
+    private static final String PROFILE_PICTURE_KEY = "member profile pic key";
+    private static final String GUEST_CREATING_TIME_STAMP_KEY = "guest creating time stamp key";
+    private static final String GUEST_OTP_KEY = "guest otp key";
+    private static final String GUEST_VERIFIED_KEY = "guest verified";
 
     private static SessionManager sessionManager;
     /* ********************************************************************************************************* */
@@ -32,8 +50,6 @@ public class SessionManager  {
 
     private SharedPreferences preferences;
     private int sessionID;
-
-    private String userSap;
 
     private Member loggedInMember;
     private TrialMember guestMember;
@@ -54,29 +70,27 @@ public class SessionManager  {
         sessionManager.sessionID = sessionManager.preferences.getInt(SESSION_ID_STORE_KEY,NONE);
         switch (sessionManager.sessionID) {
             case MEMBER_SESSION_ID : {
-                sessionManager.userSap = sessionManager.preferences.getString(MEMBER_SAP_KEY,null);
+                sessionManager.loggedInMember = sessionManager.retrieveMember();
                 break;
             }
             case GUEST_SESSION_ID : {
-                sessionManager.userSap = sessionManager.preferences.getString(GUEST_MEMBER_SAP_KEY,null);
+                sessionManager.guestMember = sessionManager.retrieveGuestMember();
             }
             default : {
                 System.out.println("no session has been in progress");
             }
         }
 
-        if(sessionManager.userSap != null) {
+        if(sessionManager.loggedInMember != null) {
             FirebaseDatabase.getInstance().getReference()
-                    .child("acm_acmw_members")
-                    .child(sessionManager.userSap)
+                    .child(FirebaseConfig.ACM_ACMW_MEMBERS)
+                    .child(sessionManager.loggedInMember.getSap())
                     .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(sessionManager.sessionID == MEMBER_SESSION_ID) {
                                 sessionManager.loggedInMember = dataSnapshot.getValue(Member.class);
                                 System.out.println("session manager : data fetched");
-                            } else {
-                                sessionManager.guestMember = dataSnapshot.getValue(TrialMember.class);
                             }
                         }
 
@@ -94,7 +108,6 @@ public class SessionManager  {
                     "Use SessionManager.init(Context)");
         return sessionManager;
     }
-
 
 
     //this function will be called each time any operation is requested from the session manager
@@ -129,12 +142,49 @@ public class SessionManager  {
         return sessionID;
     }
 
-    /**
-     * This method creates a new Member Session if it has not already been created
-     * @param memberSap - The Sap ID of the member for whom the session is being created
-     * @return true - if the session has been created and false if a session is already alive
-     */
-    private boolean  createMemberSession(@NonNull String memberSap) {
+    private void saveMember(@NonNull Member member) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(MEMBER_ID,member.getMemberId());
+        editor.putString(NAME_KEY,member.getName());
+        editor.putString(PASSWORD_KEY,member.getPassword());
+        editor.putString(MEMBER_SAP_KEY,member.getSap());
+        editor.putString(BRANCH_KEY,member.getBranch());
+        editor.putString(YEAR_KEY,member.getBranch());
+        editor.putString(EMAIL_KEY,member.getEmail());
+        editor.putString(CONTACT_KEY,member.getContact());
+        editor.putString(WHATSAPP_NO_KEY,member.getWhatsappNo());
+        editor.putString(DOB_KEY,member.getDob());
+        editor.putString(ADDRESS_KEY,member.getCurrentAdd());
+        editor.putString(RECIPIENT_SAP_KEY,member.getRecepientSap());
+        editor.putBoolean(PREMIUM_KEY,member.isPremium());
+        editor.putString(MEMBERSHIP_TYPE_KEY,member.getMembershipType());
+        editor.putString(PROFILE_PICTURE_KEY,member.getProfilePicture());
+        editor.commit();
+    }
+
+    private Member retrieveMember() {
+
+        Member member = new Member.Builder()
+                .setSAPId(preferences.getString(MEMBER_SAP_KEY,null))
+                .setmemberId(preferences.getString(MEMBER_ID,null))
+                .setName(preferences.getString(NAME_KEY,null))
+                .setPassword(preferences.getString(PASSWORD_KEY,null))
+                .setBranch(preferences.getString(BRANCH_KEY,null))
+                .setYear(preferences.getString(YEAR_KEY,null))
+                .setEmail(preferences.getString(EMAIL_KEY,null))
+                .setContact(preferences.getString(CONTACT_KEY,null))
+                .setWhatsappNo(preferences.getString(WHATSAPP_NO_KEY,null))
+                .setDob(preferences.getString(DOB_KEY,null))
+                .setCurrentAdd(preferences.getString(ADDRESS_KEY,null))
+                .setRecipientSap(preferences.getString(RECIPIENT_SAP_KEY,null))
+                .setPremium(preferences.getBoolean(PREMIUM_KEY,false))
+                .setMembershipType(preferences.getString(MEMBERSHIP_TYPE_KEY,null))
+                .setProfilePicture(preferences.getString(PROFILE_PICTURE_KEY,null))
+                .build();
+        return member;
+    }
+
+    public boolean createMemberSession(@NonNull Member member) {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
@@ -143,33 +193,40 @@ public class SessionManager  {
             return false;
 
         //create the memeber session
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(MEMBER_SAP_KEY,memberSap);
-        editor.putInt(SESSION_ID_STORE_KEY,MEMBER_SESSION_ID);
-        editor.commit();
-
-        this.userSap = memberSap;
-
+        saveMember(member);
+        this.loggedInMember = member;
         sessionID = SessionManager.MEMBER_SESSION_ID;
 
         return true;
     }
 
-    public boolean createMemberSession(@NonNull Member member) {
-        boolean created = createMemberSession(member.getSap());
-        if(created) {
-            this.loggedInMember = member;
-        }
-        System.out.println("Member session created : "+created);
-        return created;
+    private void saveGuestMember(TrialMember guestMember) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(MEMBER_SAP_KEY,guestMember.getSap());
+        editor.putString(EMAIL_KEY,guestMember.getEmail());
+        editor.putString(NAME_KEY,guestMember.getEmail());
+        editor.putString(PROFILE_PICTURE_KEY,guestMember.getImageUrl());
+        editor.putString(GUEST_CREATING_TIME_STAMP_KEY,guestMember.getCreationTimeStamp());
+        editor.putString(GUEST_OTP_KEY,guestMember.getOtp());
+        editor.putBoolean(GUEST_VERIFIED_KEY,guestMember.isVerified());
+        editor.commit();
     }
 
-    /**
-     * This method creates a new Guest Session if it has not already been created
-     * @param trialMemberSap - The Sap ID of the guest for whom the session is being created
-     * @return true - if the session has been created and - false if a session is already alive
- createMemberSession    */
-    private boolean createGuestSession(@NonNull String trialMemberSap) {
+    private TrialMember retrieveGuestMember() {
+
+        TrialMember trialMember = new TrialMember.Builder(preferences.getString(GUEST_CREATING_TIME_STAMP_KEY,null))
+                .setSap(preferences.getString(MEMBER_SAP_KEY,null))
+                .setEmail(preferences.getString(EMAIL_KEY,null))
+                .setName(preferences.getString(NAME_KEY,null))
+                .setImageUrl(preferences.getString(PROFILE_PICTURE_KEY,null))
+                .setOtp(preferences.getString(GUEST_OTP_KEY,null))
+                .setVerified(preferences.getBoolean(GUEST_VERIFIED_KEY,false))
+                .build();
+
+        return trialMember;
+    }
+
+    public boolean createGuestSession(@NonNull TrialMember guestMember) {
         if(!isSharedPreferencesSet())
             throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
                     "to function");
@@ -177,60 +234,15 @@ public class SessionManager  {
         if(isSessionAlive())
             return false;
 
-        //create the guest session
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(GUEST_MEMBER_SAP_KEY,trialMemberSap);
-        editor.putInt(SESSION_ID_STORE_KEY,GUEST_SESSION_ID);
-        editor.commit();
 
-        this.userSap = trialMemberSap;
-
+        saveGuestMember(guestMember);
+        this.guestMember = guestMember;
         sessionID = SessionManager.GUEST_SESSION_ID;
 
         return true;
     }
 
-    public boolean createGuestSession(@NonNull TrialMember guestMember) {
-        boolean created = createGuestSession(guestMember.getSap());
-        if(created) {
-            this.guestMember = guestMember;
-        }
-        System.out.println("Guest session created : "+created);
-        return created;
-    }
 
-    /**
-     * @return The sap id of the member if a Member Session is alive otherwise null
-     */
-    private String retriveMemberSap() {
-        if(!isSharedPreferencesSet())
-            throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
-                    "to function");
-        if(userSap==null)
-            userSap = preferences.getString(MEMBER_SAP_KEY,null);
-
-        if(userSap == null)
-            throw new IllegalStateException("Member Sap stored by SessionManager was null");
-
-        return userSap;
-    }
-
-    /**
-     * @return The Sap id of the guest if a Guest Session is alive otherwise null
-     */
-    private String retrieveGuestMemberSap() {
-        if(!isSharedPreferencesSet())
-            throw new SessionManagerNotInitializedException("SharedPreference must be set for the SessionManger" +
-                    "to function");
-
-        if(userSap == null) //fetch the guestMemberSap from the preference file
-            userSap = preferences.getString(GUEST_MEMBER_SAP_KEY,null);
-
-        if(userSap == null)
-            throw new IllegalStateException("Guest Sap stored by SessionManager was null");
-
-        return userSap;
-    }
 
     /**
      * This method destroys any alive session
@@ -248,7 +260,6 @@ public class SessionManager  {
         editor.clear();
         editor.commit();
 
-        userSap = null;
         loggedInMember = null;
         guestMember = null;
         sessionID = SessionManager.NONE;
@@ -257,22 +268,6 @@ public class SessionManager  {
     }
     /* ******************************************************************************************/
 
-    @Nullable
-    public String getUserSap() {
-        switch (sessionID) {
-            case GUEST_SESSION_ID : {
-                return retrieveGuestMemberSap();
-            }
-
-            case MEMBER_SESSION_ID : {
-                return retriveMemberSap();
-            }
-
-            default : {
-                return null;
-            }
-        }
-    }
 
     @Nullable
     public Member getLoggedInMember() {
@@ -282,5 +277,11 @@ public class SessionManager  {
     @Nullable
     public TrialMember getGuestMember() {
         return guestMember;
+    }
+
+    public static class SessionManagerNotInitializedException extends RuntimeException{
+        public SessionManagerNotInitializedException(String msg) {
+            super(msg);
+        }
     }
 }

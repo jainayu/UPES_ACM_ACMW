@@ -59,7 +59,7 @@ public class EventActivity extends AppCompatActivity implements
         frameLayout = findViewById(R.id.frame_layout_event_activity);
         Bundle args = getIntent().getExtras();
         if(args!=null) {
-            int fragmentId = args.getInt(HomeActivity.EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY);
+            int fragmentId = args.getInt(MainActivity.EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY);
             Event event = args.getParcelable(Event.PARCEL_KEY);
             switch (fragmentId) {
                 case R.layout.fragment_event_detail : {

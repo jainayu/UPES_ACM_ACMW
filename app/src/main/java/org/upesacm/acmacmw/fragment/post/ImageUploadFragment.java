@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage.post;
+package org.upesacm.acmacmw.fragment.post;
 
 
 import android.content.Context;
@@ -24,9 +24,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.model.Post;
-import org.upesacm.acmacmw.retrofit.ApiClient;
+import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.retrofit.ResponseModel;
@@ -77,7 +77,7 @@ public class ImageUploadFragment extends Fragment implements
     UploadTask uploadTask;
     private File destination;
 
-    private HomeActivity callback;
+    private MainActivity callback;
 
     public ImageUploadFragment() {
         // Required empty public constructor
@@ -92,8 +92,8 @@ public class ImageUploadFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if (context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
+        if (context instanceof MainActivity) {
+            callback = (MainActivity)context;
             resultListener = callback.getPostController();
             super.onAttach(context);
         } else {
@@ -212,7 +212,7 @@ public class ImageUploadFragment extends Fragment implements
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("image", destination.getName(), fileBody);
         RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
 // Change base URL to your upload server URL.
-        MembershipClient membershipClient = ApiClient.getClient().create(MembershipClient.class);
+        MembershipClient membershipClient = RetrofitHostingerApiClient.getInstance().create(MembershipClient.class);
         membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {

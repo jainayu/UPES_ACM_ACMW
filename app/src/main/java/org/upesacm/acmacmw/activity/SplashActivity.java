@@ -1,23 +1,15 @@
 package org.upesacm.acmacmw.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import  android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.SessionManager;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class SplashActivity extends AppCompatActivity {
       private static int SPLASH_TIME_OUT=2000;
@@ -36,7 +28,7 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent homeIntent = new Intent(SplashActivity.this, HomeActivity.class);
+                Intent homeIntent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(homeIntent);
                 finish();
             }

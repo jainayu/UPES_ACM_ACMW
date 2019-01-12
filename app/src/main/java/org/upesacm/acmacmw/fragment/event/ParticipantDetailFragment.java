@@ -1,9 +1,6 @@
 package org.upesacm.acmacmw.fragment.event;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -18,10 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventActivity;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
@@ -46,7 +38,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMenuItemClickListener {

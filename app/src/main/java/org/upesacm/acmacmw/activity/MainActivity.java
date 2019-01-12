@@ -1,107 +1,129 @@
 package org.upesacm.acmacmw.activity;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
-import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
+import org.upesacm.acmacmw.fragment.homepage.MenuFragment;
+import org.upesacm.acmacmw.fragment.homepage.EventsListFragment;
+import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
+import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
+import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
+import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
+import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.OTPSender;
-import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
-import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
-import org.upesacm.acmacmw.fragment.navdrawer.AlumniFragment;
-import org.upesacm.acmacmw.fragment.navdrawer.HomePageFragment;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
-import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
-import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
-import org.upesacm.acmacmw.util.Config;
+import org.upesacm.acmacmw.util.SessionManager;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class HomeActivity extends AppCompatActivity implements
+public class MainActivity extends AppCompatActivity implements
+        View.OnClickListener,
+        BottomNavigationView.OnNavigationItemSelectedListener,
         EventsListFragment.FragmentInteractionListener,
-        NavigationView.OnNavigationItemSelectedListener,
-        View.OnClickListener {
-
+        MenuFragment.OnFragmentInteractionListener,
+        ProfileFragment.OnFragmentInteractionListener {
+    public static final String TAG = "MainActivity";
     public static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     public static final String EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY = "event activity current fragment key";
     protected static final int MEMBER_PROFILE_MENU_ID = 1;
     protected static final int CHOOSE_PROFILE_PICTURE = 4;
 
-    private Toolbar toolbar;
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle toggle;
-    private NavigationView navigationView;
+    private static final int POSTS_FRAGMENT_ID = 1;
+    private static final int EVENTS_FRAGMENT_ID = 2;
+    private static final int HIERARCHY_FRAGMENT_ID = 3;
+    private static final int PROFILE_FRAGMENT_ID = 4;
+    private static final int MENU_FRAGMENT_ID = 5;
+
+    private int selectedFragmentId;
+
+    //private DrawerLayout drawerLayout;
+    //private ActionBarDrawerToggle toggle;
+    //private NavigationView navigationView;
 
     private Retrofit retrofit;
     private HomePageClient homePageClient;
     private MembershipClient membershipClient;
-    private View headerLayout;
-
+    //private View headerLayout;
     protected String newMemberSap;
-
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
 
+    private BottomNavigationView bottomNavigationView;
+    private FrameLayout frameLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_main);
-
-        toolbar = findViewById(R.id.my_toolbar);
-        drawerLayout=findViewById(R.id.drawer_layout);
-        navigationView=findViewById(R.id.nav_view);
+        setContentView(R.layout.fragment_home_page);
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        frameLayout = findViewById(R.id.frame_layout_homepage);
+        switch(selectedFragmentId) {
+            case POSTS_FRAGMENT_ID : {
+                setCurrentFragment(new PostsFragment(),false);
+                break;
+            }
+            case EVENTS_FRAGMENT_ID : {
+                setCurrentFragment(new EventsListFragment(),false);
+                break;
+            }
+            case HIERARCHY_FRAGMENT_ID : {
+                setCurrentFragment(new HierarchyFragment(),false);
+                break;
+            }
+            case PROFILE_FRAGMENT_ID : {
+                setCurrentFragment(ProfileFragment.newInstance(),false);
+                break;
+            }
+            case MENU_FRAGMENT_ID : {
+                setCurrentFragment(MenuFragment.newInstance(),false);
+                break;
+            }
+            default : {
+                setCurrentFragment(new PostsFragment(),false);
+                break;
+            }
+        }
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
         retrofit=new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
         homePageClient =retrofit.create(HomePageClient.class);
         membershipClient=retrofit.create(MembershipClient.class);
+        /*drawerLayout=findViewById(R.id.drawer_layout);
+        navigationView=findViewById(R.id.nav_view);
+        */
 
         /* *************************Setting the the action bar *****************************/
-        setSupportActionBar(toolbar);
-        toggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,
+        /*toggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,
                 R.string.drawer_opened, R.string.drawer_closed) ;
         drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        toggle.syncState();*/
         /* **********************************************************************************/
 
-        /* *****************Setting up home page fragment ***********************/
+        /* *****************Setting up home page fragment **********************
         FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout,new HomePageFragment(),"homepage");
         fragmentTransaction.commit();
-        /* *********************************************************************************/
+         *********************************************************************************/
 
-        navigationView.setNavigationItemSelectedListener(this);
+        /*navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.action_home);
         headerLayout=navigationView.getHeaderView(0);
         Button signin=headerLayout.findViewById(R.id.button_sign_in);
@@ -112,15 +134,12 @@ public class HomeActivity extends AppCompatActivity implements
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account!=null && SessionManager.getInstance().getSessionID() != SessionManager.GUEST_SESSION_ID) {
             getUserController().signOutFromGoogle();
-        }
-
+        }*/
     }
 
     @Override
     protected void onDestroy() {
-        toolbar = null;
-
-        drawerLayout.removeDrawerListener(toggle);
+        /*drawerLayout.removeDrawerListener(toggle);
         toggle = null;
         drawerLayout = null;
 
@@ -131,20 +150,50 @@ public class HomeActivity extends AppCompatActivity implements
         homePageClient = null;
         membershipClient  = null;
 
-        headerLayout = null;
+        headerLayout = null;*/
         super.onDestroy();
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         System.out.println("onNaviagationItemSelected");
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        switch (item.getItemId()) {
+            case R.id.action_posts : {
+                selectedFragmentId = POSTS_FRAGMENT_ID;
+                setCurrentFragment(new PostsFragment(),false);
+                break;
+            }
+            case R.id.action_upcoming_events : {
+                selectedFragmentId = EVENTS_FRAGMENT_ID;
+                setCurrentFragment(new EventsListFragment(),false);
+                break;
+            }
+            case R.id.action_heirarchy : {
+                selectedFragmentId = HIERARCHY_FRAGMENT_ID;
+                setCurrentFragment(new HierarchyFragment(),false);
+                break;
+            }
+            case R.id.action_profile : {
+                selectedFragmentId = PROFILE_FRAGMENT_ID;
+                setCurrentFragment(ProfileFragment.newInstance(),false);
+                break;
+            }
+            case R.id.action_menu : {
+                selectedFragmentId = MENU_FRAGMENT_ID;
+                setCurrentFragment(MenuFragment.newInstance(),false);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        /*FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (item.getItemId() == R.id.action_home) {
             ft.replace(R.id.frame_layout, new HomePageFragment(), getString(R.string.fragment_tag_homepage));
         }
-        else if(item.getItemId()== R.id.action_new_member_registration) {
+        else if(item.getItemId()== R.id.action_new_member_registration) { */
                 /* *****************Open the new member registration fragment here *************** */
-                getSupportFragmentManager().beginTransaction()
+           /*     getSupportFragmentManager().beginTransaction()
                         .replace(R.id.frame_layout, new MemberRegistrationFragment(),
                                 getString(R.string.fragment_tag_new_member_registration))
                         .commit();
@@ -167,13 +216,13 @@ public class HomeActivity extends AppCompatActivity implements
             setDrawerEnabled(false);
         }
         ft.commit();
-        drawerLayout.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.START);*/
         return true;
     }
 
     @Override
     public void onClick(View view) {
-        if(view.getId()== R.id.button_sign_in) {
+        /*if(view.getId()== R.id.button_sign_in) {
             LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
             loginDialogFragment.show(getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -199,38 +248,20 @@ public class HomeActivity extends AppCompatActivity implements
                     .create();
             alertDialog.show();
 
-        }
+        } */
     }
 
     public void setDrawerEnabled(boolean enable) {
-        int lockMode=enable? DrawerLayout.LOCK_MODE_UNLOCKED: DrawerLayout.
+        /*int lockMode=enable? DrawerLayout.LOCK_MODE_UNLOCKED: DrawerLayout.
                 LOCK_MODE_LOCKED_CLOSED;
         drawerLayout.setDrawerLockMode(lockMode);
-        toggle.setDrawerIndicatorEnabled(enable);
-    }
-
-    public void setActionBarTitle(String title) {
-        toolbar.setTitle(title);
-    }
-
-    private long getCurrentFragmentUid(int containerId) {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(containerId);
-        if(fragment == null)
-            return -1;
-        if(fragment instanceof HomePageFragment)
-            return Config.HOME_PAGE_FRAGMENT_UID;
-        if(fragment instanceof EventDetailFragment)
-            return Config.EVENT_DETAIL_FRAGMENT_UID;
-        if(fragment instanceof ParticipantDetailFragment)
-            return Config.EVENT_REGISTRATION_FRAGMENT_UID;
-
-        return -1;
+        toggle.setDrawerIndicatorEnabled(enable);*/
     }
 
     @Override
     public void onBackPressed() {
         System.out.println("back button pressed");
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        /*if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
@@ -242,7 +273,7 @@ public class HomeActivity extends AppCompatActivity implements
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            HomeActivity.super.onBackPressed();
+                            MainActivity.super.onBackPressed();
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -285,7 +316,7 @@ public class HomeActivity extends AppCompatActivity implements
                 getSupportFragmentManager().popBackStack();
             else
                 displayHomePage();
-        }
+        } */
     }
 
     synchronized boolean isVisible(String tag) {
@@ -296,29 +327,26 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     void displayHomePage() {
-        /*FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame_layout,new HomePageFragment(),getString(R.string.fragment_tag_homepage));
-        ft.commitAllowingStateLoss();*/
-        setCurrentFragment(new HomePageFragment(), true);
+       /* setCurrentFragment(new HomePageFragment(), true);
 
         getSupportActionBar().show();
-        setDrawerEnabled(true);
-        navigationView.setCheckedItem(R.id.action_home);
+        setDrawerEnabled(true);*/
+        //navigationView.setCheckedItem(R.id.action_home);
     }
 
     ImageView imageButtonProfile;
     public static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 10;
     @SuppressLint("CheckResult")
     void customizeNavigationDrawer() {
-        if(SessionManager.getInstance().getLoggedInMember()!=null){
+        /*if(SessionManager.getInstance().getLoggedInMember()!=null){
         navigationView.removeHeaderView(headerLayout);
         Menu navDrawerMenu = navigationView.getMenu();
         navDrawerMenu.clear();
         getMenuInflater().inflate(R.menu.navigationdrawer,navDrawerMenu);
         if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
-            headerLayout = navigationView.inflateHeaderView(R.layout.signed_in_header);
+            headerLayout = navigationView.inflateHeaderView(R.layout.signed_in_header); */
             /* *********************************Setting the new header components**************************/
-             imageButtonProfile=headerLayout.findViewById(R.id.image_button_profile_pic);
+           /*  imageButtonProfile=headerLayout.findViewById(R.id.image_button_profile_pic);
             if(SessionManager.getInstance().getLoggedInMember().getProfilePicture()!=null)
             {
                 Glide.with(getBaseContext())
@@ -339,19 +367,19 @@ public class HomeActivity extends AppCompatActivity implements
 
 
             TextView textViewUsername = headerLayout.findViewById(R.id.text_view_username);
-            textViewUsername.setText(SessionManager.getInstance().getLoggedInMember().getName());
+            textViewUsername.setText(SessionManager.getInstance().getLoggedInMember().getName());*/
             /* *****************************************************************************************/
 
             /* ************ Adding the personalized corner *********************************************/
-            Menu submenu = navDrawerMenu.addSubMenu(Menu.NONE,Menu.NONE,Menu.FIRST,"Personalized Corner");
+         /*   Menu submenu = navDrawerMenu.addSubMenu(Menu.NONE,Menu.NONE,Menu.FIRST,"Personalized Corner");
             submenu.add(Menu.NONE,MEMBER_PROFILE_MENU_ID,Menu.NONE,"My Profile")
                     .setCheckable(true);
             /* ************************************************************************************************/
-        }
+       /* }
         else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE){
             headerLayout = navigationView.inflateHeaderView(R.layout.nav_drawer_header);
             Button signin=headerLayout.findViewById(R.id.button_sign_in);
-            signin.setOnClickListener(HomeActivity.this);
+            signin.setOnClickListener(MainActivity.this);
         }
         else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
             headerLayout = navigationView.inflateHeaderView(R.layout.trial_member_nav_header);
@@ -374,7 +402,7 @@ public class HomeActivity extends AppCompatActivity implements
             textViewSignOut.setOnClickListener(this);
         }
         navigationView.invalidate();
-        }
+        } */
     }
 
     public HomePageClient getHomePageClient() {
@@ -387,7 +415,6 @@ public class HomeActivity extends AppCompatActivity implements
 
     public MembershipClient getMembershipClient() {return membershipClient;}
 
-    public Toolbar getToolbar() {return toolbar;}
 
     public void sendIDCard(String recipientEmail,String subject,String mailBody) {
         OTPSender sender=new OTPSender();
@@ -397,7 +424,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame_layout,fragment);
+        ft.replace(frameLayout.getId(),fragment);
         if(addToBackStack)
             ft.addToBackStack(null);
         ft.commit();
@@ -417,5 +444,20 @@ public class HomeActivity extends AppCompatActivity implements
         eventActIntent.putExtra(Event.PARCEL_KEY,event);
         eventActIntent.putExtra(EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY,R.layout.fragment_event_detail);
         startActivity(eventActIntent);
+    }
+
+    @Override
+    public void onMenuItemSelected(int menuItemId) {
+        Intent menuActivityIntent = new Intent(this,MenuActivity.class);
+        menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
+        startActivity(menuActivityIntent);
+    }
+
+    @Override
+    public void onProfileFragmentInteraction(int selectedOptId) {
+        Log.i(TAG,"onProfileFragmentInteraction");
+        Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
+        profileActivityIntent.putExtra(ProfileFragment.SELECTED_OPT_KEY, selectedOptId);
+        startActivity(profileActivityIntent);
     }
 }

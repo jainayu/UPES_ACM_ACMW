@@ -15,8 +15,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.activity.SessionManager;
+import org.upesacm.acmacmw.activity.MainActivity;
+import org.upesacm.acmacmw.util.SessionManager;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
@@ -25,13 +25,13 @@ import java.util.ArrayList;
 
 public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
 
-    private HomeActivity callback;
+    private MainActivity callback;
     boolean isLoading=false;
     ArrayList<Post> posts;
     HomePageClient homePageClient;
     OnRecyclerItemSelectListener<Post> itemSelectListener;
 
-    public PostsRecyclerViewAdapter(HomeActivity callback) {
+    public PostsRecyclerViewAdapter(MainActivity callback) {
         this.callback = callback;
         this.homePageClient = callback.getHomePageClient();
     }
@@ -136,14 +136,19 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
                     .into(imageView);
 
 
-            boolean deleteButtonVisible = post.getOwnerSapId().equals(SessionManager.getInstance().getUserSap());
+            String loggedInUserSap = null;
+            if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                loggedInUserSap = SessionManager.getInstance().getLoggedInMember().getSap();
+            else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID)
+                loggedInUserSap = SessionManager.getInstance().getGuestMember().getSap();
+
+            boolean deleteButtonVisible = post.getOwnerSapId().equals(loggedInUserSap);
             if(deleteButtonVisible)
                 imageButtonDelete.setVisibility(View.VISIBLE);
             else
                 imageButtonDelete.setVisibility(View.GONE);
 
             if(SessionManager.getInstance().isSessionAlive()) {
-                String loggedInUserSap = SessionManager.getInstance().getUserSap();
                 int noOfLikes = post.getLikesIds().size();
                 int i = 0;
                 while (i < noOfLikes) {

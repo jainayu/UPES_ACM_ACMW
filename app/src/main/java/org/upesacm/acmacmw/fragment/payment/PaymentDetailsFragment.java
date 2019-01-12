@@ -50,7 +50,7 @@ public class PaymentDetailsFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof EventActivity) {
+        if(context instanceof OnFragmentInteractionListener) {
             listener = (OnFragmentInteractionListener)context;
             super.onAttach(context);
         }

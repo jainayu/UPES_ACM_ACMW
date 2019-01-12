@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage.post;
+package org.upesacm.acmacmw.fragment.homepage;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,7 +12,6 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
-import android.media.MediaCas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,14 +39,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.activity.SessionManager;
+import org.upesacm.acmacmw.activity.MainActivity;
+import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
+import org.upesacm.acmacmw.util.SessionManager;
 import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
 import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
-import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
 import org.upesacm.acmacmw.listener.OnLoadMoreListener;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
-import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
@@ -99,7 +97,7 @@ public class PostsFragment extends Fragment
     RecyclerView.OnScrollListener scrollListener;
     Call<HashMap<String,Post>> loadMoreCall;
     private Uri fileUri;
-    HomeActivity callback;
+    MainActivity callback;
     FragmentInteractionListener interactionListener;
     boolean viewAlive;
     public PostsFragment() {
@@ -109,13 +107,13 @@ public class PostsFragment extends Fragment
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
+        if(context instanceof MainActivity) {
+            callback = (MainActivity)context;
             interactionListener = callback.getPostController();
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException("context must be instance of HomeActivity");
+            throw new IllegalStateException("context must be instance of MainActivity");
         }
     }
     @Override
@@ -127,7 +125,6 @@ public class PostsFragment extends Fragment
         if(database==null) {
             database = FirebaseDatabase.getInstance();
         }
-        callback.getSupportActionBar().show();
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
@@ -529,18 +526,18 @@ public class PostsFragment extends Fragment
 
     public void onNewPostDataAvailable(Bundle args) {
         System.out.println("on new post data available called");
-        ((HomeActivity)getContext()).getSupportActionBar().hide();
-        ((HomeActivity)getContext()).setDrawerEnabled(false);
+        ((MainActivity)getContext()).getSupportActionBar().hide();
+        ((MainActivity)getContext()).setDrawerEnabled(false);
         ImageUploadFragment imageUploadFragment= ImageUploadFragment.newInstance(homePageClient);
 
         String ownerName=null;
         String ownerSapId=null;
         if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
-            ownerSapId=SessionManager.getInstance().getUserSap();
+            ownerSapId=SessionManager.getInstance().getLoggedInMember().getSap();
             ownerName=SessionManager.getInstance().getLoggedInMember().getName();
         }
         else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
-            ownerSapId=SessionManager.getInstance().getUserSap();
+            ownerSapId=SessionManager.getInstance().getGuestMember().getSap();
             ownerName=SessionManager.getInstance().getGuestMember().getName();
 
             System.out.println("trial memeber : "+ownerSapId);
@@ -550,7 +547,7 @@ public class PostsFragment extends Fragment
         args.putString(getString(R.string.post_owner_name_key),ownerName);
         imageUploadFragment.setArguments(args);
 
-        FragmentTransaction ft=((HomeActivity)getContext()).getSupportFragmentManager().beginTransaction();
+        FragmentTransaction ft=((MainActivity)getContext()).getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout,imageUploadFragment,getString(R.string.fragment_tag_image_upload));
         ft.commit();
     }

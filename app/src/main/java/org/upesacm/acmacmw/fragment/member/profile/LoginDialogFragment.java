@@ -12,9 +12,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
+import org.upesacm.acmacmw.util.SessionManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginDialogFragment extends DialogFragment implements View.OnClickListener{
+    public static final int LOGIN_SUCCESSFUL = 1;
+    public static final int SIGNUP_PRESSED = 2;
+    public static final int CANCEL_PRESSED = 3;
+    public static final int GUEST_SIGNUP_PRESSED = 4;
+    public static final int LOGIN_FAILED = 5;
+    public static final int NETWORK_ERROR = 6;
+
+
     EditText editTextUsername;
     EditText editTextPassword;
     Button buttonLogin;
@@ -26,16 +40,15 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     private String username,password;
     InteractionListener interactionListener;
 
-    HomeActivity homeActivity;
+    //MainActivity homeActivity;
     public static LoginDialogFragment newInstance() {
         return new LoginDialogFragment();
     }
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            homeActivity = (HomeActivity)context;
-            interactionListener = (InteractionListener)homeActivity.getUserController();
+        if(context instanceof InteractionListener) {
+            interactionListener = (InteractionListener)context;
             super.onAttach(context);
         }
 
@@ -77,17 +90,41 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
         username=editTextUsername.getText().toString().trim();
         password=editTextPassword.getText().toString().trim();
         if(view.getId()==R.id.button_login) {
-            interactionListener.onLoginPressed(this);
+            Call<Member> memberCall=RetrofitFirebaseApiClient.getInstance().getMembershipClient().getMember(username);
+            memberCall.enqueue(new Callback<Member>() {
+                @Override
+                public void onResponse(Call<Member> call, Response<Member> response) {
+                    Member member=response.body();
+                    if(member!=null) {
+                        if(member.getPassword().equals(password)) {
+                            SessionManager.getInstance().createMemberSession(member);
+                            interactionListener.onLoginDialogFragmentInteraction(LOGIN_SUCCESSFUL);
+                        }
+                        else {
+                           interactionListener.onLoginDialogFragmentInteraction(LOGIN_FAILED);
+                        }
+                    }
+                    else {
+                        interactionListener.onLoginDialogFragmentInteraction(LOGIN_FAILED);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Member> call, Throwable t) {
+                    interactionListener.onLoginDialogFragmentInteraction(NETWORK_ERROR);
+                }
+            });
         }
         else if(view.getId()==R.id.button_signup){
-            interactionListener.onSignUpPressed(this);
+            interactionListener.onLoginDialogFragmentInteraction(SIGNUP_PRESSED);
         }
         else if(view.getId() == R.id.button_guest_sign_up){
-            interactionListener.onGuestSignUpPressed(this);
+            interactionListener.onLoginDialogFragmentInteraction(SIGNUP_PRESSED);
         }
         else {
-            interactionListener.onCancelPressed(this);
+            interactionListener.onLoginDialogFragmentInteraction(CANCEL_PRESSED);
         }
+        this.dismiss();
     }
 
     public String getUsername() {
@@ -99,9 +136,6 @@ public class LoginDialogFragment extends DialogFragment implements View.OnClickL
     }
 
     public interface InteractionListener {
-        void onLoginPressed(LoginDialogFragment loginDialogFragment);
-        void onSignUpPressed(LoginDialogFragment loginDialogFragment);
-        void onCancelPressed(LoginDialogFragment loginDialogFragment);
-        void onGuestSignUpPressed(LoginDialogFragment loginDialogFragment);
+        void onLoginDialogFragmentInteraction(int resultCode);
     }
 }
