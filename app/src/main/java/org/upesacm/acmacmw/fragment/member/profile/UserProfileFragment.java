@@ -195,11 +195,10 @@ public class UserProfileFragment extends Fragment implements
     }
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.fab_profile_logout) {
-            listener.onFragmentInteraction(SIGN_OUT);
-        }
-        else if(view.getId() == R.id.fab_profile_edit) {
+        if(view.getId() == R.id.fab_profile_edit) {
             listener.onFragmentInteraction(EDIT_PROFILE);
+        } else if(view.getId() == R.id.fab_profile_logout) {
+            listener.onFragmentInteraction(SIGN_OUT);
         }
     }
 

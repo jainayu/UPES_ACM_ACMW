@@ -12,7 +12,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.model.Member;
-import org.upesacm.acmacmw.model.Participant;
 import org.upesacm.acmacmw.model.TrialMember;
 
 
@@ -142,8 +141,9 @@ public class SessionManager  {
         return sessionID;
     }
 
-    private void saveMember(@NonNull Member member) {
+    private void saveMemberSession(@NonNull Member member) {
         SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(SESSION_ID_STORE_KEY,MEMBER_SESSION_ID);
         editor.putString(MEMBER_ID,member.getMemberId());
         editor.putString(NAME_KEY,member.getName());
         editor.putString(PASSWORD_KEY,member.getPassword());
@@ -193,15 +193,16 @@ public class SessionManager  {
             return false;
 
         //create the memeber session
-        saveMember(member);
+        saveMemberSession(member);
         this.loggedInMember = member;
         sessionID = SessionManager.MEMBER_SESSION_ID;
 
         return true;
     }
 
-    private void saveGuestMember(TrialMember guestMember) {
+    private void saveGuestMemberSession(TrialMember guestMember) {
         SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(SESSION_ID_STORE_KEY,GUEST_SESSION_ID);
         editor.putString(MEMBER_SAP_KEY,guestMember.getSap());
         editor.putString(EMAIL_KEY,guestMember.getEmail());
         editor.putString(NAME_KEY,guestMember.getEmail());
@@ -235,7 +236,7 @@ public class SessionManager  {
             return false;
 
 
-        saveGuestMember(guestMember);
+        saveGuestMemberSession(guestMember);
         this.guestMember = guestMember;
         sessionID = SessionManager.GUEST_SESSION_ID;
 

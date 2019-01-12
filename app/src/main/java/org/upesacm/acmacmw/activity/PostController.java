@@ -12,7 +12,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.util.SessionManager;
 
@@ -103,9 +102,9 @@ public class PostController implements
 
         } else {
             Log.i(TAG,"unable to like as user session is not in progress");
-            LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
+            /*LoginFragment loginDialogFragment =new LoginFragment();
             loginDialogFragment.show(mainActivity.getSupportFragmentManager(),
-                    mainActivity.getString(R.string.dialog_fragment_tag_login));
+                    mainActivity.getString(R.string.dialog_fragment_tag_login));*/
             Toast.makeText(mainActivity,"Please log in to like the post",Toast.LENGTH_LONG).show();
         }
     }

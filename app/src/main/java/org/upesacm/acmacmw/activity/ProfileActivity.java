@@ -13,7 +13,8 @@ import android.widget.Toast;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
+import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
+import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
 import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.model.Member;
@@ -23,7 +24,7 @@ public class ProfileActivity extends AppCompatActivity implements
         UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
-        LoginDialogFragment.InteractionListener  {
+        LoginFragment.InteractionListener {
     private FrameLayout frameLayout;
     private int selectedOptId;
     @Override
@@ -41,8 +42,7 @@ public class ProfileActivity extends AppCompatActivity implements
     }
 
     void requestUserAuthentication() {
-        LoginDialogFragment fragment = LoginDialogFragment.newInstance();
-        fragment.show(getSupportFragmentManager(),"logindialog");
+        setCurrentFragment(new LoginFragment(),false);
     }
 
     void updateUI() {
@@ -57,8 +57,8 @@ public class ProfileActivity extends AppCompatActivity implements
             case ProfileFragment.PROFILE_IMAGE: {
                 if(SessionManager.getInstance().getSessionID() == SessionManager.NONE) {
                     requestUserAuthentication();
-                } else if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
-                    setCurrentFragment(UserProfileFragment.newInstance(SessionManager.getInstance().getLoggedInMember()),false);
+                }
+                break;
             }
             case ProfileFragment.PRIVILEGED_ACTION_REQUEST: {
                 requestUserAuthentication();
@@ -97,6 +97,7 @@ public class ProfileActivity extends AppCompatActivity implements
                                 getSupportFragmentManager().popBackStack();
                                 Toast.makeText(ProfileActivity.this,"Successfully Logged Out",
                                         Toast.LENGTH_SHORT).show();
+                                ProfileActivity.this.finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -172,29 +173,28 @@ public class ProfileActivity extends AppCompatActivity implements
     public void onLoginDialogFragmentInteraction(int resultCode) {
         String msg="";
         switch (resultCode) {
-            case LoginDialogFragment.LOGIN_SUCCESSFUL: {
+            case LoginFragment.LOGIN_SUCCESSFUL: {
                 msg = "Login Successful";
-                if(selectedOptId == ProfileFragment.PRIVILEGED_ACTION_REQUEST)
-                    this.finish();
-                break;
-            }
-            case LoginDialogFragment.SIGNUP_PRESSED: {
-                startActivity(new Intent(this,MemberRegistrationActivity.class));
-                break;
-            }
-            case LoginDialogFragment.CANCEL_PRESSED: {
                 this.finish();
                 break;
             }
-            case LoginDialogFragment.GUEST_SIGNUP_PRESSED:{
+            case LoginFragment.SIGNUP_PRESSED: {
+                startActivity(new Intent(this,MemberRegistrationActivity.class));
                 break;
             }
-            case LoginDialogFragment.LOGIN_FAILED: {
+            case LoginFragment.CANCELLED: {
+                this.finish();
+                break;
+            }
+            case LoginFragment.GUEST_SIGNUP_PRESSED:{
+                break;
+            }
+            case LoginFragment.LOGIN_FAILED: {
                 this.finish();
                 msg = "Incorrect Username or Password";
                 break;
             }
-            case LoginDialogFragment.NETWORK_ERROR: {
+            case LoginFragment.NETWORK_ERROR: {
                 this.finish();
                 msg = "Network Error";
             }

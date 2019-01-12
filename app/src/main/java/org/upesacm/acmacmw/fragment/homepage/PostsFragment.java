@@ -43,7 +43,6 @@ import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
 import org.upesacm.acmacmw.util.SessionManager;
 import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
 import org.upesacm.acmacmw.listener.OnLoadMoreListener;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Post;
@@ -262,8 +261,8 @@ public class PostsFragment extends Fragment
                 }
             }
             else {
-                LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
-                loginDialogFragment.show(getActivity().getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));
+               /* LoginFragment loginDialogFragment =new LoginFragment();
+                loginDialogFragment.show(getActivity().getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));*/
                 Toast.makeText(getContext(), "Please Login First", Toast.LENGTH_SHORT).show();
             }
         }

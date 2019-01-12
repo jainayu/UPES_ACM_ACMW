@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -23,13 +22,10 @@ import org.upesacm.acmacmw.fragment.homepage.EventsListFragment;
 import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
 import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
 import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
-import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
-import org.upesacm.acmacmw.util.SessionManager;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -223,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View view) {
         /*if(view.getId()== R.id.button_sign_in) {
-            LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
+            LoginFragment loginDialogFragment =new LoginFragment();
             loginDialogFragment.show(getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));
             drawerLayout.closeDrawer(GravityCompat.START);
 
