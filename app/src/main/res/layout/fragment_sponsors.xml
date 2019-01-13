@@ -30,6 +30,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:background="#E0E0E0"
             app:layout_constraintTop_toTopOf="parent">
         </android.support.v7.widget.RecyclerView>
         <ProgressBar
