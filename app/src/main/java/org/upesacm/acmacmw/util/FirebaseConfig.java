@@ -6,7 +6,7 @@ public interface FirebaseConfig {
     String MEMBER_OTP = "otp";
     String EMAIL_MSG = "email_msg";
     String REGISTRATION_OTP_RECIPIENT = "otp_recepients";
-
+    String SPONSORS="sponsors";
     String EVENTS_DB = "event_db";
     String PARTICIPANTS = "participants";
     String EVENTS_LIST = "eventsList";

@@ -23,10 +23,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -99,6 +104,8 @@ public class PostsFragment extends Fragment
     MainActivity callback;
     FragmentInteractionListener interactionListener;
     boolean viewAlive;
+    private Toolbar toolbar;
+
     public PostsFragment() {
         // Required empty public constructor
     }
@@ -119,7 +126,7 @@ public class PostsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         System.out.println("onCreate post fragment");
-
+        setHasOptionsMenu(true);
         database = callback.getDatabase();
         if(database==null) {
             database = FirebaseDatabase.getInstance();
@@ -143,6 +150,10 @@ public class PostsFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        toolbar = view.findViewById(R.id.toolbar_frag_post);
+        toolbar.setTitle("Home");
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+
         recyclerView=view.findViewById(R.id.posts_recyclerView);
         progressBar = view.findViewById(R.id.progress_bar_home);
         floatingActionButton = view.findViewById(R.id.cameraButton);
@@ -513,7 +524,7 @@ public class PostsFragment extends Fragment
         System.out.println("failed");
         if(recyclerViewAdapter!=null) {
             t.printStackTrace();
-            if (swipeContainer.isRefreshing()) {
+            if (swipeContainer!=null&&swipeContainer.isRefreshing()) {
                 swipeContainer.setRefreshing(false);
             } else {
                 recyclerViewAdapter.removePost();//remove the null post
@@ -766,5 +777,16 @@ public class PostsFragment extends Fragment
         void onCameraButtonClicked();
         void onPostLiked(Post post);
         void onPostDeleted(Post post);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.post_menu,menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 }

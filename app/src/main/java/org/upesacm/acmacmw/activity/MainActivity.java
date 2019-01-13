@@ -14,9 +14,11 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.fragment.sponsors.SponsorsFragment;
 import org.upesacm.acmacmw.fragment.homepage.MenuFragment;
 import org.upesacm.acmacmw.fragment.homepage.EventsListFragment;
 import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_home_page);
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         frameLayout = findViewById(R.id.frame_layout_homepage);
         switch(selectedFragmentId) {
@@ -257,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         System.out.println("back button pressed");
+        super.onBackPressed();
         /*if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
             return;
@@ -455,5 +459,14 @@ public class MainActivity extends AppCompatActivity implements
         Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
         profileActivityIntent.putExtra(ProfileFragment.SELECTED_OPT_KEY, selectedOptId);
         startActivity(profileActivityIntent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.sponsors)
+        {
+            setCurrentFragment(new SponsorsFragment(),true);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
