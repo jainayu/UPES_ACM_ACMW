@@ -409,7 +409,7 @@
                 android:layout_height="250dp"
                 android:background="#44449a"
                 android:scaleType="centerCrop"
-                android:src="@drawable/userrrrrrr"
+                android:src="@drawable/profile_top_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"

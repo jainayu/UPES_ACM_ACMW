@@ -2,14 +2,19 @@ package org.upesacm.acmacmw.fragment.homepage;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -22,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.LeaderboardActivity;
 import org.upesacm.acmacmw.adapter.events.EventsRecyclerViewAdapter;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Event;
@@ -74,6 +80,8 @@ public class EventsListFragment extends Fragment implements
         progressBar = view.findViewById(R.id.progress_bar_events);
         toolbar = view.findViewById(R.id.toolbar_frag_event_list);
         toolbar.setTitle("Upcoming Events");
+        setHasOptionsMenu(true);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter = new EventsRecyclerViewAdapter();
         adapter.setItemSelectListener(this);// setting the item select listener
@@ -121,5 +129,21 @@ public class EventsListFragment extends Fragment implements
 
     public interface FragmentInteractionListener {
         void onClickEventDetails(Event event);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.event_list_menu,menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.leaderboard)
+        {
+            Intent intent=new Intent(getActivity(),LeaderboardActivity.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

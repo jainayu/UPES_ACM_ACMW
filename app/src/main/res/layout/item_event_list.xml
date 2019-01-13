@@ -29,30 +29,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="10dp">
-
+                android:paddingRight="10dp">
                 <TextView
                     android:id="@+id/textview_month"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
-                    android:text="OCT"
                     android:textColor="#79bcf7"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="20"
+                    android:textAllCaps="true"
                     android:id="@+id/text_view_event_date"
                     android:textSize="25sp"
                     android:textColor="#000000"
                     />
-
                 <TextView
                     android:id="@+id/textview_day"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="SAT"
+                    android:textAllCaps="true"
                     android:textColor="#000" />
             </LinearLayout>
             <View
@@ -91,13 +87,6 @@
                 android:id="@+id/details"
                 android:layout_gravity="center_vertical"
                 android:text="Details"/>
-
-            <Button
-                android:id="@+id/button1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Button" />
         </LinearLayout>
 
     </LinearLayout>

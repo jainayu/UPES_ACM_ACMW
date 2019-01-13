@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/userrrrrrr">
+    android:background="@drawable/profile_top_image">
 
     <android.support.v7.widget.CardView
         android:id="@+id/image_button_card_view"

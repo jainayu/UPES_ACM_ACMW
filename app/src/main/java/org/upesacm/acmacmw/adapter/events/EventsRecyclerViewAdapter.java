@@ -26,8 +26,8 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_layout,parent,false);
-        if(viewType == R.layout.event_layout) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event_list,parent,false);
+        if(viewType == R.layout.item_event_list) {
             return new EventViewHolder(view);
         }
         return null;
@@ -46,7 +46,7 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        return R.layout.event_layout;
+        return R.layout.item_event_list;
     }
 
 

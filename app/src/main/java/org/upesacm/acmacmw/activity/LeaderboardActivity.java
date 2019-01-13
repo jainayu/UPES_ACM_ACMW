@@ -1,17 +1,23 @@
 package org.upesacm.acmacmw.activity;
 
-import android.app.LauncherActivity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,17 +39,19 @@ public class LeaderboardActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerViewAdapter adapter;
     private List<Participant> participants;
-
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
         recyclerView = findViewById(R.id.view_recycler_view);
-        recyclerView.setLayoutManager( new LinearLayoutManager(this));
-
+        recyclerView.setLayoutManager( new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         participants = new ArrayList<>();
-
+        toolbar=findViewById(R.id.toolbar_activity_leaderboard);
+        setSupportActionBar(toolbar);
+        if(getSupportActionBar()!=null)
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         FirebaseDatabase database= FirebaseDatabase.getInstance();
         DatabaseReference ref= database.getReference()
@@ -59,16 +67,13 @@ public class LeaderboardActivity extends AppCompatActivity {
                     Participant participant = ds.getValue(Participant.class);
                     participants.add(participant);
                 }
-                Collections.sort(participants,new Comparator<Participant>() {
+
+                Collections.sort(participants,Collections.reverseOrder(new Comparator<Participant>() {
                     @Override
                     public int compare(Participant p1, Participant p2) {
                         return p1.getScore() - p2.getScore();
                     }
-                });
-
-                for(Participant p:participants){
-                    System.out.println("participant : "+p.getScore());
-                }
+                }));
                 adapter.setItem(participants);
             }
 
@@ -96,7 +101,6 @@ public class LeaderboardActivity extends AppCompatActivity {
             name= itemView.findViewById(R.id.view_text_name);
             score= itemView.findViewById(R.id.view_text_Score);
         }
-
     }
     private class RecyclerViewAdapter extends RecyclerView.Adapter<ItemViewHolder>{
         List<Participant> participants;
@@ -110,17 +114,16 @@ public class LeaderboardActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.activity_leaderboard_2,viewGroup,false);
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_leaderboard,viewGroup,false);
             return new ItemViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ItemViewHolder itemViewHolder, int i) {
             Participant p= participants.get(i);
-            //itemViewHolder.rank.setText(ListItems.getRank1());
+            itemViewHolder.score.setText(""+p.getScore());
+            itemViewHolder.rank.setText(i+1+"");
             itemViewHolder.name.setText(p.getName());
-            itemViewHolder.score.setText(p.getScore());
-
         }
 
         @Override
@@ -136,5 +139,29 @@ public class LeaderboardActivity extends AppCompatActivity {
                 notifyDataSetChanged();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==android.R.id.home)
+        {
+            finish();
+        }
+        if(item.getItemId()==R.id.search){
+
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.leaderboard_menu, menu);
+        SearchView searchView = findViewById(R.id.searchview);
+        MenuItem item=menu.findItem(R.id.search);
+        item.setActionView(searchView);
+        searchView.setVisibility(View.VISIBLE);
+        searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        searchView.setQueryHint("Enter SapId");
+        return true;
     }
 }

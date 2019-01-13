@@ -38,7 +38,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="TextView"
-            app:layout_constraintBottom_toBottomOf="@+id/image_view_frag_profile"
+            app:layout_constraintBottom_toBottomOf="@+id/image_button_card_view"
             app:layout_constraintEnd_toEndOf="@+id/text_view__frag_profile_name"
             app:layout_constraintStart_toStartOf="@+id/text_view__frag_profile_name"
             app:layout_constraintTop_toBottomOf="@+id/text_view__frag_profile_name" />
@@ -56,19 +56,29 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/image_view_frag_profile"
-            app:layout_constraintTop_toTopOf="@+id/image_view_frag_profile" />
-
+            app:layout_constraintStart_toEndOf="@+id/image_button_card_view"
+            app:layout_constraintTop_toTopOf="@+id/image_button_card_view" />
+        <android.support.v7.widget.CardView
+            android:id="@+id/image_button_card_view"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:scaleType="centerCrop"
+            android:padding="10dp"
+            app:cardCornerRadius="35dp"
+            android:background="@drawable/round_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
         <ImageView
             android:id="@+id/image_view_frag_profile"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/acm_app_logo"></ImageView>
-
+            android:layout_gravity="center"
+            android:src="@drawable/acm_app_logo">
+        </ImageView>
+        </android.support.v7.widget.CardView>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_frag_profile"
             android:layout_width="0dp"
@@ -80,7 +90,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_view_frag_profile" />
+            app:layout_constraintTop_toBottomOf="@+id/image_button_card_view" />
 
 
     </android.support.constraint.ConstraintLayout>
