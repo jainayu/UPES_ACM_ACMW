@@ -15,9 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
+import org.upesacm.acmacmw.util.SessionManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,7 +44,7 @@ public class PasswordChangeDialogFragment extends DialogFragment
     Button buttonSave;
 
     PasswordChangeListener changeListener;
-    HomeActivity homeActivity;
+    //MainActivity homeActivity;
     String newpass;
     public PasswordChangeDialogFragment() {
         // Required empty public constructor
@@ -62,10 +62,9 @@ public class PasswordChangeDialogFragment extends DialogFragment
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
+        if(context instanceof PasswordChangeListener) {
             super.onAttach(context);
-            homeActivity = (HomeActivity)context;
-            changeListener = homeActivity.getUserController();
+            changeListener = (PasswordChangeListener)context;
         }
         else
             throw new IllegalStateException(context.toString()+" must implement" +
@@ -98,21 +97,8 @@ public class PasswordChangeDialogFragment extends DialogFragment
         if(view.getId() == R.id.button_pass_change_save) {
             if(newpass.length()>=8) {
                 if (oldpass.equals(member.getPassword())) {
-                    member = new Member.Builder()
-                            .setmemberId(member.getMemberId())
-                            .setName(member.getName())
+                    member = new Member.Builder(member)
                             .setPassword(newpass)
-                            .setSAPId(member.getSap())
-                            .setBranch(member.getBranch())
-                            .setEmail(member.getEmail())
-                            .setContact(member.getContact())
-                            .setWhatsappNo(member.getWhatsappNo())
-                            .setYear(member.getYear())
-                            .setDob(member.getDob())
-                            .setCurrentAdd(member.getCurrentAdd())
-                            .setPremium(member.isPremium())
-                            .setRecipientSap(member.getRecepientSap())
-                            .setMembershipType(member.getMembershipType())
                             .build();
 
                             membershipClient.createMember(member.getSap(), member)
@@ -120,19 +106,21 @@ public class PasswordChangeDialogFragment extends DialogFragment
                                         @Override
                                         public void onResponse(Call<Member> call, Response<Member> response) {
                                             System.out.println("password successfully changed");
-                                            changeListener.onPasswordChange(PasswordChangeDialogFragment.this, PASSWORD_SUCCESSSFULLY_CHANGED);
+                                            SessionManager.getInstance().destroySession();
+                                            SessionManager.getInstance().createMemberSession(member);
+                                            changeListener.onPasswordChange(PASSWORD_SUCCESSSFULLY_CHANGED);
                                             PasswordChangeDialogFragment.this.dismiss();
                                         }
 
                                         @Override
                                         public void onFailure(Call<Member> call, Throwable t) {
                                             System.out.println("Failed to change to password");
-                                            changeListener.onPasswordChange(PasswordChangeDialogFragment.this, PASSWORD_CHANGE_FAILED);
+                                            changeListener.onPasswordChange(PASSWORD_CHANGE_FAILED);
                                             PasswordChangeDialogFragment.this.dismiss();
                                         }
                                     });
                 } else {
-                    changeListener.onPasswordChange(this, INCORRECT_OLD_PASSWORD);
+                    changeListener.onPasswordChange(INCORRECT_OLD_PASSWORD);
                     this.dismiss();
                 }
             }
@@ -141,7 +129,7 @@ public class PasswordChangeDialogFragment extends DialogFragment
             }
         }
         else if(view.getId() == R.id.button_pass_change_cancel) {
-            changeListener.onPasswordChange(this,ACTION_CANCELLED_BY_USER);
+            changeListener.onPasswordChange(ACTION_CANCELLED_BY_USER);
             this.dismiss();
         }
     }
@@ -150,6 +138,6 @@ public class PasswordChangeDialogFragment extends DialogFragment
     }
 
     public interface PasswordChangeListener {
-        void onPasswordChange(PasswordChangeDialogFragment fragment,int resultCode);
+        void onPasswordChange(int resultCode);
     }
 }

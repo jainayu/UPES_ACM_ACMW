@@ -14,15 +14,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventActivity;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;
@@ -37,7 +36,6 @@ public class SAPIDFragment extends Fragment {
     Event selectedEvent;
     FragmentInteractionListener listener;
     RecyclerView recyclerView;
-    Button buttonProceed;
     FloatingActionButton addButton;
     private Toolbar toolbar;
     private RecyclerViewAdapter sapIdAdapter;
@@ -77,20 +75,17 @@ public class SAPIDFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_sapid, container, false);
         recyclerView = view.findViewById(R.id.recycler_view_sapid);
-        buttonProceed = view.findViewById(R.id.button_proceed_sapid_fragment);
         addButton = view.findViewById(R.id.floating_action_button_sapids);
         toolbar = view.findViewById(R.id.toolbar_frag_sapid);
         sapIdAdapter = new RecyclerViewAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerView.setAdapter(sapIdAdapter);
-        toolbar.setTitle("Enter SAP ID of the Participant/s");
-
-        View.OnClickListener onClickListener = new View.OnClickListener() {
+        toolbar.setTitle("Enter SAP ID/s");
+        toolbar.inflateMenu(R.menu.sapid_frag_toolbar_menu);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View view) {
-                if(view.getId() == R.id.floating_action_button_sapids) {
-                    sapIdAdapter.addInputTextLayouts(1);
-                } else if(view.getId() == R.id.button_proceed_sapid_fragment) {
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if(menuItem.getItemId() == R.id.action_next_toolbar_frag_sapid) {
                     List<String> sapIds = new ArrayList<>();
                     System.out.println("sap id count : "+sapIdAdapter.getCount());
                     for(int i=0;i<sapIdAdapter.getCount();++i) {
@@ -98,7 +93,7 @@ public class SAPIDFragment extends Fragment {
                         if(!sapIdAdapter.isSapValid(i)) {
                             Toast.makeText(SAPIDFragment.this.getContext(),"Please check all the sap ids",Toast.LENGTH_LONG)
                                     .show();
-                            return;
+                            return true;
                         }
                         sapIds.add(sapIdAdapter.getSapId(i));
                     }
@@ -113,12 +108,21 @@ public class SAPIDFragment extends Fragment {
 
                     //call the callback method
                     listener.onSAPIDAvailable(selectedEvent,sapIds);
+                    return true;
+                }
+
+                return false;
+            }
+        });
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(view.getId() == R.id.floating_action_button_sapids) {
+                    sapIdAdapter.addInputTextLayouts(1);
                 }
             }
         };
-
         addButton.setOnClickListener(onClickListener);
-        buttonProceed.setOnClickListener(onClickListener);
         return view;
     }
 

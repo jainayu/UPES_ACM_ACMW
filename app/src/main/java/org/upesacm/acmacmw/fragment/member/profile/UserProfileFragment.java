@@ -26,9 +26,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
-import org.upesacm.acmacmw.retrofit.ApiClient;
+import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.retrofit.ResponseModel;
 import org.upesacm.acmacmw.util.UploadService;
@@ -49,16 +48,19 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
-import static org.upesacm.acmacmw.activity.HomeActivity.BASE_URL;
+import static org.upesacm.acmacmw.activity.MainActivity.BASE_URL;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class UserProfileFragment extends Fragment implements
         View.OnClickListener{
+    public static final int SIGN_OUT = 1;
+    public static final int EDIT_PROFILE = 2;
+    public static final int UPDATE_PROFILE_PIC = 3;
 
     FragmentInteractionListener listener;
-    HomeActivity homeActivity;
+    //MainActivity homeActivity;
 
     ImageView imageViewProfilePic;
     TextView textViewName;
@@ -78,7 +80,7 @@ public class UserProfileFragment extends Fragment implements
     Member member;
 
     private static final int CHOOSE_PROFILE_PICTURE = 4;
-    public static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 10;
+    private static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 10;
     private Retrofit retrofit;
 
     public UserProfileFragment() {
@@ -100,10 +102,9 @@ public class UserProfileFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
+        if(context instanceof FragmentInteractionListener) {
             super.onAttach(context);
-            homeActivity = (HomeActivity)context;
-            listener = homeActivity.getUserController();
+            listener = (FragmentInteractionListener)context;
         }
         else
             throw new IllegalStateException(context.toString()+" must implement" +
@@ -125,7 +126,7 @@ public class UserProfileFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         ImageView editImage=view.findViewById(R.id.edit_image);
         imageViewProfilePic = view.findViewById(R.id.image_view_profile_pic);
-        textViewName = view.findViewById(R.id.text_view_profile_name);
+        textViewName = view.findViewById(R.id.text_view__frag_profile_name);
         textViewYear = view.findViewById(R.id.text_view_profile_year);
         textViewBranch = view.findViewById(R.id.text_view_profile_branch);
         textViewSap = view.findViewById(R.id.text_view_profile_sap);
@@ -194,18 +195,15 @@ public class UserProfileFragment extends Fragment implements
     }
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.fab_profile_logout) {
-            listener.onSignOutClicked(this);
-        }
-        else if(view.getId() == R.id.fab_profile_edit) {
-            listener.onEditClicked(this);
+        if(view.getId() == R.id.fab_profile_edit) {
+            listener.onFragmentInteraction(EDIT_PROFILE);
+        } else if(view.getId() == R.id.fab_profile_logout) {
+            listener.onFragmentInteraction(SIGN_OUT);
         }
     }
 
     public interface FragmentInteractionListener {
-        void onSignOutClicked(UserProfileFragment fragment);
-        void onEditClicked(UserProfileFragment fragment);
-        void updateProfilePicture();
+        void onFragmentInteraction(int code);
     }
     Bitmap imageBitmap;
     private File destination;
@@ -275,7 +273,7 @@ public class UserProfileFragment extends Fragment implements
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("image", destination.getName(), fileBody);
         RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
 // Change base URL to your upload server URL.
-        final MembershipClient membershipClient = ApiClient.getClient().create(MembershipClient.class);
+        final MembershipClient membershipClient = RetrofitHostingerApiClient.getInstance().create(MembershipClient.class);
         membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
@@ -307,7 +305,7 @@ public class UserProfileFragment extends Fragment implements
 
                                             if(listener!=null)
                                             {
-                                                listener.updateProfilePicture();
+                                                listener.onFragmentInteraction(UPDATE_PROFILE_PIC);
                                             }
                                        }
 

@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,8 +16,8 @@ import android.widget.Toast;
 
 import org.upesacm.acmacmw.BuildConfig;
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
 
 import java.util.regex.Pattern;
 
@@ -39,7 +38,7 @@ public class EditProfileFragment extends Fragment
     public static final int ACTION_CANCELLED_BY_USER=2;
     public static final int FAILED_TO_SAVE_NEW_DATA=3;
 
-    HomeActivity callback;
+    //MainActivity callback;
     PasswordChangeDialogFragment passchangeFrag;
     FragmentInteractionListener listener;
 
@@ -73,13 +72,12 @@ public class EditProfileFragment extends Fragment
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
+        if(context instanceof FragmentInteractionListener) {
             super.onAttach(context);
-            callback = (HomeActivity)context;
-            listener = callback.getUserController();
+            listener = (FragmentInteractionListener)context;
         }
         else {
-            throw new IllegalStateException("context must be HomeActivity");
+            throw new IllegalStateException(context.toString()+" must be instance of FragmentInteractionListener");
         }
     }
 
@@ -140,7 +138,6 @@ public class EditProfileFragment extends Fragment
     @Override
     public void onDestroy() {
         super.onDestroy();
-        callback = null;
         listener = null;
     }
 
@@ -151,23 +148,24 @@ public class EditProfileFragment extends Fragment
 
     @Override
     public void onClick(View view) {
-        InputMethodManager inputManager = (InputMethodManager)
+        /*InputMethodManager inputManager = (InputMethodManager)
                 getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+                InputMethodManager.HIDE_NOT_ALWAYS);*/
         if(view.getId() == R.id.button_edit_save) {
             member = modifyMember();
             if(member!=null) {
-                callback.getMembershipClient().createMember(member.getSap(), member)
+                RetrofitFirebaseApiClient.getInstance().getMembershipClient().createMember(member.getSap(), member)
                         .enqueue(this);
             }
         }
         else if(view.getId() == R.id.button_edit_cancel) {
-            listener.onDataEditResult(this,ACTION_CANCELLED_BY_USER,member);
+            listener.onDataEditResult(ACTION_CANCELLED_BY_USER,member);
         }
         else if(view.getId() == R.id.button_edit_passchange) {
-            passchangeFrag = PasswordChangeDialogFragment.newInstance(callback.getMembershipClient(),member);
+            passchangeFrag = PasswordChangeDialogFragment
+                    .newInstance(RetrofitFirebaseApiClient.getInstance().getMembershipClient(),member);
             passchangeFrag.show(getChildFragmentManager(),getString(R.string.dialog_fragment_tag_pass_change));
         }
     }
@@ -176,13 +174,13 @@ public class EditProfileFragment extends Fragment
     public void onResponse(Call<Member> call, Response<Member> response) {
         if(BuildConfig.DEBUG)
             Log.i(TAG, response.message());
-        listener.onDataEditResult(this,SUCESSFULLY_SAVED_NEW_DATA,member);
+        listener.onDataEditResult(SUCESSFULLY_SAVED_NEW_DATA,member);
     }
 
     @Override
     public void onFailure(Call<Member> call, Throwable t) {
         t.printStackTrace();
-        listener.onDataEditResult(this,FAILED_TO_SAVE_NEW_DATA,member);
+        listener.onDataEditResult(FAILED_TO_SAVE_NEW_DATA,member);
     }
 
     public Member modifyMember() {
@@ -243,7 +241,7 @@ public class EditProfileFragment extends Fragment
     }
 
     public interface FragmentInteractionListener {
-        void onDataEditResult(EditProfileFragment fragment,int resultCode,Member member);
+        void onDataEditResult(int resultCode,Member member);
     }
 
 }

@@ -129,12 +129,14 @@ public class OtpConfirmationFragment extends Fragment implements
         //on Submit button Clicked
         String enteredOtp = textInputLayoutOtp.getEditText().getText().toString();
         if(enteredOtp.equals(otp)) {
+            showProgress(true);
             mListener.onOtpConfirmationResult(true);
         } else {
             --triesLeft;
             if(triesLeft>0) {
                 textInputLayoutOtp.setError(triesLeft+" tries left");
             } else {
+                showProgress(true);
                 mListener.onOtpConfirmationResult(false);
             }
         }

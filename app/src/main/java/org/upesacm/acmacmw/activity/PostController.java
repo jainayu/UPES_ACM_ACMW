@@ -10,13 +10,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
-import org.upesacm.acmacmw.fragment.homepage.post.ImageUploadFragment;
-import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
+import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
+import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
 import org.upesacm.acmacmw.model.Post;
-
-import java.util.ArrayList;
+import org.upesacm.acmacmw.util.SessionManager;
 
 
 public class PostController implements
@@ -24,16 +21,16 @@ public class PostController implements
         PostsFragment.FragmentInteractionListener {
     private static final String TAG = "PostController";
     private static PostController postController;
-    private HomeActivity homeActivity;
+    private MainActivity mainActivity;
     private PostsFragment postsFragment;
 
     private PostController() {
     }
 
-    public static PostController getInstance(@NonNull HomeActivity homeActivity) {
+    public static PostController getInstance(@NonNull MainActivity mainActivity) {
         if(postController == null) {
             postController = new PostController();
-            postController.homeActivity = homeActivity;
+            postController.mainActivity = mainActivity;
         }
 
         return postController;
@@ -57,12 +54,12 @@ public class PostController implements
             msg="Upload Failed. Please Try Again";
         else if(resultCode == ImageUploadFragment.UPLOAD_CANCEL_OPERATION_FAILED)
             msg="Upload cancel failed";
-        Toast.makeText(homeActivity,msg,Toast.LENGTH_LONG).show();
-        if(homeActivity.isVisible((homeActivity.getString(R.string.fragment_tag_image_upload)))) {
-            homeActivity.displayHomePage();
+        Toast.makeText(mainActivity,msg,Toast.LENGTH_LONG).show();
+        if(mainActivity.isVisible((mainActivity.getString(R.string.fragment_tag_image_upload)))) {
+            mainActivity.displayHomePage();
         }
-        homeActivity.getSupportActionBar().show();
-        homeActivity.setDrawerEnabled(true);
+        mainActivity.getSupportActionBar().show();
+        mainActivity.setDrawerEnabled(true);
     }
 
     @Override
@@ -75,7 +72,12 @@ public class PostController implements
         Log.i(TAG,"Post by "+post.getPostId()+"Liked");
         SessionManager sessionManager = SessionManager.getInstance();
         if(sessionManager.isSessionAlive()) {
-            String loggedInUserSap = SessionManager.getInstance().getUserSap();
+            String loggedInUserSap = null;
+            if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID)
+                loggedInUserSap = SessionManager.getInstance().getLoggedInMember().getSap();
+            else if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                loggedInUserSap = SessionManager.getInstance().getGuestMember().getSap();
+
             int noOfLikes = post.getLikesIds().size();
             int i = 0;
             while(i<noOfLikes) {
@@ -100,10 +102,10 @@ public class PostController implements
 
         } else {
             Log.i(TAG,"unable to like as user session is not in progress");
-            LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
-            loginDialogFragment.show(homeActivity.getSupportFragmentManager(),
-                    homeActivity.getString(R.string.dialog_fragment_tag_login));
-            Toast.makeText(homeActivity,"Please log in to like the post",Toast.LENGTH_LONG).show();
+            /*LoginFragment loginDialogFragment =new LoginFragment();
+            loginDialogFragment.show(mainActivity.getSupportFragmentManager(),
+                    mainActivity.getString(R.string.dialog_fragment_tag_login));*/
+            Toast.makeText(mainActivity,"Please log in to like the post",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -111,7 +113,7 @@ public class PostController implements
     public void onPostDeleted(final Post post) {
         Log.i(TAG,"Post by "+post.getPostId()+" Deleted");
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(homeActivity);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mainActivity);
         alertDialog.setTitle("Delete this Post");
         alertDialog.setMessage("Are you Sure ? ");
         alertDialog.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
@@ -123,7 +125,7 @@ public class PostController implements
                 postReference.setValue(nullPost);
 
                 postsFragment.removePost(post);
-                Toast.makeText(homeActivity,"Deleted Sucessfully by Post Controller",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mainActivity,"Deleted Sucessfully by Post Controller",Toast.LENGTH_SHORT).show();
             }
         });
         alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

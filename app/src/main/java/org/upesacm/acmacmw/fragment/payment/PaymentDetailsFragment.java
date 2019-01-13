@@ -4,10 +4,13 @@ package org.upesacm.acmacmw.fragment.payment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.upesacm.acmacmw.R;
@@ -28,6 +31,9 @@ public class PaymentDetailsFragment extends Fragment implements
     private TextView textViewContact;
     private TextView textViewEmail;
     private Button buttonProceed;
+    private Toolbar toolbar;
+    private ProgressBar progressBar;
+    private NestedScrollView scrollView;
     public PaymentDetailsFragment() {
         // Required empty public constructor
     }
@@ -44,7 +50,7 @@ public class PaymentDetailsFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof EventActivity) {
+        if(context instanceof OnFragmentInteractionListener) {
             listener = (OnFragmentInteractionListener)context;
             super.onAttach(context);
         }
@@ -77,6 +83,9 @@ public class PaymentDetailsFragment extends Fragment implements
         textViewContact = view.findViewById(R.id.text_view_frag_payment_details_recip_contact_no);
         textViewEmail = view.findViewById(R.id.text_view_frag_payment_details_recip_email);
         buttonProceed = view.findViewById(R.id.button_frag_payment_details_proceed);
+        toolbar = view.findViewById(R.id.toolbar_frag_payment_details);
+        progressBar = view.findViewById(R.id.progress_bar_frag_payment_details);
+        scrollView = view.findViewById(R.id.scroll_view_frag_payment_details);
 
         textViewAmount.setText(""+amount);
         textViewName.setText(recipient.getName());
@@ -89,26 +98,17 @@ public class PaymentDetailsFragment extends Fragment implements
 
     }
 
-    /*private int calculateAmountToPay() {
-        int amount=0;
-        if(event.getEntryFeesTeam()==0)
-        {
-            for(Map.Entry<String, Participant> participantMap:participants.entrySet())
-            {
-                if(participantMap.getValue().isACMMember())
-                {
-                    amount=amount+event.getEntryFeesAcm();
-                }
-                else {
-                    amount=amount+event.getEntryFeesNonAcm();
-                }
-            }
+    void showProgress(boolean show) {
+        if(progressBar!=null) {
+            progressBar.setVisibility(show?View.VISIBLE:View.GONE);
+            progressBar.setIndeterminate(show);
         }
-        else {
-            amount=event.getEntryFeesTeam();
+
+        if(scrollView!=null) {
+            scrollView.setVisibility(show?View.INVISIBLE:View.VISIBLE);
         }
-        return amount;
-    } */
+    }
+
 
    /* private void registerToDatabase() {
         final Map<String ,Object> appendParticipants=new HashMap<>();
@@ -160,6 +160,7 @@ public class PaymentDetailsFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
+        showProgress(true);
         listener.onClickNext(recipient);
     }
 

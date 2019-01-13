@@ -2,7 +2,6 @@ package org.upesacm.acmacmw.fragment.member.profile;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
@@ -22,16 +17,15 @@ import org.upesacm.acmacmw.util.RandomOTPGenerator;
 public class ForgotPasswordFragment extends DialogFragment {
     Button buttonSendMail,buttonchangePassword;
     EditText editTextOtp,editTextSapid,editTextPassword,editTextRetypePassword;
-    private HomeActivity homeActivity;
+    //private MainActivity homeActivity;
     private String otp;
     private Member member;
     private InteractionListener interactionListener;
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            homeActivity = (HomeActivity)context;
-            interactionListener = (InteractionListener)homeActivity;
+        if(context instanceof InteractionListener) {
+            interactionListener = (InteractionListener)context;
             super.onAttach(context);
         }
 
@@ -93,15 +87,15 @@ public class ForgotPasswordFragment extends DialogFragment {
                 }
                 else {
                     if(!otp.equals(enterotp)) {
-                        Toast.makeText(homeActivity, "OTP is Incorrect", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ForgotPasswordFragment.this.getContext(), "OTP is Incorrect", Toast.LENGTH_SHORT).show();
                     }
                     else {
                         if(password.length()<8) {
-                            Toast.makeText(homeActivity, "Password should consist of 8 characters", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ForgotPasswordFragment.this.getContext(), "Password should consist of 8 characters", Toast.LENGTH_SHORT).show();
                         }
                         else {
                             if(!password.equals(retype)) {
-                                Toast.makeText(homeActivity, "Password do not match", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ForgotPasswordFragment.this.getContext(), "Password do not match", Toast.LENGTH_SHORT).show();
                             }
                             else {
                                 if(member!=null)

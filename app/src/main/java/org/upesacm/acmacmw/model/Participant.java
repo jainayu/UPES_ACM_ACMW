@@ -207,7 +207,6 @@ public class Participant implements Parcelable {
             this.branch = participant.getBranch();
             this.contact = participant.getContact();
             this.email = participant.getEmail();
-            this.eventsList = participant.getEventsList();
             this.name = participant.getName();
             this.whatsapp = participant.getWhatsappNo();
             this.year = participant.getYear();

@@ -1,33 +1,22 @@
 package org.upesacm.acmacmw.fragment.navdrawer;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
-import org.upesacm.acmacmw.fragment.homepage.contactus.ContactUsFragment;
-import org.upesacm.acmacmw.fragment.homepage.event.EventsListFragment;
-import org.upesacm.acmacmw.fragment.homepage.hierarchy.HierarchyFragment;
-import org.upesacm.acmacmw.fragment.homepage.post.PostsFragment;
+import org.upesacm.acmacmw.activity.MainActivity;
+import org.upesacm.acmacmw.fragment.menu.ContactUsFragment;
+import org.upesacm.acmacmw.fragment.homepage.EventsListFragment;
+import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
 import org.upesacm.acmacmw.util.Config;
-
-import java.lang.reflect.Field;
 
 public class HomePageFragment extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -37,7 +26,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
     private static final int HIERARCHY_FRAGMENT = 1;
     private static final int UPCOMING_EVENTS_FRAGMENT = 3;
     BottomNavigationView bottomNavigationView;
-    HomeActivity callback;
+    MainActivity callback;
     private int userSelectedFragmentId;
     public HomePageFragment() {
         // Required empty public constructor
@@ -45,12 +34,12 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
+        if(context instanceof MainActivity) {
+            callback = (MainActivity)context;
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException("context must be instance of HomeActivity");
+            throw new IllegalStateException("context must be instance of MainActivity");
         }
     }
     @Override
@@ -109,7 +98,6 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
     public void onResume() {
         System.out.println("onResume homepagefragment");
         callback.setDrawerEnabled(true);
-        callback.setActionBarTitle("UPES ACM/ACM-W");
         super.onResume();
     }
 
@@ -180,7 +168,7 @@ public class HomePageFragment extends Fragment implements BottomNavigationView.O
             userSelectedFragmentId = HIERARCHY_FRAGMENT;
             ft.replace(R.id.frame_layout_homepage,new HierarchyFragment());
         }
-        else if(item.getItemId() == R.id.action_contact) {
+        else if(item.getItemId() == R.id.action_profile) {
             userSelectedFragmentId = CONTACT_US_FRAGMENT;
             ft.replace(R.id.frame_layout_homepage, new ContactUsFragment());
         }

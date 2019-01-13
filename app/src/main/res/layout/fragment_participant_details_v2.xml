@@ -19,13 +19,6 @@
             app:titleTextColor="@android:color/white"
             android:theme="?attr/actionBarTheme" />
 
-        <Button
-            android:id="@+id/button_participant_details_next"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Next"
-            app:layout_scrollFlags="scroll|enterAlways" />
-
         <ProgressBar
             android:id="@+id/progress_bar_participant_details"
             style="?android:attr/progressBarStyleHorizontal"

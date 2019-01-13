@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
+import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.model.TrialMember;
 
 /**
@@ -29,7 +29,7 @@ public class TrialMemberOTPVerificationFragment extends Fragment
     Button buttonVerify;
     EditText editTextOTP;
     TrialOTPVerificationListener listener;
-    HomeActivity callback;
+    MainActivity callback;
     TrialMember trialMember;
     String otp;
     int tries=0;
@@ -47,9 +47,9 @@ public class TrialMemberOTPVerificationFragment extends Fragment
     }
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
+        if(context instanceof MainActivity) {
             super.onAttach(context);
-            callback = (HomeActivity)context;
+            callback = (MainActivity)context;
             listener = callback.getUserController();
         }
         else

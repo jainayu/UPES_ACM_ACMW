@@ -1,9 +1,6 @@
 package org.upesacm.acmacmw.fragment.event;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -15,12 +12,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventActivity;
-import org.upesacm.acmacmw.activity.HomeActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
@@ -45,10 +38,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
-public class ParticipantDetailFragment extends Fragment implements View.OnClickListener {
+public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
     private static final String TAG = "EventRegisterFragment";
     public static final long UID = Config.EVENT_REGISTRATION_FRAGMENT_UID;
     Event event;
@@ -59,8 +51,8 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
     Map<String,Participant> participants = new HashMap<>();
     Map<String,ItemInputHolder> inputMap = new HashMap<>();
     Toolbar toolbar;
+    MenuItem menuItemNext;
     RecyclerView recyclerView;
-    Button buttonNext;
     ProgressBar progressBar;
     RecyclerViewAdpater recyclerViewAdpater;
     FragmentInteractionListener listener;
@@ -100,13 +92,13 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
         View view= inflater.inflate(R.layout.fragment_participant_details_v2, container, false);
         toolbar = view.findViewById(R.id.toolbar_participant_details);
         recyclerView = view.findViewById(R.id.recycler_view_participant_details);
-        buttonNext = view.findViewById(R.id.button_participant_details_next);
         progressBar = view.findViewById(R.id.progress_bar_participant_details);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerViewAdpater = new RecyclerViewAdpater();
         recyclerView.setAdapter(recyclerViewAdpater);
-        buttonNext.setOnClickListener(this);
-        buttonNext.setVisibility(View.GONE);
+        toolbar.inflateMenu(R.menu.menu_frag_participant_details_toolbar);
+        toolbar.setOnMenuItemClickListener(this);
+        menuItemNext = toolbar.getMenu().findItem(R.id.action_next_toolbar_frag_participant_details);
         showProgress(true);
         return view;
     }
@@ -116,46 +108,52 @@ public class ParticipantDetailFragment extends Fragment implements View.OnClickL
             progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
             progressBar.setIndeterminate(show);
         }
-        if(buttonNext!=null)
-            buttonNext.setVisibility(show?View.GONE:View.VISIBLE);
         if(recyclerView!=null)
             recyclerView.setVisibility(show?View.GONE:View.VISIBLE);
         if(toolbar!=null)
-            toolbar.setTitle(show?null:"Fill Participant Details");
-        if(buttonNext!=null)
-            buttonNext.setVisibility(show?View.GONE:View.VISIBLE);
+            toolbar.setTitle(show ? "Processing..." : "Fill Participant Details");
+        if(menuItemNext!=null) {
+            menuItemNext.setVisible(!show);
+            menuItemNext.setEnabled(!show);
+        }
     }
 
     @Override
-    public void onClick(View v) {
+    public boolean onMenuItemClick(MenuItem menuItem) {
         /*InputMethodManager inputManager = (InputMethodManager)
                 getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);*/
-        showProgress(true);
-        boolean allValid = true;
-        for(String sapId:newSapIds)
-            allValid = allValid && inputMap.get(sapId).isDataValid();
+        if(menuItem.getItemId() == R.id.action_next_toolbar_frag_participant_details) {
+            showProgress(true);
+            boolean allValid = true;
+            for (String sapId : newSapIds)
+                allValid = allValid && inputMap.get(sapId).isDataValid();
 
-        if(allValid) {
-            for(String sapId:newSapIds) {
-                List<String> eventList = new ArrayList<>();
-                eventList.add(event.getEventID());
-                participants.put(sapId, new Participant.Builder()
-                        .setName(inputMap.get(sapId).getName())
-                        .setContact(inputMap.get(sapId).getContact())
-                        .setBranch(inputMap.get(sapId).getBranch())
-                        .setYear(inputMap.get(sapId).getYear())
-                        .setEmail(inputMap.get(sapId).getEmail())
-                        .setWhatsapp(inputMap.get(sapId).getWhatsappNo())
-                        .setEventsList(eventList)
-                        .build());
+            if (allValid) {
+                for (String sapId : newSapIds) {
+                    List<String> eventList = new ArrayList<>();
+                    eventList.add(event.getEventID());
+                    participants.put(sapId, new Participant.Builder()
+                            .setName(inputMap.get(sapId).getName())
+                            .setContact(inputMap.get(sapId).getContact())
+                            .setBranch(inputMap.get(sapId).getBranch())
+                            .setYear(inputMap.get(sapId).getYear())
+                            .setEmail(inputMap.get(sapId).getEmail())
+                            .setWhatsapp(inputMap.get(sapId).getWhatsappNo())
+                            .setEventsList(eventList)
+                            .build());
+                }
+                listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap, alreadyRegistered, participants, event, false);
+            } else {
+                Toast.makeText(this.getContext(), "Please check all the fields", Toast.LENGTH_SHORT).show();
+                showProgress(false);
             }
-            listener.onParticipantDetailsAvailable(newSapIds, acmParticipantsSap,alreadyRegistered,participants,event,false);
-        } else {
-            Toast.makeText(this.getContext(),"Please check all the fields",Toast.LENGTH_SHORT).show();
+            return true;
         }
+
+        return false;
     }
     @Override
     public void onDestroyView() {
