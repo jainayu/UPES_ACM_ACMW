@@ -60,6 +60,11 @@
             android:name=".activity.MenuActivity"
             android:parentActivityName=".activity.MainActivity" />
         <activity android:name=".activity.MemberRegistrationActivity"></activity>
+        <activity
+            android:name=".activity.EventActivity"
+            android:parentActivityName=".activity.HomeActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.LeaderboardActivity"></activity>
     </application>
 
 </manifest>
