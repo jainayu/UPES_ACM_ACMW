@@ -52,6 +52,7 @@ public class HomeActivity extends AppCompatActivity implements
         EventsListFragment.FragmentInteractionListener,
         NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener {
+        Button btn;
 
     public static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     public static final String EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY = "event activity current fragment key";
@@ -76,6 +77,14 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_main);
+       btn= findViewById(R.id.button2);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(HomeActivity.this, LeaderboardActivity.class);
+                startActivity(intent);
+            }
+        });
 
         toolbar = findViewById(R.id.my_toolbar);
         drawerLayout=findViewById(R.id.drawer_layout);

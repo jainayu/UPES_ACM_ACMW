@@ -45,11 +45,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-
-        <activity android:name=".activity.EventActivity"
+        <activity
+            android:name=".activity.EventActivity"
             android:parentActivityName=".activity.HomeActivity"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.LeaderboardActivity"></activity>
     </application>
 
 </manifest>

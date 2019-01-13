@@ -18,6 +18,12 @@ android:orientation="vertical"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:titleTextColor="@android:color/white" />
 
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button" />
+
     <FrameLayout
         android:id="@+id/frame_layout"
         android:layout_width="match_parent"

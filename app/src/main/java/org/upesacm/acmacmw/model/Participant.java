@@ -39,6 +39,7 @@ public class Participant implements Parcelable {
         in.readBooleanArray(array);
         isACMMember = array[0];
         teamId = in.readString();
+        score = in.readInt();
     }
 
     public Participant() {
@@ -74,6 +75,13 @@ public class Participant implements Parcelable {
 
     @JsonProperty("teamId")
     private String teamId;
+
+    @JsonProperty("score")
+    private int score;
+
+    public  int getScore() {
+        return score;
+    }
 
     public String getSap() {
         return sap;
@@ -158,6 +166,7 @@ public class Participant implements Parcelable {
         boolArray[0] = isACMMember;
         parcel.writeBooleanArray(boolArray);
         parcel.writeString(teamId);
+        parcel.writeInt(score);
     }
 
 
@@ -172,6 +181,7 @@ public class Participant implements Parcelable {
         private List<String> eventsList;
         private boolean isAcmMember;
         private String teamId;
+        private int score;
 
 
         public Builder() {
@@ -189,6 +199,7 @@ public class Participant implements Parcelable {
             this.year = participant.year;
             this.isAcmMember = participant.isACMMember;
             this.teamId = participant.teamId;
+            this.score = participant.score;
         }
 
         public Builder(Member participant) {
@@ -215,6 +226,7 @@ public class Participant implements Parcelable {
             participant.year = this.year;
             participant.isACMMember = this.isAcmMember;
             participant.teamId = this.teamId;
+            participant.score = this.score;
             return participant;
         }
 
@@ -269,6 +281,11 @@ public class Participant implements Parcelable {
 
         public Builder setTeamId(String teamId) {
             this.teamId = teamId;
+            return this;
+        }
+
+        public Builder setScore(int score) {
+            this.score  = score;
             return this;
         }
     }
