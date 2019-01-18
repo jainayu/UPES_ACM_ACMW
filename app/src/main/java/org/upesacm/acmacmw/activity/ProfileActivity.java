@@ -179,7 +179,9 @@ public class ProfileActivity extends AppCompatActivity implements
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
-                startActivity(new Intent(this,MemberRegistrationActivity.class));
+                Intent intent = new Intent(this,MemberRegistrationActivity.class);
+                intent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
+                startActivity(intent);
                 break;
             }
             case LoginFragment.CANCELLED: {
@@ -187,6 +189,9 @@ public class ProfileActivity extends AppCompatActivity implements
                 break;
             }
             case LoginFragment.GUEST_SIGNUP_PRESSED:{
+                Intent intent = new Intent(this,MemberRegistrationActivity.class);
+                intent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.GUEST_SIGN_UP);
+                startActivity(intent);
                 break;
             }
             case LoginFragment.LOGIN_FAILED: {
