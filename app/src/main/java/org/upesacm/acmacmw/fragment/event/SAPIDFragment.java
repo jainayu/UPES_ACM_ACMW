@@ -25,7 +25,9 @@ import org.upesacm.acmacmw.activity.EventActivity;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -96,6 +98,12 @@ public class SAPIDFragment extends Fragment {
                             return true;
                         }
                         sapIds.add(sapIdAdapter.getSapId(i));
+                    }
+                    HashSet<String> sapIdSet = new HashSet<>(sapIds);
+                    if(sapIds.size() != sapIdSet.size()){
+                        Toast.makeText(SAPIDFragment.this.getContext(),"Please check all the sap ids",Toast.LENGTH_LONG)
+                                .show();
+                        return true;
                     }
                     System.out.println(sapIds.size());
                     Toast.makeText(SAPIDFragment.this.getContext(),"everything is valid"+sapIds.size(),Toast.LENGTH_LONG).show();

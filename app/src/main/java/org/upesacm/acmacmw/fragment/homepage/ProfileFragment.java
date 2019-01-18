@@ -142,9 +142,11 @@ public class ProfileFragment extends Fragment {
             switch (position) {
                 case 0: {
                     listener.onProfileFragmentInteraction(MY_PROFILE);
+                    break;
                 }
                 case 1: {
                     listener.onProfileFragmentInteraction(MY_EVENTS);
+                    break;
                 }
                 default: {
                     break;
