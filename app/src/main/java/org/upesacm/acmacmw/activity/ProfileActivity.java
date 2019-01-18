@@ -15,8 +15,11 @@ import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
+import org.upesacm.acmacmw.fragment.member.profile.MyEventDetailFragment;
+import org.upesacm.acmacmw.fragment.member.profile.MyEventsFragment;
 import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
+import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.SessionManager;
 
@@ -24,7 +27,8 @@ public class ProfileActivity extends AppCompatActivity implements
         UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
-        LoginFragment.InteractionListener {
+        LoginFragment.InteractionListener
+        ,MyEventDetailFragment.FragmentInteractionListener {
     private FrameLayout frameLayout;
     private int selectedOptId;
     @Override
@@ -58,6 +62,13 @@ public class ProfileActivity extends AppCompatActivity implements
                 if(SessionManager.getInstance().getSessionID() == SessionManager.NONE) {
                     requestUserAuthentication();
                 }
+                break;
+            }
+            case ProfileFragment.MY_EVENTS: {
+                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                    setCurrentFragment(MyEventsFragment.newInstance(),false);
+                else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE)
+                    requestUserAuthentication();
                 break;
             }
             case ProfileFragment.PRIVILEGED_ACTION_REQUEST: {
@@ -203,5 +214,10 @@ public class ProfileActivity extends AppCompatActivity implements
             }
         }
         Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onClickRegister(Event event) {
+
     }
 }
