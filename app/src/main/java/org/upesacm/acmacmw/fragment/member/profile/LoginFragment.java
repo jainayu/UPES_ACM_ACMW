@@ -78,17 +78,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         buttonGuestSignUp=view.findViewById(R.id.button_guest_sign_up);
         forgotPassword=view.findViewById(R.id.forgot);
         toolbar = view.findViewById(R.id.toolbar_frag_login);
-        forgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ForgotPasswordFragment forgotPasswordFragment=new ForgotPasswordFragment();
-                forgotPasswordFragment.show(getActivity().getSupportFragmentManager(),"Fogot password dialog fragment");
-            }
-        });
         TextView logincred =view.findViewById(R.id.text_view_login_credentials);
         Typeface type = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
         logincred.setTypeface(type);
-
+        forgotPassword.setOnClickListener(this);
         buttonSignup.setOnClickListener(this);
         buttonLogin.setOnClickListener(this);
         buttonGuestSignUp.setOnClickListener(this);
@@ -140,6 +133,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         }
         else if(view.getId() == R.id.button_guest_sign_up){
             interactionListener.onLoginDialogFragmentInteraction(GUEST_SIGNUP_PRESSED);
+        }
+        else if(view.getId()==R.id.forgot)
+        {
+            ForgotPasswordFragment forgotPasswordFragment=new ForgotPasswordFragment();
+            forgotPasswordFragment.show(getActivity().getSupportFragmentManager(),"Fogot password dialog fragment");
         }
         else {
             interactionListener.onLoginDialogFragmentInteraction(CANCELLED);
