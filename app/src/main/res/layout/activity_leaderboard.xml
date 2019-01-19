@@ -41,36 +41,36 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="10dp">
+
             <TextView
                 android:id="@+id/view_rank"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="23dp"
-                android:text="Rank"
-                android:textStyle="bold"
                 android:layout_weight="1.3"
+                android:text="Rank"
                 android:textColor="#ffffff"
-                />
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/view_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="23dp"
-                android:text="Name"
-                android:textStyle="bold"
                 android:layout_weight="1"
+                android:text="Name"
                 android:textColor="#ffffff"
-                />
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/view_Score"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="23dp"
-                android:text="Scores"
                 android:layout_weight="1"
-                android:textStyle="bold"
+                android:text="Scores"
                 android:textColor="#ffffff"
-                />
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
     <android.support.v7.widget.RecyclerView
