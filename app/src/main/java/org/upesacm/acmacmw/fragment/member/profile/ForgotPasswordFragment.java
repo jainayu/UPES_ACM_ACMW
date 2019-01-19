@@ -1,6 +1,7 @@
 package org.upesacm.acmacmw.fragment.member.profile;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +10,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
@@ -54,24 +62,36 @@ public class ForgotPasswordFragment extends DialogFragment {
                     Toast.makeText(getContext(), "Enter SapId", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    String sapid=editTextSapid.getText().toString().trim();
-                    member=interactionListener.getMember(sapid);
-                    if(member!=null)
-                    {
-                        otp=RandomOTPGenerator.generate(Integer.parseInt(sapid),6);
-                        String mailBody="Your OTP is"+otp;
-                        String recepientMail=member.getEmail();
-                        String subject="ACM Change Password";
-                        OTPSender otpSender =new OTPSender();
-                        otpSender.execute(mailBody,recepientMail,subject);
-                        editTextSapid.setVisibility(View.GONE);
-                        buttonSendMail.setVisibility(View.GONE);
-                        editTextPassword.setVisibility(View.VISIBLE);
-                        editTextOtp.setVisibility(View.VISIBLE);
-                        editTextRetypePassword.setVisibility(View.VISIBLE);
-                        buttonchangePassword.setVisibility(View.VISIBLE);
-                    }
+                    final String sapid=editTextSapid.getText().toString().trim();
+                    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference().child(FirebaseConfig.ACM_ACMW_MEMBERS).child(sapid);
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists())
+                            {
+                                member =dataSnapshot.getValue(Member.class);
+                                if(member!=null)
+                                {
+                                    otp=RandomOTPGenerator.generate(Integer.parseInt(sapid),6);
+                                    String mailBody="Hello "+member.getName()+",<br/>You can change your password from App by using this OTP.<br/>Your OTP is <b>"+otp+"</b>";
+                                    String recepientMail=member.getEmail();
+                                    String subject="ACM Change Password";
+                                    OTPSender otpSender =new OTPSender();
+                                    otpSender.execute(mailBody,recepientMail,subject);
+                                    editTextSapid.setVisibility(View.GONE);
+                                    buttonSendMail.setVisibility(View.GONE);
+                                    editTextPassword.setVisibility(View.VISIBLE);
+                                    editTextOtp.setVisibility(View.VISIBLE);
+                                    editTextRetypePassword.setVisibility(View.VISIBLE);
+                                    buttonchangePassword.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                        }
+                    });
                 }
             }
         });
@@ -100,22 +120,7 @@ public class ForgotPasswordFragment extends DialogFragment {
                             else {
                                 if(member!=null)
                                 {
-                                    member = new Member.Builder()
-                                            .setmemberId(member.getMemberId())
-                                            .setName(member.getName())
-                                            .setPassword(password)
-                                            .setSAPId(member.getSap())
-                                            .setBranch(member.getBranch())
-                                            .setEmail(member.getEmail())
-                                            .setContact(member.getContact())
-                                            .setWhatsappNo(member.getWhatsappNo())
-                                            .setYear(member.getYear())
-                                            .setDob(member.getDob())
-                                            .setCurrentAdd(member.getCurrentAdd())
-                                            .setPremium(member.isPremium())
-                                            .setRecipientSap(member.getRecepientSap())
-                                            .setMembershipType(member.getMembershipType())
-                                            .build();
+                                    member = new Member.Builder(member).setPassword(password).build();
                                     interactionListener.changePassword(member);
                                 }
                                 dismiss();

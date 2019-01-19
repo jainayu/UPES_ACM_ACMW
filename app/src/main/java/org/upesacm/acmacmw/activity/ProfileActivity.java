@@ -1,7 +1,9 @@
 package org.upesacm.acmacmw.activity;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -10,9 +12,18 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
+import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
 import org.upesacm.acmacmw.fragment.member.profile.MyEventDetailFragment;
 import org.upesacm.acmacmw.fragment.member.profile.MyEventsFragment;
@@ -20,6 +31,7 @@ import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.SessionManager;
 
 public class ProfileActivity extends AppCompatActivity implements
@@ -27,7 +39,8 @@ public class ProfileActivity extends AppCompatActivity implements
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
         LoginFragment.InteractionListener ,
-        MyEventDetailFragment.FragmentInteractionListener {
+        MyEventDetailFragment.FragmentInteractionListener,
+        ForgotPasswordFragment.InteractionListener {
     public static final String SELECTED_OPT_KEY = "selected opt key";
 
     private FrameLayout frameLayout;
@@ -221,5 +234,27 @@ public class ProfileActivity extends AppCompatActivity implements
     @Override
     public void onClickRegister(Event event) {
 
+    }
+    @Override
+    public Member getMember(String sapid) {
+        return null;
+    }
+
+    @Override
+    public void changePassword(Member member) {
+        final ProgressDialog progressDialog=new ProgressDialog(this);
+        progressDialog.setTitle("Changing Password");
+        progressDialog.show();
+        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference().child(FirebaseConfig.ACM_ACMW_MEMBERS).child(member.getSap());
+        databaseReference.setValue(member).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful())
+                {
+                    progressDialog.dismiss();
+                    Toast.makeText(ProfileActivity.this, "Password Changed Successfully,Login Now", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

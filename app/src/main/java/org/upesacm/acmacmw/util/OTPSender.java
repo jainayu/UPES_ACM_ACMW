@@ -18,7 +18,7 @@ public class OTPSender extends AsyncTask<String, Void, String> {
     private String mailBody;
     private String recipientMail;
     private final static String ACM_EMAIL = "appdev.upesacmacmw@gmail.com";               //ACM's gmail address
-    private final static String ACM_PASSWORD = "appdev2018-2019";                      //ACM's gmsil sccount'd password
+    private final static String ACM_PASSWORD = "upesacmappdevcore1819";                      //ACM's gmsil sccount'd password
     @Override
     protected String doInBackground(String... params) {
         mailBody=params[0];

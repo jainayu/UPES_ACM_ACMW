@@ -61,7 +61,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         ValueEventListener valueEventListener= new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Participant> participants = new ArrayList<>();
+                 participants = new ArrayList<>();
 
                 for(DataSnapshot ds : dataSnapshot.getChildren() ){
                     Participant participant = ds.getValue(Participant.class);
@@ -139,6 +139,10 @@ public class LeaderboardActivity extends AppCompatActivity {
                 notifyDataSetChanged();
             }
         }
+
+        public List<Participant> getParticipants() {
+            return participants;
+        }
     }
 
     @Override
@@ -160,14 +164,39 @@ public class LeaderboardActivity extends AppCompatActivity {
         MenuItem item=menu.findItem(R.id.search);
         item.setActionView(searchView);
         searchView.setVisibility(View.VISIBLE);
-        searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
-        searchView.setQueryHint("Enter SapId");
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT);
+        searchView.setQueryHint("Search by Name");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View v) {
-                recyclerView.smoothScrollToPosition(3);
+            public boolean onQueryTextSubmit(String s) {
+               return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if(s.equals(""))
+                {
+                    adapter.setItem(participants);
+                    adapter.notifyDataSetChanged();
+                    return true;
+                }
+                final List<Participant> filteredModelList = filter(adapter.getParticipants(), s);
+                adapter.setItem(filteredModelList);
+                adapter.notifyDataSetChanged();
+                return true;
             }
         });
         return true;
+    }
+    private static List<Participant> filter(List<Participant> models, String query) {
+        final List<Participant> filteredModelList = new ArrayList<>();
+        for (Participant model : models) {
+
+            if (model.getName().toLowerCase().contains(query.toLowerCase())) {
+                filteredModelList.add(model);
+            }
+        }
+        return filteredModelList;
     }
 }
