@@ -17,28 +17,29 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface MembershipClient  {
 
     @PUT("unconfirmed_members/{id}.json")
-    Call<NewMember> saveNewMemberData(@Path("id") String id, @Body NewMember newMember);
+    Call<NewMember> saveNewMemberData(@Path("id") String id, @Body NewMember newMember,@Query("auth") String idToken);
 
     @GET("unconfirmed_members/{id}.json")
-    Call<NewMember> getNewMemberData(@Path("id")String id);
+    Call<NewMember> getNewMemberData(@Path("id")String id,@Query("auth") String idToken);
 
     @GET("acm_acmw_members/{id}.json")
-    Call<Member> getMember(@Path("id")String id);
+    Call<Member> getMember(@Path("id")String id,@Query("auth") String idToken);
 
     @PUT("acm_acmw_members/{id}.json")
-    Call<Member> createMember(@Path("id")String id,@Body Member member);
+    Call<Member> createMember(@Path("id")String id,@Body Member member,@Query("auth") String idToken);
 
     @GET("otp_recepients.json")
-    Call<HashMap<String,String>> getOTPRecipients();
+    Call<HashMap<String,String>> getOTPRecipients(@Query("auth") String idToken);
     @Multipart
     @POST("/upesacmacmwapp/upload.php")
-    Call<ResponseModel> uploadFile(@Part ("name") RequestBody name,@Part MultipartBody.Part filepart );
+    Call<ResponseModel> uploadFile(@Part ("name") RequestBody name,@Part MultipartBody.Part filepart,@Query("auth") String idToken );
 
     @GET("email_msg.json")
-    Call<EmailMsg> getEmailMsg();
+    Call<EmailMsg> getEmailMsg(@Query("auth") String idToken);
 
 }

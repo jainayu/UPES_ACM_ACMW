@@ -494,7 +494,7 @@ public class PostsFragment extends Fragment
                     c.add(Calendar.MONTH, monthCount);
                     if (c.get(Calendar.YEAR) >= 2018 && c.get(Calendar.MONTH) >= 5) {
                         RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR),
-                                "M" + c.get(Calendar.MONTH))
+                                "M" + c.get(Calendar.MONTH),Config.AUTH_TOKEN)
                                 .enqueue(this);
                     } else {
                         System.out.println("removing posts");
@@ -559,7 +559,7 @@ public class PostsFragment extends Fragment
 
             Calendar c = Calendar.getInstance();
             c.add(Calendar.MONTH, monthCount);
-            loadMoreCall = RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR), "M" + c.get(Calendar.MONTH));
+            loadMoreCall = RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR), "M" + c.get(Calendar.MONTH),Config.AUTH_TOKEN);
             loadMoreCall.enqueue(this);
         }
         else {

@@ -31,6 +31,7 @@ import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.retrofit.ResponseModel;
+import org.upesacm.acmacmw.util.Config;
 import org.upesacm.acmacmw.util.UploadService;
 
 import java.io.File;
@@ -210,7 +211,7 @@ public class ImageUploadFragment extends Fragment implements
         RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
 // Change base URL to your upload server URL.
         MembershipClient membershipClient = RetrofitHostingerApiClient.getInstance().create(MembershipClient.class);
-        membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
+        membershipClient.uploadFile(name,filePart,Config.AUTH_TOKEN).enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
                 Log.d("Tag", "code" + response.code() + "");
@@ -233,7 +234,7 @@ public class ImageUploadFragment extends Fragment implements
                         Call<Post> newPostCall = RetrofitFirebaseApiClient.getInstance().getHomePageClient().createPost(post.getYearId(),
                                 post.getMonthId(),
                                 post.getPostId(),
-                                post);
+                                post, Config.AUTH_TOKEN);
 
                         newPostCall.enqueue(ImageUploadFragment.this);
                         System.out.println("initiated the post meta data upload process");

@@ -8,4 +8,5 @@ public class Config {
     public static final long HOME_PAGE_FRAGMENT_UID = 0x0001;
     public static final long EVENT_DETAIL_FRAGMENT_UID = 0X0002;
     public static final long EVENT_REGISTRATION_FRAGMENT_UID = 0X0003 ;
+    public static  String AUTH_TOKEN = null;
 }
