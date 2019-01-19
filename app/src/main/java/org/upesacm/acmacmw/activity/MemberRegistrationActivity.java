@@ -1,7 +1,5 @@
 package org.upesacm.acmacmw.activity;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -11,12 +9,10 @@ import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
@@ -24,61 +20,37 @@ import com.google.firebase.database.ValueEventListener;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.member.registration.MemberRegistrationFragment;
 import org.upesacm.acmacmw.fragment.member.registration.SapIdFragment;
-import org.upesacm.acmacmw.fragment.member.trial.GoogleSignInFragment;
-import org.upesacm.acmacmw.fragment.member.trial.TrialMemberOTPVerificationFragment;
 import org.upesacm.acmacmw.fragment.payment.OtpConfirmationFragment;
 import org.upesacm.acmacmw.fragment.payment.PaymentDetailsFragment;
 import org.upesacm.acmacmw.fragment.payment.RecipientSelectFragment;
 import org.upesacm.acmacmw.model.EmailMsg;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
-import org.upesacm.acmacmw.model.TrialMember;
-import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.OTPSender;
-import org.upesacm.acmacmw.util.RandomOTPGenerator;
 import org.upesacm.acmacmw.util.SessionManager;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MemberRegistrationActivity extends AppCompatActivity implements
         SapIdFragment.FragmentInteractionListener,
         MemberRegistrationFragment.RegistrationResultListener,
         OtpConfirmationFragment.OnFragmentInteractionListener,
         RecipientSelectFragment.FragmentInteractionListener,
-        PaymentDetailsFragment.OnFragmentInteractionListener,
-        GoogleSignInFragment.GoogleSignInListener,
-        TrialMemberOTPVerificationFragment.TrialOTPVerificationListener {
-    public static final String SIGN_UP_TYPE_KEY = "sign up type key";
-    public static final int MEMBER_SIGN_UP = 1;
-    public static final int GUEST_SIGN_UP = 2;
+        PaymentDetailsFragment.OnFragmentInteractionListener {
     public static final String TAG = "MemberRegActivity";
     private static final String NEW_MEMBER_SAP_KEY = "sap key";
     private static final String NEW_MEMBER_KEY = "new Member key";
     private FrameLayout frameLayout;
     private Bundle tempStorage = new Bundle();
-    private int signUpType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_registration);
         frameLayout = findViewById(R.id.frame_layout_member_registration_activity);
-        Bundle args = savedInstanceState;
-        if(args == null)
-            args = getIntent().getExtras();
-        signUpType = args.getInt(MemberRegistrationActivity.SIGN_UP_TYPE_KEY);
-        if(signUpType == MemberRegistrationActivity.MEMBER_SIGN_UP)
-            setCurrentFragment(SapIdFragment.newInstance(),false);
-        else
-            setCurrentFragment(GoogleSignInFragment.newInstance(),false);
-
+        setCurrentFragment(SapIdFragment.newInstance(),false);
     }
 
     void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
@@ -283,91 +255,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                     });
         } else {
             Toast.makeText(this,"Max tries exceeded",Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onGoogleSignIn(final String sap, GoogleSignInAccount account) {
-        if(account!=null) {
-            final TrialMember newTrialMember = new TrialMember.Builder(String.valueOf(Calendar.getInstance().getTimeInMillis()))
-                    .setEmail(account.getEmail())
-                    .setName(account.getDisplayName())
-                    .setSap(sap)
-                    .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap),6))
-                    .build();
-            RetrofitFirebaseApiClient.getInstance().getHomePageClient().getTrialMember(sap)
-                    .enqueue(new Callback<TrialMember>() {
-                        @Override
-                        public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
-                            final TrialMember trialMember;
-                            if(!(response.body()==null)) {
-                                trialMember = new TrialMember.Builder(response.body().getCreationTimeStamp())
-                                        .setEmail(newTrialMember.getEmail())
-                                        .setName(newTrialMember.getName())
-                                        .setSap(newTrialMember.getSap())
-                                        .setOtp(newTrialMember.getOtp())
-                                        .build();
-                            }
-                            else {
-                                trialMember = newTrialMember;
-                            }
-                            RetrofitFirebaseApiClient.getInstance().getHomePageClient().createTrialMember(sap,trialMember)
-                                    .enqueue(new Callback<TrialMember>() {
-                                        @Override
-                                        public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
-                                            System.out.println("createTrialMember response : "+response.message());
-                                            String mailBody = getString(R.string.guest_user_sign_in_msg_header)+"\n\n"+
-                                                    getString(R.string.guest_user_sign_in_msg_body)+" "+trialMember.getOtp();
-                                            OTPSender sender=new OTPSender();
-                                            sender.execute(mailBody,trialMember.getSap()+"@"+ getString(R.string.upes_domain),"ACM");
-
-                                            setCurrentFragment(TrialMemberOTPVerificationFragment.newInstance(trialMember),true);
-
-                                            getSupportActionBar().show();
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<TrialMember> call, Throwable t) {
-                                            t.printStackTrace();
-                                            Toast.makeText(MemberRegistrationActivity.this, "unable to create trial member", Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-
-                        }
-
-                        @Override
-                        public void onFailure(Call<TrialMember> call, Throwable t) {
-                            Toast.makeText(MemberRegistrationActivity.this, "unable to verify trial member Please try again", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-        }
-        else {
-            Toast.makeText(MemberRegistrationActivity.this, "unable to sign in", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onTrialOTPVerificationResult(TrialMember trialMember, int code) {
-        if(code == TrialMemberOTPVerificationFragment.SUCCESSFUL_VERIFICATION) {
-            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preference_file_key),
-                    Context.MODE_PRIVATE).edit();
-            editor.putString(getString(R.string.trial_member_sap),trialMember.getSap());
-            editor.commit();
-            //Create the Guest Session Here
-            SessionManager.getInstance().createGuestSession(trialMember);
-
-            FirebaseDatabase.getInstance().getReference("postsTrialLogin/")
-                    .child(trialMember.getSap())
-                    .setValue(trialMember);
-
-            System.out.println("inside home activity onTrialMemberStateChange"+trialMember);
-            System.out.println(trialMember.getName()+trialMember.getEmail());
-            Toast.makeText(this, "trial member created", Toast.LENGTH_LONG).show();
-            onBackPressed();
-        }
-        else {
-            Toast.makeText(this,"Maximum tries exceeded",Toast.LENGTH_LONG);
         }
     }
 }

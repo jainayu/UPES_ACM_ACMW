@@ -26,7 +26,6 @@ import com.google.firebase.storage.UploadTask;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.model.Post;
-import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
 import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
 import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
@@ -57,13 +56,15 @@ public class ImageUploadFragment extends Fragment implements
     public static final int UPLOAD_CANCEL_OPERATION_FAILED = 4;
     public static final int UPLOAD_FAILED = 3;
 
-    //HomePageClient homePageClient;
+    HomePageClient homePageClient;
     byte[] byteArray;
     Post post;
 
     EditText caption;
     FloatingActionButton upload;
     ProgressBar progressBar;
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
     UploadResultListener resultListener;
     TextView textViewUpload;
     String ownerSapId;
@@ -82,16 +83,18 @@ public class ImageUploadFragment extends Fragment implements
         // Required empty public constructor
     }
 
-    public static ImageUploadFragment newInstance(Bundle args) {
+    public static ImageUploadFragment newInstance(HomePageClient homePageClient) {
         ImageUploadFragment fragment = new ImageUploadFragment();
-        fragment.setArguments(args);
+        fragment.homePageClient = homePageClient;
+
         return fragment;
     }
 
     @Override
     public void onAttach(Context context) {
-        if (context instanceof UploadResultListener) {
-            resultListener = (UploadResultListener)context;
+        if (context instanceof MainActivity) {
+            callback = (MainActivity)context;
+            resultListener = callback.getPostController();
             super.onAttach(context);
         } else {
             throw new IllegalStateException(context.toString() + " must " +
@@ -230,7 +233,7 @@ public class ImageUploadFragment extends Fragment implements
                                 .setOwnerSapId(ownerSapId)
                                 .setOwnerName(ownerName)
                                 .build();
-                        Call<Post> newPostCall = RetrofitFirebaseApiClient.getInstance().getHomePageClient().createPost(post.getYearId(),
+                        Call<Post> newPostCall = homePageClient.createPost(post.getYearId(),
                                 post.getMonthId(),
                                 post.getPostId(),
                                 post);

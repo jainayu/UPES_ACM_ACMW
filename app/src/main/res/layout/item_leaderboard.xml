@@ -10,29 +10,28 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp">
-
         <TextView
             android:id="@+id/view_text_rank"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="23dp"
+
             android:layout_weight="1.3"
-
-            android:textSize="14sp" />
-
+            />
         <TextView
             android:id="@+id/view_text_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="23dp"
+
             android:layout_weight="1"
-
-            android:textSize="14sp" />
-
+            />
         <TextView
             android:id="@+id/view_text_Score"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="23dp"
             android:layout_weight="1"
-            android:textSize="14sp"
 
             />
     </LinearLayout>

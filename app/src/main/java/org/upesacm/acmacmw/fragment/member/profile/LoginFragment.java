@@ -139,12 +139,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
             interactionListener.onLoginDialogFragmentInteraction(SIGNUP_PRESSED);
         }
         else if(view.getId() == R.id.button_guest_sign_up){
-            interactionListener.onLoginDialogFragmentInteraction(GUEST_SIGNUP_PRESSED);
+            interactionListener.onLoginDialogFragmentInteraction(SIGNUP_PRESSED);
         }
         else {
             interactionListener.onLoginDialogFragmentInteraction(CANCELLED);
         }
     }
+
+    public String getUsername() {
+        return username;
+    }
+
     public String getPassword() {
         return password;
     }

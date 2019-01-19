@@ -55,7 +55,7 @@ public class MenuActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle("Contact Us");
                 break;
             }
-            default: { 
+            default: {
                 break;
             }
         }

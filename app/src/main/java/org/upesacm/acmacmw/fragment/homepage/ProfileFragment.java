@@ -25,8 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileFragment extends Fragment {
+    public static final String SELECTED_OPT_KEY = "selected opt key";
     public static final int PROFILE_IMAGE = 1;
     public static final int MY_PROFILE = 2;
+    public static final int PRIVILEGED_ACTION_REQUEST = 3;
+    public static final int MY_EVENTS = 4;
     private Toolbar toolbar;
     private OnFragmentInteractionListener listener;
     private RecyclerView recyclerView;
@@ -81,6 +84,7 @@ public class ProfileFragment extends Fragment {
             }
         });
         recyclerViewAdapter.addMenuItem("My Profile");
+        recyclerViewAdapter.addMenuItem("My Events");
         return view;
     }
 
@@ -138,6 +142,11 @@ public class ProfileFragment extends Fragment {
             switch (position) {
                 case 0: {
                     listener.onProfileFragmentInteraction(MY_PROFILE);
+                    break;
+                }
+                case 1: {
+                    listener.onProfileFragmentInteraction(MY_EVENTS);
+                    break;
                 }
                 default: {
                     break;

@@ -46,7 +46,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
-import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
 import org.upesacm.acmacmw.util.SessionManager;
 import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
 import org.upesacm.acmacmw.listener.OnLoadMoreListener;
@@ -84,17 +83,17 @@ public class PostsFragment extends Fragment
         ValueEventListener,
         View.OnClickListener,
         OnRecyclerItemSelectListener<Post> {
-    public static final String TAG = "PostsFragment";
-    public static final String INTERACTION_CODE_KEY = "interaction code key";
-    public static final int REQUEST_AUTHENTICATION = 1;
-    public static final int UPLOAD_IMAGE = 2;
-    private static final int CHOOSE_FROM_GALLERY=2;
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 3;
 
+    static final int CHOOSE_FROM_GALLERY=2;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 3;
+
+    HomePageClient homePageClient;
     RecyclerView recyclerView;
     ProgressBar progressBar;
     private int monthCount=-1;
+    FirebaseDatabase database;
     private DatabaseReference postsReference;
     PostsRecyclerViewAdapter recyclerViewAdapter;
     FloatingActionButton floatingActionButton;
@@ -102,6 +101,7 @@ public class PostsFragment extends Fragment
     RecyclerView.OnScrollListener scrollListener;
     Call<HashMap<String,Post>> loadMoreCall;
     private Uri fileUri;
+    MainActivity callback;
     FragmentInteractionListener interactionListener;
     boolean viewAlive;
     private Toolbar toolbar;
@@ -113,12 +113,13 @@ public class PostsFragment extends Fragment
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof FragmentInteractionListener) {
-            interactionListener = (FragmentInteractionListener)context;
+        if(context instanceof MainActivity) {
+            callback = (MainActivity)context;
+            interactionListener = callback.getPostController();
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context.toString()+" must be instance of FragmentInteractionListener");
+            throw new IllegalStateException("context must be instance of MainActivity");
         }
     }
     @Override
@@ -126,14 +127,20 @@ public class PostsFragment extends Fragment
         super.onCreate(savedInstanceState);
         System.out.println("onCreate post fragment");
         setHasOptionsMenu(true);
+        database = callback.getDatabase();
+        if(database==null) {
+            database = FirebaseDatabase.getInstance();
+        }
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        recyclerViewAdapter=new PostsRecyclerViewAdapter(this.getContext());
+        homePageClient = callback.getHomePageClient();
+
+        recyclerViewAdapter=new PostsRecyclerViewAdapter(callback);
         recyclerViewAdapter.setItemSelectListener(this);
 
         Calendar calendar = Calendar.getInstance();
-        postsReference = FirebaseDatabase.getInstance()
+        postsReference = database
                 .getReference("posts/" + "Y" + calendar.get(Calendar.YEAR) + "/"
                         + "M" + calendar.get(Calendar.MONTH));
     }
@@ -220,7 +227,7 @@ public class PostsFragment extends Fragment
         progressBar = null;
 
         swipeContainer.setOnRefreshListener(null);
-        swipeContainer = null;  //MainActivity callback;
+        swipeContainer = null;
 
         monthCount = -1;
 
@@ -231,11 +238,14 @@ public class PostsFragment extends Fragment
 
     @Override
     public void onDetach() {
+        callback = null;
         super.onDetach();
     }
     @Override
     public void onDestroy() {
+        database = null;
         postsReference = null;
+        homePageClient = null;
         recyclerViewAdapter = null;
         super.onDestroy();
         System.gc();
@@ -493,7 +503,7 @@ public class PostsFragment extends Fragment
                     Calendar c = Calendar.getInstance();
                     c.add(Calendar.MONTH, monthCount);
                     if (c.get(Calendar.YEAR) >= 2018 && c.get(Calendar.MONTH) >= 5) {
-                        RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR),
+                        homePageClient.getPosts("Y" + c.get(Calendar.YEAR),
                                 "M" + c.get(Calendar.MONTH))
                                 .enqueue(this);
                     } else {
@@ -526,6 +536,9 @@ public class PostsFragment extends Fragment
 
     public void onNewPostDataAvailable(Bundle args) {
         System.out.println("on new post data available called");
+        ((MainActivity)getContext()).getSupportActionBar().hide();
+        ((MainActivity)getContext()).setDrawerEnabled(false);
+        ImageUploadFragment imageUploadFragment= ImageUploadFragment.newInstance(homePageClient);
 
         String ownerName=null;
         String ownerSapId=null;
@@ -542,7 +555,11 @@ public class PostsFragment extends Fragment
         }
         args.putString(getString(R.string.post_owner_id_key),ownerSapId);
         args.putString(getString(R.string.post_owner_name_key),ownerName);
-        interactionListener.onPostFragmentInteraction(UPLOAD_IMAGE,args);
+        imageUploadFragment.setArguments(args);
+
+        FragmentTransaction ft=((MainActivity)getContext()).getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.frame_layout,imageUploadFragment,getString(R.string.fragment_tag_image_upload));
+        ft.commit();
     }
 
 
@@ -559,7 +576,7 @@ public class PostsFragment extends Fragment
 
             Calendar c = Calendar.getInstance();
             c.add(Calendar.MONTH, monthCount);
-            loadMoreCall = RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR), "M" + c.get(Calendar.MONTH));
+            loadMoreCall = homePageClient.getPosts("Y" + c.get(Calendar.YEAR), "M" + c.get(Calendar.MONTH));
             loadMoreCall.enqueue(this);
         }
         else {
@@ -730,74 +747,12 @@ public class PostsFragment extends Fragment
 
 
     @Override
-    public void onRecyclerItemSelect(View view,final Post post, int position) {
+    public void onRecyclerItemSelect(View view,Post dataItem, int position) {
         if(view.getId() == R.id.image_button_post_like) {
-            Log.i(TAG,"Post by "+post.getPostId()+"Liked");
-            SessionManager sessionManager = SessionManager.getInstance();
-            if(sessionManager.isSessionAlive()) {
-                String loggedInUserSap = null;
-                if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID)
-                    loggedInUserSap = SessionManager.getInstance().getLoggedInMember().getSap();
-                else if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
-                    loggedInUserSap = SessionManager.getInstance().getGuestMember().getSap();
-
-                int noOfLikes = post.getLikesIds().size();
-                int i = 0;
-                while(i<noOfLikes) {
-                    if(post.getLikesIds().get(i).equals(loggedInUserSap)) {
-                        post.getLikesIds().remove(i);
-                        break;
-                    }
-                    i++;
-                }
-                // if no current user id is not present in likesIds then add
-                if(i==noOfLikes) {
-                    System.out.println("liked");
-                    post.getLikesIds().add(loggedInUserSap);
-                }
-                //save the like in database
-                String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
-                DatabaseReference postReference = FirebaseDatabase.getInstance().getReference(postUrl);
-                postReference.setValue(post);
-
-                //update the UI
-                recyclerViewAdapter.modifyPost(post);
-
-            } else {
-                Log.i(TAG,"unable to like as user session is not in progress");
-                interactionListener.onPostFragmentInteraction(REQUEST_AUTHENTICATION,null);
-                Toast.makeText(this.getContext(),"Please log in to like the post",Toast.LENGTH_LONG).show();
-            }
+            interactionListener.onPostLiked(dataItem);
         }
         else if(view.getId() == R.id.image_button_post_delete) {
-            Log.i(TAG,"Post by "+post.getPostId()+" Deleted");
-
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.getContext());
-            alertDialog.setTitle("Delete this Post");
-            alertDialog.setMessage("Are you Sure ? ");
-            alertDialog.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
-                    DatabaseReference postReference = FirebaseDatabase.getInstance().getReference(postUrl);
-                    Post nullPost = new Post();
-                    postReference.setValue(nullPost);
-
-                    recyclerViewAdapter.removePost(post.getPostId());
-                    Toast.makeText(PostsFragment.this.getContext(),"Deleted Sucessfully by Post Controller",Toast.LENGTH_SHORT).show();
-                }
-            });
-            alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    // DO SOMETHING HERE
-
-                }
-            });
-
-            AlertDialog dialog = alertDialog.create();
-            dialog.show();
+            interactionListener.onPostDeleted(dataItem);
         }
 
     }
@@ -819,7 +774,9 @@ public class PostsFragment extends Fragment
     }
 
     public interface FragmentInteractionListener {
-        void onPostFragmentInteraction(int code,Bundle data);
+        void onCameraButtonClicked();
+        void onPostLiked(Post post);
+        void onPostDeleted(Post post);
     }
 
     @Override

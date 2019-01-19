@@ -29,6 +29,7 @@ public class TrialMemberOTPVerificationFragment extends Fragment
     Button buttonVerify;
     EditText editTextOTP;
     TrialOTPVerificationListener listener;
+    MainActivity callback;
     TrialMember trialMember;
     String otp;
     int tries=0;
@@ -48,7 +49,8 @@ public class TrialMemberOTPVerificationFragment extends Fragment
     public void onAttach(Context context) {
         if(context instanceof MainActivity) {
             super.onAttach(context);
-            listener = (TrialOTPVerificationListener)context;
+            callback = (MainActivity)context;
+            listener = callback.getUserController();
         }
         else
             throw new IllegalStateException(context.toString()+

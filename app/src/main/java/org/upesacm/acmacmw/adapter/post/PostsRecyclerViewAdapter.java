@@ -1,7 +1,6 @@
 package org.upesacm.acmacmw.adapter.post;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,15 +25,15 @@ import java.util.ArrayList;
 
 public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
 
-    //private MainActivity callback;
+    private MainActivity callback;
     boolean isLoading=false;
     ArrayList<Post> posts;
-    //HomePageClient homePageClient;
+    HomePageClient homePageClient;
     OnRecyclerItemSelectListener<Post> itemSelectListener;
-    private Context context;
 
-    public PostsRecyclerViewAdapter(Context context) {
-        this.context = context;
+    public PostsRecyclerViewAdapter(MainActivity callback) {
+        this.callback = callback;
+        this.homePageClient = callback.getHomePageClient();
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -101,7 +100,7 @@ public class PostsRecyclerViewAdapter extends RecyclerView.Adapter {
             textViewDate = itemView.findViewById(R.id.text_view_post_date);
             textViewTime = itemView.findViewById(R.id.text_view_post_time);
 
-            Typeface bold = Typeface.createFromAsset(context.getAssets(),"Fonts/product_sans_bold.ttf");
+            Typeface bold = Typeface.createFromAsset(callback.getAssets(),"Fonts/product_sans_bold.ttf");
             username.setTypeface(bold);
 
             imageButtonLike.setOnClickListener(this);

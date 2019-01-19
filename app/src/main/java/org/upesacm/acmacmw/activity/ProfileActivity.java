@@ -13,9 +13,13 @@ import android.widget.Toast;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
+import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
+import org.upesacm.acmacmw.fragment.member.profile.MyEventDetailFragment;
+import org.upesacm.acmacmw.fragment.member.profile.MyEventsFragment;
 import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
+import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.SessionManager;
 
@@ -23,9 +27,8 @@ public class ProfileActivity extends AppCompatActivity implements
         UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
-        LoginFragment.InteractionListener {
-    public static final String SELECTED_OPT_KEY = "selected opt key";
-    public static final int PRIVILEGED_ACTION_REQUEST = 3;
+        LoginFragment.InteractionListener
+        ,MyEventDetailFragment.FragmentInteractionListener {
     private FrameLayout frameLayout;
     private int selectedOptId;
     @Override
@@ -38,7 +41,7 @@ public class ProfileActivity extends AppCompatActivity implements
         if(args==null)
             args = savedInstanceState;
 
-        selectedOptId = args.getInt(SELECTED_OPT_KEY);
+        selectedOptId = args.getInt(ProfileFragment.SELECTED_OPT_KEY);
         updateUI();
     }
 
@@ -61,7 +64,14 @@ public class ProfileActivity extends AppCompatActivity implements
                 }
                 break;
             }
-            case PRIVILEGED_ACTION_REQUEST: {
+            case ProfileFragment.MY_EVENTS: {
+                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                    setCurrentFragment(MyEventsFragment.newInstance(),false);
+                else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE)
+                    requestUserAuthentication();
+                break;
+            }
+            case ProfileFragment.PRIVILEGED_ACTION_REQUEST: {
                 requestUserAuthentication();
                 break;
             }
@@ -74,7 +84,7 @@ public class ProfileActivity extends AppCompatActivity implements
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putInt(SELECTED_OPT_KEY,selectedOptId);
+        state.putInt(ProfileFragment.SELECTED_OPT_KEY,selectedOptId);
     }
 
     void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
@@ -180,9 +190,7 @@ public class ProfileActivity extends AppCompatActivity implements
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
-                Intent intent = new Intent(this,MemberRegistrationActivity.class);
-                intent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
-                startActivity(intent);
+                startActivity(new Intent(this,MemberRegistrationActivity.class));
                 break;
             }
             case LoginFragment.CANCELLED: {
@@ -190,9 +198,6 @@ public class ProfileActivity extends AppCompatActivity implements
                 break;
             }
             case LoginFragment.GUEST_SIGNUP_PRESSED:{
-                Intent intent = new Intent(this,MemberRegistrationActivity.class);
-                intent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.GUEST_SIGN_UP);
-                startActivity(intent);
                 break;
             }
             case LoginFragment.LOGIN_FAILED: {
@@ -209,5 +214,10 @@ public class ProfileActivity extends AppCompatActivity implements
             }
         }
         Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onClickRegister(Event event) {
+
     }
 }
