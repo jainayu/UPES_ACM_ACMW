@@ -14,8 +14,11 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
+import org.upesacm.acmacmw.fragment.member.profile.MyEventDetailFragment;
+import org.upesacm.acmacmw.fragment.member.profile.MyEventsFragment;
 import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
+import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.SessionManager;
 
@@ -23,9 +26,11 @@ public class ProfileActivity extends AppCompatActivity implements
         UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
-        LoginFragment.InteractionListener {
+        LoginFragment.InteractionListener ,
+        MyEventDetailFragment.FragmentInteractionListener {
     public static final String SELECTED_OPT_KEY = "selected opt key";
     public static final int PRIVILEGED_ACTION_REQUEST = 3;
+
     private FrameLayout frameLayout;
     private int selectedOptId;
     @Override
@@ -48,21 +53,23 @@ public class ProfileActivity extends AppCompatActivity implements
 
     void updateUI() {
         switch (selectedOptId) {
-            case ProfileFragment.MY_PROFILE: {
+            case ProfileFragment.MY_PROFILE:
+            case ProfileFragment.PROFILE_IMAGE: {
                 if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
                     setCurrentFragment(UserProfileFragment.newInstance(SessionManager.getInstance().getLoggedInMember()),false);
                 else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE)
                     requestUserAuthentication();
                 break;
             }
-            case ProfileFragment.PROFILE_IMAGE: {
-                if(SessionManager.getInstance().getSessionID() == SessionManager.NONE) {
-                    requestUserAuthentication();
-                }
-                break;
-            }
             case PRIVILEGED_ACTION_REQUEST: {
                 requestUserAuthentication();
+                break;
+            }
+            case ProfileFragment.MY_EVENTS: {
+                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                    setCurrentFragment(MyEventsFragment.newInstance(),false);
+                else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE)
+                    requestUserAuthentication();
                 break;
             }
             default: {
@@ -177,6 +184,7 @@ public class ProfileActivity extends AppCompatActivity implements
             case LoginFragment.LOGIN_SUCCESSFUL: {
                 msg = "Login Successful";
                 this.finish();
+                ///
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
@@ -209,5 +217,10 @@ public class ProfileActivity extends AppCompatActivity implements
             }
         }
         Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onClickRegister(Event event) {
+
     }
 }

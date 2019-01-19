@@ -162,6 +162,12 @@ public class LeaderboardActivity extends AppCompatActivity {
         searchView.setVisibility(View.VISIBLE);
         searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
         searchView.setQueryHint("Enter SapId");
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerView.smoothScrollToPosition(3);
+            }
+        });
         return true;
     }
 }
