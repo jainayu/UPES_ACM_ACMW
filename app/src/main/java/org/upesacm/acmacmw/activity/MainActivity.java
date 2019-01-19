@@ -1,6 +1,5 @@
 package org.upesacm.acmacmw.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,15 +9,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
-
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
 import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.sponsors.SponsorsFragment;
 import org.upesacm.acmacmw.fragment.homepage.MenuFragment;
@@ -27,12 +21,6 @@ import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
 import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
 import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.model.Event;
-import org.upesacm.acmacmw.util.OTPSender;
-import org.upesacm.acmacmw.retrofit.HomePageClient;
-import org.upesacm.acmacmw.retrofit.MembershipClient;
-
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements
         BottomNavigationView.OnNavigationItemSelectedListener,
@@ -168,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onProfileFragmentInteraction(int selectedOptId) {
         Log.i(TAG,"onProfileFragmentInteraction");
         Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
-        profileActivityIntent.putExtra(ProfileFragment.SELECTED_OPT_KEY, selectedOptId);
+        profileActivityIntent.putExtra(ProfileActivity.SELECTED_OPT_KEY, selectedOptId);
         startActivity(profileActivityIntent);
     }
 
@@ -185,7 +173,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onPostFragmentInteraction(int code,Bundle data) {
         switch (code) {
             case PostsFragment.REQUEST_AUTHENTICATION: {
-                setCurrentFragment(LoginFragment.newInstance(),false);
+                Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
+                profileActivityIntent.putExtra(ProfileActivity.SELECTED_OPT_KEY, ProfileActivity.PRIVILEGED_ACTION_REQUEST);
+                startActivity(profileActivityIntent);
                 break;
             }
             case PostsFragment.UPLOAD_IMAGE: {
