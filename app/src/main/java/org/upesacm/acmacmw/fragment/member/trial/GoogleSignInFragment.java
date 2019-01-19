@@ -35,21 +35,21 @@ public class GoogleSignInFragment extends Fragment
 
     SignInButton signInButton;
     EditText editTextSap;
-
     GoogleSignInClient signInClient;
-    MainActivity callback;
     String sap;
-
     private GoogleSignInListener listener;
     public GoogleSignInFragment() {
         // Required empty public constructor
     }
 
+    public static GoogleSignInFragment newInstance() {
+        return new GoogleSignInFragment();
+    }
+
     @Override
     public void onAttach(Context context) {
-        if(context instanceof MainActivity) {
-            callback = (MainActivity)context;
-            listener = callback.getUserController();
+        if(context instanceof GoogleSignInListener) {
+            listener = (GoogleSignInListener)context;
             super.onAttach(context);
         }
         else
