@@ -27,6 +27,7 @@ import java.util.List;
 public class ProfileFragment extends Fragment {
     public static final int PROFILE_IMAGE = 1;
     public static final int MY_PROFILE = 2;
+    public static final int PRIVILEGED_ACTION_REQUEST = 3;
     public static final int MY_EVENTS = 4;
     private Toolbar toolbar;
     private OnFragmentInteractionListener listener;

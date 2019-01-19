@@ -27,9 +27,11 @@ import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
 import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.retrofit.ResponseModel;
+import org.upesacm.acmacmw.util.Config;
 import org.upesacm.acmacmw.util.UploadService;
 
 import java.io.ByteArrayOutputStream;
@@ -274,7 +276,7 @@ public class UserProfileFragment extends Fragment implements
         RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
 // Change base URL to your upload server URL.
         final MembershipClient membershipClient = RetrofitHostingerApiClient.getInstance().create(MembershipClient.class);
-        membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
+        membershipClient.uploadFile(name,filePart,Config.AUTH_TOKEN).enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
                 Log.d("Tag", "code" + response.code() + "");
@@ -288,12 +290,7 @@ public class UserProfileFragment extends Fragment implements
 
                             final Member newMember=new Member.Builder(member).setProfilePicture(uri).build();
 
-                            retrofit=new Retrofit.Builder()
-                                    .baseUrl(BASE_URL)
-                                    .addConverterFactory(JacksonConverterFactory.create())
-                                    .build();
-                            MembershipClient membershipClient1=retrofit.create(MembershipClient.class);
-                            membershipClient1.createMember(newMember.getSap(),newMember).enqueue(new Callback<Member>() {
+                            RetrofitFirebaseApiClient.getInstance().getMembershipClient().createMember(newMember.getSap(),newMember,Config.AUTH_TOKEN).enqueue(new Callback<Member>() {
                                 @Override
                                 public void onResponse(Call<Member> call, Response<Member> response) {
                                     if(response.code()==200)

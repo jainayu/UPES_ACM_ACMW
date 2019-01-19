@@ -1,5 +1,6 @@
 package org.upesacm.acmacmw.activity;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -9,9 +10,11 @@ import android.widget.FrameLayout;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.homepage.MenuFragment;
+import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.fragment.menu.ContactUsFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
 import org.upesacm.acmacmw.fragment.navdrawer.AlumniFragment;
+import org.upesacm.acmacmw.fragment.navdrawer.PolicyFragment;
 
 public class MenuActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -39,10 +42,18 @@ public class MenuActivity extends AppCompatActivity {
         state.putInt(MenuFragment.SELECTED_MENU_ITEM_KEY,selectedMenu);
     }
     void updateUI() {
+
+
         switch (selectedMenu) {
             case MenuFragment.ACTION_ALUMNI : {
                 setCurrentFragment(new AlumniFragment(),false);
                 getSupportActionBar().setTitle("Alumni");
+                break;
+            }
+            case MenuFragment.ACTION_NEW_REGISTRATION: {
+                Intent memberRegistrationActIntent = new Intent(this,MemberRegistrationActivity.class);
+                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
+                startActivity(memberRegistrationActIntent);
                 break;
             }
             case MenuFragment.ACTION_ABOUT_US: {
@@ -53,6 +64,10 @@ public class MenuActivity extends AppCompatActivity {
             case MenuFragment.ACTION_CONTACT_US: {
                 setCurrentFragment(new ContactUsFragment(),false);
                 getSupportActionBar().setTitle("Contact Us");
+                break;
+            }
+            case MenuFragment.ACTION_PRIVACY_POLICY: {
+                setCurrentFragment(PolicyFragment.newInstance(),false);
                 break;
             }
             default: { 

@@ -34,6 +34,7 @@ import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
+import org.upesacm.acmacmw.util.Config;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
@@ -295,7 +296,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                     .setSap(sap)
                     .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap),6))
                     .build();
-            RetrofitFirebaseApiClient.getInstance().getHomePageClient().getTrialMember(sap)
+            RetrofitFirebaseApiClient.getInstance().getHomePageClient().getTrialMember(sap,Config.AUTH_TOKEN)
                     .enqueue(new Callback<TrialMember>() {
                         @Override
                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
@@ -311,7 +312,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                             else {
                                 trialMember = newTrialMember;
                             }
-                            RetrofitFirebaseApiClient.getInstance().getHomePageClient().createTrialMember(sap,trialMember)
+                            RetrofitFirebaseApiClient.getInstance().getHomePageClient().createTrialMember(sap,trialMember, Config.AUTH_TOKEN)
                                     .enqueue(new Callback<TrialMember>() {
                                         @Override
                                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {

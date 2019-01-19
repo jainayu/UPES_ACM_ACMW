@@ -1,7 +1,5 @@
 package org.upesacm.acmacmw.activity;
 
-import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
+import org.upesacm.acmacmw.fragment.homepage.HomePageFragment;
 import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
 import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
 
@@ -27,14 +25,19 @@ public class HomePageActivity extends AppCompatActivity implements
         if(args == null) {
             args = savedInstanceState;
         }
-        selectedOpt = args.getInt(PostsFragment.INTERACTION_CODE_KEY);
+        selectedOpt = args.getInt(HomePageFragment.INTERACTION_CODE_KEY);
         updateUI();
     }
 
     private void updateUI() {
         switch (selectedOpt) {
-            case PostsFragment.REQUEST_AUTHENTICATION: {
+            case HomePageFragment.REQUEST_AUTHENTICATION: {
                 setCurrentFragment(LoginFragment.newInstance(),false);
+                break;
+            }
+            case HomePageFragment.UPLOAD_IMAGE: {
+                Bundle data = getIntent().getExtras().getBundle(ImageUploadFragment.UPLOAD_DATA_KEY);
+                setCurrentFragment(ImageUploadFragment.newInstance(data),false);
                 break;
             }
             default: {
@@ -63,5 +66,6 @@ public class HomePageActivity extends AppCompatActivity implements
         else if(resultCode == ImageUploadFragment.UPLOAD_CANCEL_OPERATION_FAILED)
             msg="Upload cancel failed";
         Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
+        this.finish();
     }
 }

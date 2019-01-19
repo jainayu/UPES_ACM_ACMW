@@ -20,7 +20,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -44,8 +43,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.MainActivity;
-import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
 import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
 import org.upesacm.acmacmw.util.SessionManager;
 import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
@@ -53,7 +50,6 @@ import org.upesacm.acmacmw.listener.OnLoadMoreListener;
 import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.model.TrialMember;
-import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.util.Config;
 
 import java.io.ByteArrayOutputStream;
@@ -78,13 +74,13 @@ import static android.app.Activity.RESULT_OK;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 
-public class PostsFragment extends Fragment
+public class HomePageFragment extends Fragment
         implements OnLoadMoreListener,
         Callback<HashMap<String,Post>>,
         ValueEventListener,
         View.OnClickListener,
         OnRecyclerItemSelectListener<Post> {
-    public static final String TAG = "PostsFragment";
+    public static final String TAG = "HomePageFragment";
     public static final String INTERACTION_CODE_KEY = "interaction code key";
     public static final int REQUEST_AUTHENTICATION = 1;
     public static final int UPLOAD_IMAGE = 2;
@@ -106,7 +102,7 @@ public class PostsFragment extends Fragment
     boolean viewAlive;
     private Toolbar toolbar;
 
-    public PostsFragment() {
+    public HomePageFragment() {
         // Required empty public constructor
     }
 
@@ -185,7 +181,7 @@ public class PostsFragment extends Fragment
             @Override
             public void onRefresh() {
                 if(postsReference!=null)
-                    postsReference.addValueEventListener(PostsFragment.this);
+                    postsReference.addValueEventListener(HomePageFragment.this);
             }
         });
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -395,7 +391,7 @@ public class PostsFragment extends Fragment
                 && ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)) {
             System.out.println("Permission for camera or storage not granted. Requesting Permission");
             requestPermissions(new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PostsFragment.CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE);
+                    HomePageFragment.CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE);
 
             return;
         }
@@ -412,7 +408,7 @@ public class PostsFragment extends Fragment
                     Intent intent = new Intent();
                     intent.setType("image/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    PostsFragment.this.startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_FROM_GALLERY);
+                    HomePageFragment.this.startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_FROM_GALLERY);
                 } else if (options[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
@@ -784,7 +780,7 @@ public class PostsFragment extends Fragment
                     postReference.setValue(nullPost);
 
                     recyclerViewAdapter.removePost(post.getPostId());
-                    Toast.makeText(PostsFragment.this.getContext(),"Deleted Sucessfully by Post Controller",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomePageFragment.this.getContext(),"Deleted Sucessfully by Post Controller",Toast.LENGTH_SHORT).show();
                 }
             });
             alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

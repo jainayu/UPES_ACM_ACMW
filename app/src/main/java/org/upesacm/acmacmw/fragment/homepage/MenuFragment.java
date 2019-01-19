@@ -21,8 +21,10 @@ import java.util.List;
 public class MenuFragment extends Fragment {
     public static final String SELECTED_MENU_ITEM_KEY = "selected menu item key";
     public static final int ACTION_ALUMNI = 1;
-    public static final int ACTION_ABOUT_US = 2;
-    public static final int ACTION_CONTACT_US = 3;
+    public static final int ACTION_NEW_REGISTRATION = 2;
+    public static final int ACTION_ABOUT_US = 3;
+    public static final int ACTION_CONTACT_US = 4;
+    public static final int ACTION_PRIVACY_POLICY = 5;
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
@@ -64,8 +66,10 @@ public class MenuFragment extends Fragment {
 
         toolbar.setTitle("Menu");
         recyclerViewAdapter.addMenuItem("Alumni");
+        recyclerViewAdapter.addMenuItem("New Registration");
         recyclerViewAdapter.addMenuItem("About Us");
         recyclerViewAdapter.addMenuItem("Contact Us");
+        recyclerViewAdapter.addMenuItem("Privacy Policy");
         return view;
     }
 
@@ -122,13 +126,20 @@ public class MenuFragment extends Fragment {
                     menuItemId = ACTION_ALUMNI;
                     break;
                 }
-
                 case 1 : {
-                    menuItemId = ACTION_ABOUT_US;
+                    menuItemId = ACTION_NEW_REGISTRATION;
                     break;
                 }
                 case 2 : {
+                    menuItemId = ACTION_ABOUT_US;
+                    break;
+                }
+                case 3 : {
                     menuItemId = ACTION_CONTACT_US;
+                    break;
+                }
+                case 4 : {
+                    menuItemId = ACTION_PRIVACY_POLICY;
                     break;
                 }
                 default : {

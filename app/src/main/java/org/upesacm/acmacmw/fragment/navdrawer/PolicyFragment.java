@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment;
+package org.upesacm.acmacmw.fragment.navdrawer;
 
 
 import android.os.Bundle;
@@ -36,6 +36,9 @@ public class PolicyFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static PolicyFragment newInstance() {
+        return new PolicyFragment();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

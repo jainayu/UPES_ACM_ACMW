@@ -29,7 +29,6 @@ public class ProfileActivity extends AppCompatActivity implements
         LoginFragment.InteractionListener ,
         MyEventDetailFragment.FragmentInteractionListener {
     public static final String SELECTED_OPT_KEY = "selected opt key";
-    public static final int PRIVILEGED_ACTION_REQUEST = 3;
 
     private FrameLayout frameLayout;
     private int selectedOptId;
@@ -61,7 +60,7 @@ public class ProfileActivity extends AppCompatActivity implements
                     requestUserAuthentication();
                 break;
             }
-            case PRIVILEGED_ACTION_REQUEST: {
+            case ProfileFragment.PRIVILEGED_ACTION_REQUEST: {
                 requestUserAuthentication();
                 break;
             }

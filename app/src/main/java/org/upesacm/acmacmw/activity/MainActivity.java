@@ -10,24 +10,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.fragment.homepage.HomePageFragment;
 import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.sponsors.SponsorsFragment;
 import org.upesacm.acmacmw.fragment.homepage.MenuFragment;
 import org.upesacm.acmacmw.fragment.homepage.EventsListFragment;
 import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
-import org.upesacm.acmacmw.fragment.homepage.PostsFragment;
 import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
 import org.upesacm.acmacmw.model.Event;
+import org.upesacm.acmacmw.util.Config;
 
 public class MainActivity extends AppCompatActivity implements
         BottomNavigationView.OnNavigationItemSelectedListener,
         EventsListFragment.FragmentInteractionListener,
         MenuFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
-        PostsFragment.FragmentInteractionListener {
+        HomePageFragment.FragmentInteractionListener {
     public static final String TAG = "MainActivity";
     public static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
     public static final String EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY = "event activity current fragment key";
@@ -45,11 +54,68 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_home_page);
 
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(currentUser==null)
+        {
+            FirebaseAuth.getInstance().signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("tag", "signInAnonymously:success");
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                user.getIdToken(true)
+                                        .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                                            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                                                if (task.isSuccessful()) {
+                                                    String idToken = task.getResult().getToken();
+                                                    Config.AUTH_TOKEN=idToken;
+                                                    // ...
+                                                } else {
+                                                    // Handle error -> task.getException();
+                                                    Config.AUTH_TOKEN=null;
+                                                }
+                                            }
+                                        });
+
+                                startApp();
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("tag", "signInAnonymously:failure", task.getException());
+                                Toast.makeText(MainActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+        else {
+            Log.d("tag", "Already Signed in :success");
+            currentUser.getIdToken(true)
+                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        public void onComplete(@NonNull Task<GetTokenResult> task) {
+                            if (task.isSuccessful()) {
+                                String idToken = task.getResult().getToken();
+                                Config.AUTH_TOKEN=idToken;
+                                // ...
+                            } else {
+                                // Handle error -> task.getException();
+                                Config.AUTH_TOKEN=null;
+                            }
+                        }
+                    });
+            startApp();
+        }
+
+
+    }
+
+    void startApp() {
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         frameLayout = findViewById(R.id.frame_layout_homepage);
         switch(selectedFragmentId) {
             case POSTS_FRAGMENT_ID : {
-                setCurrentFragment(new PostsFragment(),false);
+                setCurrentFragment(new HomePageFragment(),false);
                 break;
             }
             case EVENTS_FRAGMENT_ID : {
@@ -69,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
             default : {
-                setCurrentFragment(new PostsFragment(),false);
+                setCurrentFragment(new HomePageFragment(),false);
                 break;
             }
         }
@@ -99,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.action_posts : {
                 selectedFragmentId = POSTS_FRAGMENT_ID;
-                setCurrentFragment(new PostsFragment(),false);
+                setCurrentFragment(new HomePageFragment(),false);
                 break;
             }
             case R.id.action_upcoming_events : {
@@ -172,14 +238,17 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onPostFragmentInteraction(int code,Bundle data) {
         switch (code) {
-            case PostsFragment.REQUEST_AUTHENTICATION: {
+            case HomePageFragment.REQUEST_AUTHENTICATION: {
                 Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
-                profileActivityIntent.putExtra(ProfileActivity.SELECTED_OPT_KEY, ProfileActivity.PRIVILEGED_ACTION_REQUEST);
+                profileActivityIntent.putExtra(ProfileActivity.SELECTED_OPT_KEY, ProfileFragment.PRIVILEGED_ACTION_REQUEST);
                 startActivity(profileActivityIntent);
                 break;
             }
-            case PostsFragment.UPLOAD_IMAGE: {
-                setCurrentFragment(ImageUploadFragment.newInstance(data),false);
+            case HomePageFragment.UPLOAD_IMAGE: {
+                Intent homePageActivityIntent = new Intent(this, HomePageActivity.class);
+                homePageActivityIntent.putExtra(HomePageFragment.INTERACTION_CODE_KEY, HomePageFragment.UPLOAD_IMAGE);
+                homePageActivityIntent.putExtra(ImageUploadFragment.UPLOAD_DATA_KEY,data);
+                startActivity(homePageActivityIntent);
                 break;
             }
             default: {

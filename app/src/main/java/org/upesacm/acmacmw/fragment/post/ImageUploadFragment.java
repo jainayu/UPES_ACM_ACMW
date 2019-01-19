@@ -52,7 +52,7 @@ import retrofit2.Response;
 public class ImageUploadFragment extends Fragment implements
         View.OnClickListener,
         Callback<Post> {
-
+    public static final String UPLOAD_DATA_KEY = "upload data key";
     public static final int UPLOAD_SUCCESSFUL = 1;
     public static final int UPLOAD_CANCELLED = 2;
     public static final int UPLOAD_CANCEL_OPERATION_FAILED = 4;
