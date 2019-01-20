@@ -5,9 +5,12 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.fragment.menu.PolicyFragment;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
@@ -39,7 +43,7 @@ public class MemberRegistrationFragment extends Fragment implements
 
     EditText editTextName,editTextSap,editTextContact,editTextEmail,
             editTextYear,editTextBranch,editTextWhatsappNo,editTextCurrentAddress;
-    TextView textViewDob;
+    TextView textViewDob, textViewPolicy;
     RadioGroup radioGroupMembership;
     Button buttonRegister;
     Button buttonVerifyOTP;
@@ -90,7 +94,8 @@ public class MemberRegistrationFragment extends Fragment implements
        editTextWhatsappNo=view.findViewById(R.id.editText_whatsappno);
        textViewDob =  view.findViewById(R.id.textView_dob);
        editTextCurrentAddress = view.findViewById(R.id.editText_hosteladd);
-
+       textViewPolicy = view.findViewById(R.id.textView_Policy);
+       textViewPolicy.setPaintFlags(textViewPolicy.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
        final int minAge = 13; //Mininimum age of person to register
        textViewDob.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +114,18 @@ public class MemberRegistrationFragment extends Fragment implements
            }
        });
 
+       textViewPolicy.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               Fragment fragment = new PolicyFragment();
+               FragmentManager manager = getActivity().getSupportFragmentManager();
+               FragmentTransaction transaction = manager.beginTransaction();
+               transaction.replace(((ViewGroup)getView().getParent()).getId(), fragment);
+               transaction.addToBackStack(null);
+               transaction.commit();
+           }
+       });
+
        radioGroupMembership = view.findViewById(R.id.radio_group_membership);
        radioGroupMembership.check(R.id.radio_button_premium);
 
@@ -116,6 +133,8 @@ public class MemberRegistrationFragment extends Fragment implements
        buttonVerifyOTP = view.findViewById(R.id.button_registration_verify_otp);
        buttonRegister.setOnClickListener(this);
        buttonVerifyOTP.setOnClickListener(this);
+
+
 
        Bundle args = getArguments();
        if(args!=null) {
