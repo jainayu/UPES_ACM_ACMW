@@ -26,7 +26,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.EventActivity;
+import org.upesacm.acmacmw.activity.EventModuleActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
@@ -59,12 +59,12 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof EventActivity) {
+        if(context instanceof EventModuleActivity) {
             listener = (FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of EventActivity");
+            throw new IllegalStateException(context+" must be instance of EventModuleActivity");
         }
     }
 

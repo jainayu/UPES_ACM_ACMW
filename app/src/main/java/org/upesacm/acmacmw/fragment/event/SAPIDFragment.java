@@ -21,13 +21,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.EventActivity;
+import org.upesacm.acmacmw.activity.EventModuleActivity;
 import org.upesacm.acmacmw.model.Event;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -47,12 +46,12 @@ public class SAPIDFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof EventActivity) {
+        if(context instanceof EventModuleActivity) {
             listener = (FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of EventActivity");
+            throw new IllegalStateException(context+" must be instance of EventModuleActivity");
         }
     }
 

@@ -1,6 +1,5 @@
 package org.upesacm.acmacmw.activity;
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,8 +8,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -41,17 +38,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EventActivity extends AppCompatActivity implements
+public class EventModuleActivity extends AppCompatActivity implements
         EventDetailFragment.FragmentInteractionListener,
         ParticipantDetailFragment.FragmentInteractionListener,
         SAPIDFragment.FragmentInteractionListener,
         RecipientSelectFragment.FragmentInteractionListener,
         OtpConfirmationFragment.OnFragmentInteractionListener,
         PaymentDetailsFragment.OnFragmentInteractionListener {
-    public static final String TAG = "EventActivity";
+    public static final String TAG = "EventModuleActivity";
     private static final String REGISTERED_EVENT_KEY = "registered event key";
     private static final String PARTICIPANTS_KEY = "participants key";
     private static final String CONTEXT_TEAM_KEY = "team key";
+    private static final String TEMP_STORAGE_KEY = "temp storage key";
     Bundle tempStorage = new Bundle();
     FrameLayout frameLayout;
     @Override
@@ -61,6 +59,10 @@ public class EventActivity extends AppCompatActivity implements
 
         frameLayout = findViewById(R.id.frame_layout_event_activity);
         Bundle args = getIntent().getExtras();
+        if(args==null) {
+            args = savedInstanceState;
+            tempStorage = args.getBundle(TEMP_STORAGE_KEY);
+        }
         if(args!=null) {
             int fragmentId = args.getInt(MainActivity.EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY);
             Event event = args.getParcelable(Event.PARCEL_KEY);
@@ -87,7 +89,7 @@ public class EventActivity extends AppCompatActivity implements
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-
+        state.putParcelable(TEMP_STORAGE_KEY,tempStorage);
     }
 
 
@@ -249,7 +251,7 @@ public class EventActivity extends AppCompatActivity implements
                             setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl),true);
                         } else {
                             Log.e(TAG,"Failed to save the generated otp");
-                            Toast.makeText(EventActivity.this,"network error",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EventModuleActivity.this,"network error",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -274,7 +276,7 @@ public class EventActivity extends AppCompatActivity implements
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(EventActivity.this, "Registration Successful", Toast.LENGTH_SHORT)
+                                Toast.makeText(EventModuleActivity.this, "Registration Successful", Toast.LENGTH_SHORT)
                                         .show();
 
                                 int entryId = getSupportFragmentManager().getBackStackEntryAt(0)

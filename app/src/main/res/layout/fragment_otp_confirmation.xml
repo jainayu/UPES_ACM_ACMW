@@ -53,9 +53,12 @@
     <Button
         android:id="@+id/button_frag_otp_confirmation_submit"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:background="@drawable/round_button_blue"
         android:text="Submit"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/text_input_layout_otp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

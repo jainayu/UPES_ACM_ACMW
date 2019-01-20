@@ -49,17 +49,17 @@
         </provider>
 
         <activity
-            android:name=".activity.EventActivity"
+            android:name=".activity.EventModuleActivity"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.ProfileActivity"
+            android:name=".activity.ProfileDetailsActivity"
             android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".activity.HomePageActivity"
             android:parentActivityName=".activity.MainActivity" />
         <activity
-            android:name=".activity.MenuActivity"
+            android:name=".activity.MenuDetailsActivity"
             android:parentActivityName=".activity.MainActivity" />
         <activity android:name=".activity.MemberRegistrationActivity"></activity>
         <activity android:name=".activity.LeaderboardActivity">

@@ -15,7 +15,7 @@ import org.upesacm.acmacmw.fragment.menu.AboutFragment;
 import org.upesacm.acmacmw.fragment.menu.AlumniFragment;
 import org.upesacm.acmacmw.fragment.menu.PolicyFragment;
 
-public class MenuActivity extends AppCompatActivity {
+public class MenuDetailsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private FrameLayout frameLayout;
     private int selectedMenu;

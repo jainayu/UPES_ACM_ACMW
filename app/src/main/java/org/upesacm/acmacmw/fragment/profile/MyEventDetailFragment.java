@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.ProfileActivity;
+import org.upesacm.acmacmw.activity.ProfileDetailsActivity;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Config;
 
@@ -58,13 +58,13 @@ public class MyEventDetailFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
 
-        if(context instanceof ProfileActivity) {
+        if(context instanceof ProfileDetailsActivity) {
             fragmentInteractionListener = (FragmentInteractionListener)context;
 
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException(context+" must be instance of ProfileActivity");
+            throw new IllegalStateException(context+" must be instance of ProfileDetailsActivity");
         }
     }
 

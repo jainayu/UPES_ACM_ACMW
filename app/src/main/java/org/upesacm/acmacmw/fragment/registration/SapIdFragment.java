@@ -50,12 +50,11 @@ public class SapIdFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_sap_id, container, false);
+        View view = inflater.inflate(R.layout.fragment_new_reg_sap_id, container, false);
         toolbar = view.findViewById(R.id.toolbar_frag_sap_id);
         toolbar.setTitle("Enter Your SAP ID");
-        toolbar.inflateMenu(R.menu.sapid_frag_toolbar_menu);
         textInputLayout = view.findViewById(R.id.text_inpl_frag_sap_id);
-        toolbar.inflateMenu(R.menu.mem_reg_sap_id_frag_toolbar_menu);
+        toolbar.inflateMenu(R.menu.toolbar_menu_frag_new_reg_sap_id);
         textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

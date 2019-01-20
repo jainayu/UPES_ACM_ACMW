@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.EventActivity;
 import org.upesacm.acmacmw.model.Member;
 
 /**

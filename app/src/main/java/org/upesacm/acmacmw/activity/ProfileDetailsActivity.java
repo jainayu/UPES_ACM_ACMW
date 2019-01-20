@@ -31,7 +31,7 @@ import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.SessionManager;
 
-public class ProfileActivity extends AppCompatActivity implements
+public class ProfileDetailsActivity extends AppCompatActivity implements
         UserProfileFragment.FragmentInteractionListener,
         EditProfileFragment.FragmentInteractionListener,
         PasswordChangeDialogFragment.PasswordChangeListener,
@@ -112,9 +112,9 @@ public class ProfileActivity extends AppCompatActivity implements
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 SessionManager.getInstance().destroySession();
                                 getSupportFragmentManager().popBackStack();
-                                Toast.makeText(ProfileActivity.this,"Successfully Logged Out",
+                                Toast.makeText(ProfileDetailsActivity.this,"Successfully Logged Out",
                                         Toast.LENGTH_SHORT).show();
-                                ProfileActivity.this.finish();
+                                ProfileDetailsActivity.this.finish();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -249,7 +249,7 @@ public class ProfileActivity extends AppCompatActivity implements
                 if(task.isSuccessful())
                 {
                     progressDialog.dismiss();
-                    Toast.makeText(ProfileActivity.this, "Password Changed Successfully,Login Now", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileDetailsActivity.this, "Password Changed Successfully,Login Now", Toast.LENGTH_SHORT).show();
                 }
             }
         });

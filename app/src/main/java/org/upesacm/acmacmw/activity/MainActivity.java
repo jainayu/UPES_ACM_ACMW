@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onClickEventDetails(Event event) {
-        Intent eventActIntent = new Intent(this,EventActivity.class);
+        Intent eventActIntent = new Intent(this,EventModuleActivity.class);
         eventActIntent.putExtra(Event.PARCEL_KEY,event);
         eventActIntent.putExtra(EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY,R.layout.fragment_event_detail);
         startActivity(eventActIntent);
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
             startActivity(memberRegistrationActIntent);
         }
         else {
-            Intent menuActivityIntent = new Intent(this,MenuActivity.class);
+            Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);
             menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
             startActivity(menuActivityIntent);
         }
@@ -230,8 +230,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onProfileFragmentInteraction(int selectedOptId) {
         Log.i(TAG,"onProfileFragmentInteraction");
-        Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
-        profileActivityIntent.putExtra(ProfileActivity.SELECTED_OPT_KEY, selectedOptId);
+        Intent profileActivityIntent = new Intent(this, ProfileDetailsActivity.class);
+        profileActivityIntent.putExtra(ProfileDetailsActivity.SELECTED_OPT_KEY, selectedOptId);
         startActivity(profileActivityIntent);
     }
 
@@ -248,8 +248,8 @@ public class MainActivity extends AppCompatActivity implements
     public void onPostFragmentInteraction(int code,Bundle data) {
         switch (code) {
             case HomePageFragment.REQUEST_AUTHENTICATION: {
-                Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
-                profileActivityIntent.putExtra(ProfileActivity.SELECTED_OPT_KEY, ProfileFragment.PRIVILEGED_ACTION_REQUEST);
+                Intent profileActivityIntent = new Intent(this, ProfileDetailsActivity.class);
+                profileActivityIntent.putExtra(ProfileDetailsActivity.SELECTED_OPT_KEY, ProfileFragment.PRIVILEGED_ACTION_REQUEST);
                 startActivity(profileActivityIntent);
                 break;
             }
