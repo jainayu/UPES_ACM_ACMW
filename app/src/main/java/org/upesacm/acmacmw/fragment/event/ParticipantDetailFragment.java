@@ -243,7 +243,6 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
                                                 recyclerViewAdpater.notifyDataSetChanged();
                                                 showProgress(false);
                                             } else {
-                                                Toast.makeText(getContext(),"calling callback",Toast.LENGTH_SHORT).show();
                                                 listener.onParticipantDetailsAvailable(newSapIds,acmParticipantsSap,alreadyRegistered,participants,event,false);
                                             }
                                         }

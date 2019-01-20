@@ -260,6 +260,7 @@ public class HomePageFragment extends Fragment
             else {
                /* LoginFragment loginDialogFragment =new LoginFragment();
                 loginDialogFragment.show(getActivity().getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));*/
+                interactionListener.onPostFragmentInteraction(REQUEST_AUTHENTICATION,null);
                 Toast.makeText(getContext(), "Please Login First", Toast.LENGTH_SHORT).show();
             }
         }
@@ -732,9 +733,9 @@ public class HomePageFragment extends Fragment
             SessionManager sessionManager = SessionManager.getInstance();
             if(sessionManager.isSessionAlive()) {
                 String loggedInUserSap = null;
-                if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID)
+                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
                     loggedInUserSap = SessionManager.getInstance().getLoggedInMember().getSap();
-                else if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID)
                     loggedInUserSap = SessionManager.getInstance().getGuestMember().getSap();
 
                 int noOfLikes = post.getLikesIds().size();

@@ -107,7 +107,7 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
             this.textViewMonth=itemView.findViewById(R.id.textview_month);
             this.textViewTagline=itemView.findViewById(R.id.textview_tagline);
             this.imageViewCover=itemView.findViewById(R.id.image_view_cover);
-            buttonDetails.setOnClickListener(this);
+            itemView.setOnClickListener(this);
         }
 
         public void bindData(Event event, int position) {

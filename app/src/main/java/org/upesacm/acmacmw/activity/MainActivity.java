@@ -213,9 +213,18 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onMenuItemSelected(int menuItemId) {
-        Intent menuActivityIntent = new Intent(this,MenuActivity.class);
-        menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
-        startActivity(menuActivityIntent);
+        if(menuItemId==MenuFragment.ACTION_NEW_REGISTRATION)
+        {
+            Intent memberRegistrationActIntent = new Intent(this,MemberRegistrationActivity.class);
+            memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
+            startActivity(memberRegistrationActIntent);
+        }
+        else {
+            Intent menuActivityIntent = new Intent(this,MenuActivity.class);
+            menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
+            startActivity(menuActivityIntent);
+        }
+
     }
 
     @Override

@@ -147,7 +147,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                         }
                                     });
                         } else {
-                            Toast.makeText(MemberRegistrationActivity.this,"Alread a Member",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MemberRegistrationActivity.this,"Already a Member",Toast.LENGTH_SHORT).show();
                         }
                     }
 

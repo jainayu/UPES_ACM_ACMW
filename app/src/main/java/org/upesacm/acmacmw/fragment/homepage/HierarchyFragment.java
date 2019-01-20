@@ -33,7 +33,7 @@ public class HierarchyFragment extends Fragment {
         TextView textViewAvailable = view.findViewById(R.id.text_view_hierarchy_available);
         TextView textViewNoAvailabe = view.findViewById(R.id.text_view_hierarchy_not_available);
         toolbar = view.findViewById(R.id.toolbar_frag_hierarchy);
-        toolbar.setTitle("Hierarchy");
+        toolbar.setTitle("Our Team");
         Typeface regular = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
         textViewAvailable.setTypeface(regular);
         textViewNoAvailabe.setTypeface(regular);

@@ -81,9 +81,6 @@ public class MyEventsFragment extends Fragment implements MyEventDetailFragment.
                 bundle.putParcelable(Event.PARCEL_KEY,dataItem);
                 myEventDetailFragment.setArguments(bundle);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout_activity_profile,myEventDetailFragment).addToBackStack(null).commit();
-
-
-                Toast.makeText(getContext(), "Clicked on event" + dataItem.getEventName(), Toast.LENGTH_SHORT).show();
             }
         });
         // fix if user has no events

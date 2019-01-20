@@ -17,7 +17,7 @@
     <item
         android:id="@+id/action_heirarchy"
         android:icon="@drawable/ic_supervisor_account_black_24dp"
-        android:title="Hierarchy"
+        android:title="Our Team"
         app:showAsAction="withText" />
 
     <item
