@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="TextView"
+
             app:layout_constraintBottom_toBottomOf="@+id/image_button_card_view"
             app:layout_constraintEnd_toEndOf="@+id/text_view__frag_profile_name"
             app:layout_constraintStart_toStartOf="@+id/text_view__frag_profile_name"
@@ -50,7 +50,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:text="TextView"
+
             android:textAlignment="textStart"
             android:textColor="@android:color/black"
             android:textSize="18sp"
@@ -66,17 +66,18 @@
             android:layout_marginTop="32dp"
             android:scaleType="centerCrop"
             android:padding="10dp"
+            app:cardCornerRadius="50dp"
             android:background="@drawable/round_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-
+            app:layout_constraintTop_toTopOf="parent">
             <ImageView
                 android:id="@+id/image_view_frag_profile"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                android:src="@drawable/sign_in"></ImageView>
+                android:scaleType="centerCrop"
+                android:src="@drawable/sign_in">
+            </ImageView>
         </android.support.v7.widget.CardView>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_frag_profile"

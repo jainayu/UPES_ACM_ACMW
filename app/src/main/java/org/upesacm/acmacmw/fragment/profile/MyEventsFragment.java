@@ -28,6 +28,7 @@ import org.upesacm.acmacmw.util.SessionManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,6 +92,12 @@ public class MyEventsFragment extends Fragment implements MyEventDetailFragment.
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         // list of event ids
+                        if(!dataSnapshot.hasChildren())
+                        {
+                            Objects.requireNonNull(getActivity()).onBackPressed();
+                            Toast.makeText(getContext(), "Get Yourself Reistered in Events", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         List<String> eventList = new ArrayList<>();
                         for(DataSnapshot ds : dataSnapshot.getChildren()) {
                             eventList.add(ds.getValue(String.class));

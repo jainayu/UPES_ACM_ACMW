@@ -106,6 +106,7 @@ public class ProfileFragment extends Fragment {
                     .into(imageViewProfile);
             show = true;
         } else {
+            imageViewProfile.setImageResource(R.drawable.sign_in);
             show = false;
         }
         textViewExtra.setVisibility(show?View.VISIBLE:View.GONE);
