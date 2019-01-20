@@ -14,21 +14,18 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
-import org.upesacm.acmacmw.fragment.member.profile.EditProfileFragment;
-import org.upesacm.acmacmw.fragment.member.profile.ForgotPasswordFragment;
-import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
-import org.upesacm.acmacmw.fragment.member.profile.MyEventDetailFragment;
-import org.upesacm.acmacmw.fragment.member.profile.MyEventsFragment;
-import org.upesacm.acmacmw.fragment.member.profile.PasswordChangeDialogFragment;
-import org.upesacm.acmacmw.fragment.member.profile.UserProfileFragment;
+import org.upesacm.acmacmw.fragment.main.ProfileFragment;
+import org.upesacm.acmacmw.fragment.profile.EditProfileFragment;
+import org.upesacm.acmacmw.fragment.profile.ForgotPasswordFragment;
+import org.upesacm.acmacmw.fragment.profile.LoginFragment;
+import org.upesacm.acmacmw.fragment.profile.MyEventDetailFragment;
+import org.upesacm.acmacmw.fragment.profile.MyEventsFragment;
+import org.upesacm.acmacmw.fragment.profile.PasswordChangeDialogFragment;
+import org.upesacm.acmacmw.fragment.profile.UserProfileFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.FirebaseConfig;
@@ -224,6 +221,10 @@ public class ProfileActivity extends AppCompatActivity implements
                 this.finish();
                 msg = "Network Error";
             }
+            case LoginFragment.FORGOT_PASSWORD: {
+                setCurrentFragment(ForgotPasswordFragment.newInstance(),true);
+                break;
+            }
             default:{
                 break;
             }
@@ -234,10 +235,6 @@ public class ProfileActivity extends AppCompatActivity implements
     @Override
     public void onClickRegister(Event event) {
 
-    }
-    @Override
-    public Member getMember(String sapid) {
-        return null;
     }
 
     @Override

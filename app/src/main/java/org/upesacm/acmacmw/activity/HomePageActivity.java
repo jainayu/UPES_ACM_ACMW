@@ -8,9 +8,9 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.homepage.HomePageFragment;
-import org.upesacm.acmacmw.fragment.member.profile.LoginFragment;
-import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
+import org.upesacm.acmacmw.fragment.main.HomePageFragment;
+import org.upesacm.acmacmw.fragment.profile.LoginFragment;
+import org.upesacm.acmacmw.fragment.hompage.ImageUploadFragment;
 
 public class HomePageActivity extends AppCompatActivity implements
         ImageUploadFragment.UploadResultListener {

@@ -9,12 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.homepage.MenuFragment;
-import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
+import org.upesacm.acmacmw.fragment.main.MenuFragment;
 import org.upesacm.acmacmw.fragment.menu.ContactUsFragment;
-import org.upesacm.acmacmw.fragment.navdrawer.AboutFragment;
-import org.upesacm.acmacmw.fragment.navdrawer.AlumniFragment;
-import org.upesacm.acmacmw.fragment.navdrawer.PolicyFragment;
+import org.upesacm.acmacmw.fragment.menu.AboutFragment;
+import org.upesacm.acmacmw.fragment.menu.AlumniFragment;
+import org.upesacm.acmacmw.fragment.menu.PolicyFragment;
 
 public class MenuActivity extends AppCompatActivity {
     private Toolbar toolbar;

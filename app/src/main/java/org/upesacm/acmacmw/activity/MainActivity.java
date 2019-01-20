@@ -21,13 +21,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.homepage.HomePageFragment;
-import org.upesacm.acmacmw.fragment.post.ImageUploadFragment;
-import org.upesacm.acmacmw.fragment.sponsors.SponsorsFragment;
-import org.upesacm.acmacmw.fragment.homepage.MenuFragment;
-import org.upesacm.acmacmw.fragment.homepage.EventsListFragment;
-import org.upesacm.acmacmw.fragment.homepage.HierarchyFragment;
-import org.upesacm.acmacmw.fragment.homepage.ProfileFragment;
+import org.upesacm.acmacmw.fragment.main.HomePageFragment;
+import org.upesacm.acmacmw.fragment.hompage.ImageUploadFragment;
+import org.upesacm.acmacmw.fragment.hompage.SponsorsFragment;
+import org.upesacm.acmacmw.fragment.main.MenuFragment;
+import org.upesacm.acmacmw.fragment.main.EventsListFragment;
+import org.upesacm.acmacmw.fragment.main.HierarchyFragment;
+import org.upesacm.acmacmw.fragment.main.ProfileFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Config;
 
