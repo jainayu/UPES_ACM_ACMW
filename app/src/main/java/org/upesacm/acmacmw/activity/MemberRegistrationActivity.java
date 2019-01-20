@@ -89,6 +89,17 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
         ft.commit();
     }
 
+    void setCurrentFragment(Fragment fragment, boolean addToBackStack, String sapId) {
+        Bundle args = new Bundle();
+        args.putString("sapid", sapId);
+        fragment.setArguments(args);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(frameLayout.getId(),fragment);
+        if(addToBackStack)
+            ft.addToBackStack(null);
+        ft.commit();
+    }
+
     private void sendIDCard(String recipientEmail,String subject,String mailBody) {
         OTPSender sender=new OTPSender();
         sender.execute(mailBody,recipientEmail,subject);
@@ -114,7 +125,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             NewMember newMember = dataSnapshot.getValue(NewMember.class);
                                             if(newMember==null) {
-                                                setCurrentFragment(new MemberRegistrationFragment(),false);
+                                                setCurrentFragment(new MemberRegistrationFragment(),false, sapId);
                                             } else {
                                                 //Retrieve the fee recipient corresponding to the new member sap
                                                 FirebaseDatabase.getInstance().getReference()

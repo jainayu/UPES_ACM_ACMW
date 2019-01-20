@@ -97,6 +97,12 @@ public class MemberRegistrationFragment extends Fragment implements
        textViewPolicy = view.findViewById(R.id.textView_Policy);
        textViewPolicy.setPaintFlags(textViewPolicy.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
+       Bundle bundle = getArguments();
+       String sapId = bundle.getString("sapid");
+       if(sapId == null)
+           sapId = new String();
+       editTextSap.setText(sapId);
+
        final int minAge = 13; //Mininimum age of person to register
        textViewDob.setOnClickListener(new View.OnClickListener() {
            @Override
