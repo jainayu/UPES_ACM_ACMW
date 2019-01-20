@@ -52,7 +52,6 @@ public class ContactUsFragment extends Fragment implements
     ImageView imageViewMembChairPic;
     ImageView imageViewCallPrExec;
     ImageView imageViewCallMembChair;
-    MainActivity callback;
 
     DatabaseReference reference;
 
@@ -163,7 +162,7 @@ public class ContactUsFragment extends Fragment implements
 
     @Override
     public void onDetach() {
-        callback = null;
+
         super.onDetach();
     }
 
@@ -277,7 +276,7 @@ public class ContactUsFragment extends Fragment implements
                             Intent callIntent = new Intent(Intent.ACTION_DIAL);
                             String temp="tel:"+model.getContact();
                             callIntent.setData(Uri.parse(temp));
-                            callback.startActivity(callIntent);
+                            getActivity().startActivity(callIntent);
                         }
                     });
                 } else if (model.getSapId() == 500052158L && getActivity() != null) {
@@ -301,7 +300,7 @@ public class ContactUsFragment extends Fragment implements
                             Intent callIntent = new Intent(Intent.ACTION_DIAL);
                             String temp="tel:"+model.getContact();
                             callIntent.setData(Uri.parse(temp));
-                            callback.startActivity(callIntent);
+                            getActivity().startActivity(callIntent);
                         }
                     });
                 }
