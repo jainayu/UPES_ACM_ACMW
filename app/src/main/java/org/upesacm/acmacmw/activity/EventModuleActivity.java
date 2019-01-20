@@ -225,9 +225,9 @@ public class EventModuleActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onClickNext(Member recipient) {
-        Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
-        int teamId = tempStorage.getInt(CONTEXT_TEAM_KEY);
+    public void onClickNext(final Member recipient) {
+        final Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        final int teamId = tempStorage.getInt(CONTEXT_TEAM_KEY);
         Log.i(TAG,"OnClicknext called "+event.getEventID());
         Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
 
@@ -248,7 +248,26 @@ public class EventModuleActivity extends AppCompatActivity implements
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
-                            setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl),true);
+                            FirebaseDatabase.getInstance().getReference().child(FirebaseConfig.EVENTS_DB)
+                                    .child(FirebaseConfig.EVENTS)
+                                    .child(event.getEventID())
+                                    .child(FirebaseConfig.EVENT_OTPS)
+                                    .child(String.valueOf(teamId))
+                                    .child(FirebaseConfig.TEAM_OTP_RECIPIENT)
+                                    .setValue(recipient.getSap())
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful())
+                                                setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl),true);
+                                            else {
+                                                Log.e(TAG,"Failed to save the recipient sap in database");
+                                                Toast.makeText(EventModuleActivity.this,"network error",Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+
+
                         } else {
                             Log.e(TAG,"Failed to save the generated otp");
                             Toast.makeText(EventModuleActivity.this,"network error",Toast.LENGTH_SHORT).show();

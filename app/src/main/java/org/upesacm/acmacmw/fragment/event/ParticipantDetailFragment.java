@@ -162,7 +162,7 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
 
     void fetchParticipantDetails() {
         Collections.sort(sapIds);
-        //check for already registered to participant database and create a list of already registered members
+        //check for already registered from participant database and create a list of already registered members
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseConfig.EVENTS_DB)
                 .child(FirebaseConfig.PARTICIPANTS)
@@ -183,7 +183,7 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
                             Participant participant=participantMap.get(sapid);
                             if(participant!=null)
                             {
-                                // Check for any dublicate member in the event if found return with toast and end registration process
+                                // Check for any duplicate member in the event if found return with toast and end registration process
                                 if(participant.getEventsList().contains(event.getEventID()))
                                 {
                                     Toast.makeText(getContext(), sapid+" is already registered for this event", Toast.LENGTH_LONG).show();

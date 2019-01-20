@@ -91,10 +91,10 @@ public class PaymentDetailsFragment extends Fragment implements
         textViewContact.setText(recipient.getContact());
         textViewEmail.setText(recipient.getEmail());
         buttonProceed.setOnClickListener(this);
+        showProgress(false);
         //textView.setText("Pay :"+amount);
         //registerToDatabase();
         return view;
-
     }
 
     void showProgress(boolean show) {
@@ -107,51 +107,6 @@ public class PaymentDetailsFragment extends Fragment implements
             scrollView.setVisibility(show?View.INVISIBLE:View.VISIBLE);
         }
     }
-
-
-   /* private void registerToDatabase() {
-        final Map<String ,Object> appendParticipants=new HashMap<>();
-        appendParticipants.putAll(participants);
-        FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseConfig.EVENTS_DB)
-                .child(FirebaseConfig.PARTICIPANTS)
-                .updateChildren(appendParticipants)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful())
-                        {
-                            HashMap<String ,Object> addToEventsObject=new HashMap<>();
-                            for(Map.Entry<String,Participant> participant:participants.entrySet())
-                            {
-                                addToEventsObject.put(participant.getKey(),participant.getValue().getName());
-                            }
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child(FirebaseConfig.EVENTS_DB)
-                                    .child(FirebaseConfig.EVENTS)
-                                    .child(event.getEventID())
-                                    .child(FirebaseConfig.TEAMS)
-                                    .child("Team"+addToEventsObject.keySet().toString()
-                                            .replace(","," ")
-                                            .replace("["," ")
-                                            .replace("]"," ")
-                                            )
-                                    .setValue(addToEventsObject)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful())
-                                            {
-                                                Toast.makeText(getContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                        }
-                    }
-                });
-    } */
-
-
 
     @Override
     public void onSaveInstanceState(Bundle savedState) {

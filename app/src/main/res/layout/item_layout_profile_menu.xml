@@ -26,8 +26,8 @@
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_action_next_item"
-        tools:srcCompat="@drawable/ic_action_next_item" />
+        app:srcCompat="@drawable/ic_action_next_item_dark"
+        tools:srcCompat="@drawable/ic_action_next_item_dark" />
 
     <TextView
         android:id="@+id/text_view_item_layout_profile_menu"

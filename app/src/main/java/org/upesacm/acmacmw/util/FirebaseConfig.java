@@ -16,5 +16,6 @@ public interface FirebaseConfig {
     String EVENT_OTP_RECIPIENT = "otpRecipients";
     String EVENT_OTPS = "otps";
     String TEAM_OTP = "otp";
+    String TEAM_OTP_RECIPIENT = "recipient";
     String TEAM_OTP_CONFIRMED = "confirmed";
 }
