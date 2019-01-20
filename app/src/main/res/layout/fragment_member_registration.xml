@@ -105,12 +105,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
                     android:layout_marginTop="10dp"
-                    android:drawablePadding="10dp"
-                    android:inputType="number"
+                    android:layout_marginRight="15dp"
                     android:drawableStart="@drawable/ic_bookmark_black_24dp"
+                    android:drawablePadding="10dp"
                     android:hint="Year Of Study(1,2,3....)"
+                    android:inputType="number"
                     android:shadowColor="@color/onSeconadry"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
@@ -139,15 +139,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/editText_dob"
+                <TextView
+                    android:id="@+id/textView_dob"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
                     android:layout_marginTop="10dp"
-                    android:drawablePadding="10dp"
+                    android:layout_marginRight="15dp"
                     android:drawableStart="@drawable/ic_cake_black_24dp"
+                    android:drawablePadding="10dp"
                     android:hint="Date of Birth(dd/mm/yyyy)"
                     android:inputType="date"
                     android:shadowColor="@color/onSeconadry"

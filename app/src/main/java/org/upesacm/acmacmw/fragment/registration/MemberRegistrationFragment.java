@@ -2,25 +2,32 @@ package org.upesacm.acmacmw.fragment.registration;
 
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.regex.Pattern;
 
 
@@ -31,7 +38,8 @@ public class MemberRegistrationFragment extends Fragment implements
     //MainActivity callback;
 
     EditText editTextName,editTextSap,editTextContact,editTextEmail,
-            editTextYear,editTextBranch,editTextWhatsappNo,editTextDob,editTextCurrentAddress;
+            editTextYear,editTextBranch,editTextWhatsappNo,editTextCurrentAddress;
+    TextView textViewDob;
     RadioGroup radioGroupMembership;
     Button buttonRegister;
     Button buttonVerifyOTP;
@@ -80,8 +88,26 @@ public class MemberRegistrationFragment extends Fragment implements
        editTextYear=view.findViewById(R.id.editText_year);
        editTextBranch=view.findViewById(R.id.editText_branch);
        editTextWhatsappNo=view.findViewById(R.id.editText_whatsappno);
-       editTextDob =  view.findViewById(R.id.editText_dob);
+       textViewDob =  view.findViewById(R.id.textView_dob);
        editTextCurrentAddress = view.findViewById(R.id.editText_hosteladd);
+
+
+       final int minAge = 13; //Mininimum age of person to register
+       textViewDob.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               Calendar now = Calendar.getInstance();
+               DatePickerDialog dialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                   @Override
+                   public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                       textViewDob.setText(dayOfMonth + "/" + (month+1) + "/" + year);
+                   }
+               }, now.get(Calendar.YEAR) - minAge, now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+               now.set(now.get(Calendar.YEAR) - minAge, now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+               dialog.getDatePicker().setMaxDate(now.getTimeInMillis());
+               dialog.show();
+           }
+       });
 
        radioGroupMembership = view.findViewById(R.id.radio_group_membership);
        radioGroupMembership.check(R.id.radio_button_premium);
@@ -177,7 +203,7 @@ public class MemberRegistrationFragment extends Fragment implements
             }
         }
         System.out.println(membershipType);
-        String dob = editTextDob.getText().toString().trim();
+        String dob = textViewDob.getText().toString().trim();
         String currentAdd = editTextCurrentAddress.getText().toString();
 
         boolean isSapValid= Pattern.compile("5000[\\d]{5}").matcher(sap).matches();
@@ -192,7 +218,6 @@ public class MemberRegistrationFragment extends Fragment implements
                 "0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]" +
                 "|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(" +
                 "?:1[6-9]|[2-9]\\d)?\\d{2})$").matcher(dob).matches();
-
 
         String message="";
         if(isNameValid) {
@@ -249,7 +274,7 @@ public class MemberRegistrationFragment extends Fragment implements
         editTextContact.setText("");
         editTextWhatsappNo.setText("");
         editTextYear.setText("");
-        editTextDob.setText("");
+        textViewDob.setText("");
         editTextCurrentAddress.setText("");
 
         contentHolder.setVisibility(View.VISIBLE);
@@ -265,7 +290,7 @@ public class MemberRegistrationFragment extends Fragment implements
             editTextContact.setText(newMember.getPhoneNo());
             editTextWhatsappNo.setText(newMember.getWhatsappNo());
             editTextYear.setText(newMember.getYear());
-            editTextDob.setText(newMember.getDob());
+            textViewDob.setText(newMember.getDob());
             editTextCurrentAddress.setText(newMember.getCurrentAddress());
         }
     }
