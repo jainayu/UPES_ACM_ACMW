@@ -54,15 +54,20 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.ProfileDetailsActivity"
-            android:parentActivityName=".activity.MainActivity" />
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.HomePageActivity"
-            android:parentActivityName=".activity.MainActivity" />
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.MenuDetailsActivity"
-            android:parentActivityName=".activity.MainActivity" />
-        <activity android:name=".activity.MemberRegistrationActivity"></activity>
-        <activity android:name=".activity.LeaderboardActivity">
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.MemberRegistrationActivity"
+            android:screenOrientation="portrait" ></activity>
+        <activity android:name=".activity.LeaderboardActivity"
+            android:screenOrientation="portrait" >
 
         </activity>
     </application>

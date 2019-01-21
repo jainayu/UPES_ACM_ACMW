@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -29,8 +28,6 @@ import org.upesacm.acmacmw.fragment.menu.PolicyFragment;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.regex.Pattern;
 
@@ -39,24 +36,34 @@ public class MemberRegistrationFragment extends Fragment implements
         View.OnClickListener {
     public static final int NEW_REGISTRATION = 1;
     public static final int VERIFY_OTP = 2;
+    private static final int MIN_AGE = 13; //Minimum age of person to register
+    public static final String NEW_MEMBER_SAP_KEY = "new member sap key";
     //MainActivity callback;
 
-    EditText editTextName,editTextSap,editTextContact,editTextEmail,
+    EditText editTextName,editTextContact,editTextEmail,
             editTextYear,editTextBranch,editTextWhatsappNo,editTextCurrentAddress;
-    TextView textViewDob, textViewPolicy;
+    TextView textViewDob, textViewPolicy,textViewSap;
     RadioGroup radioGroupMembership;
     Button buttonRegister;
-    Button buttonVerifyOTP;
+   // Button buttonVerifyOTP;
     View contentHolder;
     ProgressBar progressBar;
 
     NewMember newMember;
+    private String sapId;
     RegistrationResultListener resultListener;
 
     public MemberRegistrationFragment() {
         // Required empty public constructor
     }
 
+    public static MemberRegistrationFragment newInstance(String sapId) {
+        MemberRegistrationFragment fragment = new MemberRegistrationFragment();
+        Bundle args = new Bundle();
+        args.putString(MemberRegistrationFragment.NEW_MEMBER_SAP_KEY,sapId);
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Override
     public void onAttach(Context context) {
         if(context instanceof RegistrationResultListener) {
@@ -72,6 +79,10 @@ public class MemberRegistrationFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        sapId = bundle.getString(MemberRegistrationFragment.NEW_MEMBER_SAP_KEY);
+        if(sapId == null)
+            sapId = new String();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,7 +97,7 @@ public class MemberRegistrationFragment extends Fragment implements
        contentHolder=view.findViewById(R.id.scroll_bar_container);
        progressBar=view.findViewById(R.id.progress_bar_registration);
        editTextName=view.findViewById(R.id.editText_name);
-       editTextSap=view.findViewById(R.id.editText_sap);
+       textViewSap =view.findViewById(R.id.editText_sap);
        editTextEmail=view.findViewById(R.id.editText_email);
        editTextContact=view.findViewById(R.id.editText_contact);
        editTextYear=view.findViewById(R.id.editText_year);
@@ -97,13 +108,7 @@ public class MemberRegistrationFragment extends Fragment implements
        textViewPolicy = view.findViewById(R.id.textView_Policy);
        textViewPolicy.setPaintFlags(textViewPolicy.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
-       Bundle bundle = getArguments();
-       String sapId = bundle.getString("sapid");
-       if(sapId == null)
-           sapId = new String();
-       editTextSap.setText(sapId);
-
-       final int minAge = 13; //Mininimum age of person to register
+       textViewSap.setText(sapId);
        textViewDob.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
@@ -113,8 +118,8 @@ public class MemberRegistrationFragment extends Fragment implements
                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                        textViewDob.setText(dayOfMonth + "/" + (month+1) + "/" + year);
                    }
-               }, now.get(Calendar.YEAR) - minAge, now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
-               now.set(now.get(Calendar.YEAR) - minAge, now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+               }, now.get(Calendar.YEAR) - MIN_AGE, now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+               now.set(now.get(Calendar.YEAR) - MIN_AGE, now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
                dialog.getDatePicker().setMaxDate(now.getTimeInMillis());
                dialog.show();
            }
@@ -136,9 +141,9 @@ public class MemberRegistrationFragment extends Fragment implements
        radioGroupMembership.check(R.id.radio_button_premium);
 
        buttonRegister=view.findViewById(R.id.button_register);
-       buttonVerifyOTP = view.findViewById(R.id.button_registration_verify_otp);
+      // buttonVerifyOTP = view.findViewById(R.id.button_registration_verify_otp);
        buttonRegister.setOnClickListener(this);
-       buttonVerifyOTP.setOnClickListener(this);
+     //  buttonVerifyOTP.setOnClickListener(this);
 
 
 
@@ -164,8 +169,9 @@ public class MemberRegistrationFragment extends Fragment implements
     public void onClick(View view) {
         InputMethodManager inputManager = (InputMethodManager)
                 getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+        if(inputManager.isActive())
+//            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+//                InputMethodManager.HIDE_NOT_ALWAYS);
 
         if(view.getId() == R.id.button_register) {
             System.out.println("register button clicked");
@@ -192,15 +198,15 @@ public class MemberRegistrationFragment extends Fragment implements
                         .show();
             }
         }
-        else { //verify otp button pressed
-            resultListener.onRegistrationDataAvailable(getResources().getInteger(R.integer.verify_new_entered_sap),newMember);
-            resetRegistrationPage();
-        }
+//        else { //verify otp button pressed
+//            resultListener.onRegistrationDataAvailable(getResources().getInteger(R.integer.verify_new_entered_sap),newMember);
+//            resetRegistrationPage();
+//        }
     }
 
 
     public NewMember createNewMember() {
-        String sap=editTextSap.getText().toString().trim();
+        String sap= textViewSap.getText().toString().trim();
         String name=editTextName.getText().toString().trim();
         String email=editTextEmail.getText().toString().trim();
         String contact=editTextContact.getText().toString().trim();
@@ -294,7 +300,7 @@ public class MemberRegistrationFragment extends Fragment implements
     void resetRegistrationPage() {
         editTextEmail.setText("");
         editTextName.setText("");
-        editTextSap.setText("");
+        textViewSap.setText("");
         editTextBranch.setText("");
         editTextContact.setText("");
         editTextWhatsappNo.setText("");
@@ -310,7 +316,7 @@ public class MemberRegistrationFragment extends Fragment implements
         if(newMember!=null) {
             editTextEmail.setText(newMember.getEmail());
             editTextName.setText(newMember.getFullName());
-            editTextSap.setText(newMember.getSapId());
+            textViewSap.setText(newMember.getSapId());
             editTextBranch.setText(newMember.getBranch());
             editTextContact.setText(newMember.getPhoneNo());
             editTextWhatsappNo.setText(newMember.getWhatsappNo());
