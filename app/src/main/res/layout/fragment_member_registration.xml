@@ -12,10 +12,9 @@
         android:id="@+id/scroll_bar_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
@@ -26,7 +25,8 @@
             android:layout_marginTop="15dp"
             android:background="@android:color/white"
             android:orientation="vertical"
-            android:padding="30dp">
+            android:paddingEnd="30dp"
+            android:paddingStart="30dp">
 
 
             <android.support.constraint.ConstraintLayout
@@ -38,29 +38,28 @@
                     android:id="@+id/imageView9"
                     android:layout_width="90dp"
                     android:layout_height="90dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/imageView8"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintVertical_bias="0.0"/>
 
                 <ImageView
                     android:id="@+id/imageView8"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </android.support.constraint.ConstraintLayout>
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp">
@@ -69,8 +68,10 @@
                     android:id="@+id/editText_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_person_black_24dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="15dp"
                     android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_person_black_24dp"
                     android:hint="Full Name"
                     android:shadowColor="@color/onSeconadry"
                     android:textSize="16sp" />
@@ -78,7 +79,6 @@
 
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -86,15 +86,17 @@
                     android:id="@+id/editText_branch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_branch_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_branch_black_24dp"
                     android:hint="Branch"
                     android:shadowColor="@color/onSeconadry"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -102,28 +104,31 @@
                     android:id="@+id/editText_year"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_bookmark_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
-                    android:hint="Year Of Study(1,2,3....)"
                     android:inputType="number"
+                    android:drawableStart="@drawable/ic_bookmark_black_24dp"
+                    android:hint="Year Of Study(1,2,3....)"
                     android:shadowColor="@color/onSeconadry"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
 
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <EditText
                     android:id="@+id/editText_sap"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_label_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
+                    android:drawableStart="@drawable/ic_label_black_24dp"
                     android:hint="SAP ID"
                     android:inputType="number"
                     android:shadowColor="@color/onSeconadry"
@@ -131,19 +136,19 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/textView_dob"
+                <EditText
+                    android:id="@+id/editText_dob"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_cake_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:hint="Date of Birth(tap to select)"
+                    android:drawableStart="@drawable/ic_cake_black_24dp"
+                    android:hint="Date of Birth(dd/mm/yyyy)"
                     android:inputType="date"
                     android:shadowColor="@color/onSeconadry"
                     android:textSize="16sp" />
@@ -153,7 +158,6 @@
 
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -161,8 +165,11 @@
                     android:id="@+id/editText_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_email_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_email_black_24dp"
                     android:hint="Email address"
                     android:inputType="textEmailAddress|text"
                     android:shadowColor="@color/onSeconadry"
@@ -171,7 +178,6 @@
 
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -179,8 +185,11 @@
                     android:id="@+id/editText_contact"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_ring_volume_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_ring_volume_black_24dp"
                     android:hint="Phone Number"
                     android:inputType="number|phone"
                     android:shadowColor="@color/onSeconadry"
@@ -189,7 +198,6 @@
 
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -197,8 +205,11 @@
                     android:id="@+id/editText_whatsappno"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_perm_phone_msg_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_perm_phone_msg_black_24dp"
                     android:hint="Whatsapp Number"
                     android:inputType="number|phone"
                     android:shadowColor="@color/onSeconadry"
@@ -206,7 +217,6 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -214,8 +224,11 @@
                     android:id="@+id/editText_hosteladd"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_location_searching_black_24dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
                     android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_location_searching_black_24dp"
                     android:hint="Hostel Address"
                     android:inputType="text"
                     android:shadowColor="@color/onSeconadry"
@@ -226,8 +239,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:drawableStart="@drawable/ic_card_membership_black_24dp"
                 android:drawablePadding="10dp"
+                android:drawableStart="@drawable/ic_card_membership_black_24dp"
                 android:paddingTop="20dp"
                 android:shadowColor="@color/onSeconadry"
                 android:text="Membership Type:"
@@ -237,10 +250,11 @@
                 android:id="@+id/radio_group_membership"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="8dp"
                 android:orientation="vertical">
+
 
 
                 <RadioButton
@@ -267,23 +281,16 @@
                     android:layout_weight="1"
                     android:text="1 year membership(\u20B9 300)" />
 
-            </RadioGroup>
 
-            <TextView
-                android:id="@+id/textView_Policy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ink_blue"
-                android:textAlignment="center"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:text="Privacy Policy" />
+
+
+            </RadioGroup>
 
             <Button
                 android:id="@+id/button_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:layout_marginBottom="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/round_button"
@@ -292,13 +299,27 @@
                 android:textColor="@android:color/white" />
 
             <TextView
-                android:id="@+id/textView15"
+                android:id="@+id/textView14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
-                android:text="By clicking register, you are agreeing with our privacy policy"
+                android:padding="8dp"
+                android:text="OR"
                 android:textAlignment="center"
-                android:textSize="8sp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button_registration_verify_otp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/round_button"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="Verify OTP"
+                android:textColor="@android:color/white" />
 
         </LinearLayout>
 

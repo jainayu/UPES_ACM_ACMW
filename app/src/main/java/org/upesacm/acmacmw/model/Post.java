@@ -83,23 +83,6 @@ public class Post implements Comparable<Post>  {
         private String postId;
         private String ownerName;
 
-        public Builder() {
-            //default
-        }
-
-        public Builder(Post post) {
-            this.imageUrl = post.getImageUrl();
-            this.caption = post.getCaption();
-            this.ownerSapId = post.getOwnerSapId();
-            this.yearId = post.getYearId();
-            this.monthId = post.getMonthId();
-            this.day = post.getDay();
-            this.time = post.getTime();
-            this.likesIds = post.getLikesIds();
-            this.postId = post.getPostId();
-            this.ownerName = post.getOwnerName();
-        }
-
         public Post build() {
             Post post=new Post();
             post.yearId=yearId;

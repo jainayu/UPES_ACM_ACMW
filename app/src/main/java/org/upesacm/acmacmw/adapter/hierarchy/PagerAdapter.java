@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import org.upesacm.acmacmw.fragment.hierarchy.AcmFragment;
-import org.upesacm.acmacmw.fragment.hierarchy.AcmWFragment;
+import org.upesacm.acmacmw.fragment.homepage.hierarchy.AcmFragment;
+import org.upesacm.acmacmw.fragment.homepage.hierarchy.AcmWFragment;
 
 public class PagerAdapter extends FragmentPagerAdapter {
 

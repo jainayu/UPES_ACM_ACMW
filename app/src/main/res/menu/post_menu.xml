@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-<item android:id="@+id/sponsors"
-    android:icon="@drawable/sponsor_icon"
-    android:title="Sponsors"
-    app:showAsAction="always">
-</item>
-</menu>
