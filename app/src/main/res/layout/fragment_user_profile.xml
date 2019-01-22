@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".fragment.member.profile.UserProfileFragment"
+    tools:context=".fragment.profile.UserProfileFragment"
     tools:layout_editor_absoluteY="25dp">
 
     <!-- TODO: Update blank fragment layout -->
@@ -408,15 +408,39 @@
                 android:layout_width="0dp"
                 android:layout_height="250dp"
                 android:background="#44449a"
-                android:padding="2dp"
-                android:src="@drawable/userrrrrrr"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile_top_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <ImageView
+                android:id="@+id/edit_image"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/caption_bg"
+                android:src="@drawable/ic_edit_black_24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view__frag_profile_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/text_view__frag_profile_name" />
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                android:id="@+id/progress_bar_user_profile"
+                app:layout_constraintBottom_toBottomOf="@+id/image_view_profile_pic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/image_view_profile_pic" />
+
             <TextView
-                android:id="@+id/text_view_profile_name"
+                android:id="@+id/text_view__frag_profile_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"

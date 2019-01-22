@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:paddingBottom="32dp"
-        tools:context=".fragment.homepage.contactus.ContactUsFragment">
+        tools:context=".fragment.menu.ContactUsFragment">
 
         <android.support.v7.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
