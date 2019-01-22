@@ -104,7 +104,8 @@ indulging, you may apply for an yearly membership.\n\nFollowing is your Google S
 
     <string name="contact_us_member_1_title">Membership Chair</string>
     <string name="contact_us_member_1_name">Poorva Mahara</string>
-    <string name="contact_us_member_2_title">Executive PR and Events Head</string>
+    <string name="contact_us_member_2_title">Secretary</string>
     <string name="contact_us_member_2_name">Sugandh Agarwal</string>
     <string name="key_user_selected_home_page_fragment">user selected homepage fragment</string>
+    <string name="title_activity_leaderboard">LeaderboardActivity</string>
 </resources>

@@ -1,5 +1,7 @@
 package org.upesacm.acmacmw.model;
 
+import android.support.annotation.NonNull;
+
 public class TrialMember {
     private String sap;
     private String email;
@@ -45,8 +47,19 @@ public class TrialMember {
         private String imageUrl;
         private String otp;
         private boolean verified;
+
         public Builder(String timeStamp) {
             this.timeStamp=timeStamp;
+        }
+
+        public Builder(@NonNull TrialMember trialMember) {
+            this.sap = trialMember.getSap();
+            this.email = trialMember.getEmail();
+            this.name = trialMember.getName();
+            this.timeStamp = trialMember.getCreationTimeStamp();
+            this.imageUrl = trialMember.getImageUrl();
+            this.otp = trialMember.getOtp();
+            this.verified = trialMember.isVerified();
         }
         public TrialMember build() {
             TrialMember trialMember=new TrialMember();

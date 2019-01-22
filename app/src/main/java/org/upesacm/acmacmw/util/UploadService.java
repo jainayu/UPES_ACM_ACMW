@@ -15,12 +15,6 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
-import android.widget.Toast;
-
-import org.upesacm.acmacmw.retrofit.ApiClient;
-import org.upesacm.acmacmw.retrofit.HomePageClient;
-import org.upesacm.acmacmw.retrofit.MembershipClient;
-import org.upesacm.acmacmw.retrofit.ResponseModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,14 +24,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class UploadService {
 
