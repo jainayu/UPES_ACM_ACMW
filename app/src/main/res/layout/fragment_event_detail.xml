@@ -132,7 +132,8 @@
                         android:id="@+id/textview_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="5dp" />
+                        android:padding="5dp"
+                        android:justificationMode="inter_word"/>
                 </LinearLayout>
             </LinearLayout>
 

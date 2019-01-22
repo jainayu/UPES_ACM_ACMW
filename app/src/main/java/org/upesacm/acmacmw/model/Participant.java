@@ -45,6 +45,16 @@ public class Participant implements Parcelable {
     public Participant() {
         //empty constructor
     }
+    private int rank;
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+
 
     @JsonProperty("sap")
     private String sap;
