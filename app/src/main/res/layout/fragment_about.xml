@@ -46,8 +46,7 @@ The chapter conducts workshops on various technical and non-technical themes to 
 “Individual commitment to a group effort- that is what makes a team work, a company work, a society work, a civilization work.”
 
 This inspiring quote from Vince Lombardi truly defines the expedition of UPES ACM Student Chapter."
-                android:textStyle="bold"
-                android:justificationMode="inter_word"/>
+                android:textStyle="bold"/>
 
             <ImageView
                 android:id="@+id/imageView3"
@@ -65,8 +64,7 @@ This inspiring quote from Vince Lombardi truly defines the expedition of UPES AC
                 android:text="The UPES ACM-W Student Chapter was established in the year 2015 at University of Petroleum and Energy Studies, Dehradun. The W stands for WOMEN who are thriving in the field of computing, or who wish to do so in the future.
 
 With the idea of promoting women, the chapter strives to be the connecting bridge between the budding female enthusiasts and the tech world with numerous international and national level events and conferences, the highlight being All India Conference for Women in Computing (AICWiC) with Dr. Margaret Burnett, professor of Computer Science at School of EECS at Oregon State University."
-                android:textStyle="bold"
-                android:justificationMode="inter_word"/>
+                android:textStyle="bold"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

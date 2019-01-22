@@ -39,14 +39,14 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginEnd="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/image_view_hierarchy_whatsapp"
+            app:layout_constraintBottom_toBottomOf="@+id/whatsapp"
             app:layout_constraintEnd_toStartOf="@+id/contact"
-            app:layout_constraintTop_toTopOf="@+id/image_view_hierarchy_whatsapp"
+            app:layout_constraintTop_toTopOf="@+id/whatsapp"
             app:layout_constraintVertical_bias="1.0"
             app:srcCompat="@drawable/linkedin" />
 
         <ImageView
-            android:id="@+id/image_view_hierarchy_whatsapp"
+            android:id="@+id/whatsapp"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginEnd="16dp"

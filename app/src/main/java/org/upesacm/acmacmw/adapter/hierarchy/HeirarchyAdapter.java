@@ -55,7 +55,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             holder.whatsapp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                   Uri uri = Uri.parse("smsto:"+heirarchyModels.get(position).getWhatsappNo());
+//                   Uri uri = Uri.parse("smsto:"+heirarchyModels.get(position).getWhatsapp());
 //                   Intent i = new Intent(Intent.ACTION_SENDTO, uri);
 //                   i.setPackage("com.whatsapp");
 //                   context.startActivity(i);
@@ -119,7 +119,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             name = itemView.findViewById(R.id.name);
             position = itemView.findViewById(R.id.position);
             about = itemView.findViewById(R.id.about);
-            whatsapp = itemView.findViewById(R.id.image_view_hierarchy_whatsapp);
+            whatsapp = itemView.findViewById(R.id.whatsapp);
             linkedin = itemView.findViewById(R.id.linkedin);
             contact = itemView.findViewById(R.id.contact);
             availabeInCampus = itemView.findViewById(R.id.availabe_in_campus);
