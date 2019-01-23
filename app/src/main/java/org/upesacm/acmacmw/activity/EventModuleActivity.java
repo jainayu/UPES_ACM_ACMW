@@ -31,7 +31,10 @@ import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
 import org.upesacm.acmacmw.util.FirebaseConfig;
+import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
+import org.upesacm.acmacmw.util.paytm.Order;
+import org.upesacm.acmacmw.util.paytm.PaytmUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +47,8 @@ public class EventModuleActivity extends AppCompatActivity implements
         SAPIDFragment.FragmentInteractionListener,
         RecipientSelectFragment.FragmentInteractionListener,
         OtpConfirmationFragment.OnFragmentInteractionListener,
-        PaymentDetailsFragment.OnFragmentInteractionListener {
+        PaymentDetailsFragment.OnFragmentInteractionListener,
+        PaytmUtil.TransactionCallback{
     public static final String TAG = "EventModuleActivity";
     private static final String REGISTERED_EVENT_KEY = "registered event key";
     private static final String PARTICIPANTS_KEY = "participants key";
@@ -78,12 +82,18 @@ public class EventModuleActivity extends AppCompatActivity implements
         }
     }
 
-    void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
+    private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout_event_activity,fragment);
         if(addToBackStack)
             ft.addToBackStack(null);
         ft.commit();
+    }
+
+    private void sendOtp(Member recipient,Participant participant,Event event,String otp) {
+        OTPSender sender=new OTPSender();
+        String mailBody = participant.getName()+" "+event.getEventID()+" "+otp;
+        sender.execute(mailBody,recipient.getEmail(),"New Participant OTP");
     }
 
     @Override
@@ -127,7 +137,7 @@ public class EventModuleActivity extends AppCompatActivity implements
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseConfig.EVENTS_DB)
                 .child(FirebaseConfig.PARTICIPANTS)
-                .updateChildren(new HashMap<String, Object>(participants))
+                .updateChildren(new HashMap<String, Object>(participants)) //add the participants to the database
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -152,7 +162,7 @@ public class EventModuleActivity extends AppCompatActivity implements
 
                                     @Override
                                     public void onComplete(@Nullable final DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                                        int teamId = dataSnapshot.getValue(Integer.class) - 1;//start from 0
+                                        final int teamId = dataSnapshot.getValue(Integer.class) - 1;//start from 0
                                         Log.i(TAG,"Transaction Complete "+teamId);
                                         FirebaseDatabase.getInstance().getReference()
                                                 .child(FirebaseConfig.EVENTS_DB)
@@ -185,6 +195,21 @@ public class EventModuleActivity extends AppCompatActivity implements
                                                                             databaseError.toException().printStackTrace();
                                                                         }
                                                                     });
+                                                            //TODO: add code to start paytm transaction here
+                                                            /*String timeStamp = ""+System.currentTimeMillis();
+                                                            Order order = new Order.Builder()
+                                                                    .setOrderId(timeStamp+event.getEventID()+teamId)
+                                                                    .setCustomerId(""+teamId)
+                                                                    .setAmount("1")
+                                                                    .setMobileNo(participants.get(allParticipants.get(0)).getContact())
+                                                                    .setEmail(participants.get(allParticipants.get(0)).getEmail())
+                                                                    .build();
+                                                            PaytmUtil.initializePayment(EventModuleActivity.this, order, new PaytmUtil.TransactionCallback() {
+                                                                @Override
+                                                                public void onPaytmTransactionResponse(boolean success) {
+
+                                                                }
+                                                            });*/
                                                         }
                                                     }
                                                 });
@@ -221,7 +246,6 @@ public class EventModuleActivity extends AppCompatActivity implements
             amount=event.getEntryFeesTeam();
         }
        setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,amount),true);
-
     }
 
     @Override
@@ -304,6 +328,15 @@ public class EventModuleActivity extends AppCompatActivity implements
                             }
                         }
                     });
+        }
+    }
+
+    @Override
+    public void onPaytmTransactionResponse(boolean success) {
+        if(success) {
+            Toast.makeText(this,"Payment Successful",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this,"Payment Failed",Toast.LENGTH_SHORT).show();
         }
     }
 }

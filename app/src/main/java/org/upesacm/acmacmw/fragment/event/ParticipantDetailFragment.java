@@ -173,10 +173,7 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Map<String,Participant> participantMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String,Participant>>(){});
-                        if(participantMap==null)
-                        {
-                            participantMap=new HashMap<>();
-                        }
+                        if(participantMap==null) participantMap=new HashMap<>();
                         alreadyRegistered=new ArrayList<>();
                         for (String sapid:sapIds)
                         {

@@ -63,5 +63,9 @@ dependencies {
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
     implementation 'com.google.firebase:firebase-config:16.0.0'
+
+    implementation('com.paytm:pgplussdk:1.2.3') {
+        transitive = true;
+    }
 }
 apply plugin: 'com.google.gms.google-services'
