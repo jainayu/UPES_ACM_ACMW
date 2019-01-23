@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage.post;
+package org.upesacm.acmacmw.fragment.main;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -20,13 +20,17 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -39,15 +43,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.activity.HomeActivity;
-import org.upesacm.acmacmw.adapter.post.PostsRecyclerViewAdapter;
-import org.upesacm.acmacmw.fragment.member.profile.LoginDialogFragment;
-import org.upesacm.acmacmw.listener.HomeActivityStateChangeListener;
+import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
+import org.upesacm.acmacmw.util.SessionManager;
+import org.upesacm.acmacmw.adapter.PostsRecyclerViewAdapter;
 import org.upesacm.acmacmw.listener.OnLoadMoreListener;
-import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.listener.OnRecyclerItemSelectListener;
 import org.upesacm.acmacmw.model.Post;
 import org.upesacm.acmacmw.model.TrialMember;
-import org.upesacm.acmacmw.retrofit.HomePageClient;
 import org.upesacm.acmacmw.util.Config;
 
 import java.io.ByteArrayOutputStream;
@@ -72,69 +74,62 @@ import static android.app.Activity.RESULT_OK;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 
-public class PostsFragment extends Fragment
+public class HomePageFragment extends Fragment
         implements OnLoadMoreListener,
         Callback<HashMap<String,Post>>,
         ValueEventListener,
-        HomeActivityStateChangeListener,
-        View.OnClickListener {
+        View.OnClickListener,
+        OnRecyclerItemSelectListener<Post> {
+    public static final String TAG = "HomePageFragment";
+    public static final String INTERACTION_CODE_KEY = "interaction code key";
+    public static final int REQUEST_AUTHENTICATION = 1;
+    public static final int UPLOAD_IMAGE = 2;
+    private static final int CHOOSE_FROM_GALLERY=2;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 3;
 
-    static final int CHOOSE_FROM_GALLERY=2;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-
-    static final int CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE = 3;
-
-    HomePageClient homePageClient;
     RecyclerView recyclerView;
     ProgressBar progressBar;
     private int monthCount=-1;
-    FirebaseDatabase database;
     private DatabaseReference postsReference;
     PostsRecyclerViewAdapter recyclerViewAdapter;
     FloatingActionButton floatingActionButton;
     SwipeRefreshLayout swipeContainer;
-
     RecyclerView.OnScrollListener scrollListener;
     Call<HashMap<String,Post>> loadMoreCall;
-
-    Member signedInMember;
-    TrialMember trialMember;
     private Uri fileUri;
-    HomeActivity callback;
+    FragmentInteractionListener interactionListener;
+    boolean viewAlive;
+    private Toolbar toolbar;
 
-    public PostsFragment() {
+    public HomePageFragment() {
         // Required empty public constructor
     }
 
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof HomeActivity) {
-            callback = (HomeActivity)context;
+        if(context instanceof FragmentInteractionListener) {
+            interactionListener = (FragmentInteractionListener)context;
             super.onAttach(context);
         }
         else {
-            throw new IllegalStateException("context must be instance of HomeActivity");
+            throw new IllegalStateException(context.toString()+" must be instance of FragmentInteractionListener");
         }
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         System.out.println("onCreate post fragment");
-
-        database = callback.getDatabase();
-        if(database==null) {
-            database = FirebaseDatabase.getInstance();
-        }
+        setHasOptionsMenu(true);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        homePageClient = callback.getHomePageClient();
-
-        recyclerViewAdapter=new PostsRecyclerViewAdapter(callback);
+        recyclerViewAdapter=new PostsRecyclerViewAdapter(this.getContext());
+        recyclerViewAdapter.setItemSelectListener(this);
 
         Calendar calendar = Calendar.getInstance();
-        postsReference = database
+        postsReference = FirebaseDatabase.getInstance()
                 .getReference("posts/" + "Y" + calendar.get(Calendar.YEAR) + "/"
                         + "M" + calendar.get(Calendar.MONTH));
     }
@@ -144,6 +139,10 @@ public class PostsFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        toolbar = view.findViewById(R.id.toolbar_frag_post);
+        toolbar.setTitle("Home");
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+
         recyclerView=view.findViewById(R.id.posts_recyclerView);
         progressBar = view.findViewById(R.id.progress_bar_home);
         floatingActionButton = view.findViewById(R.id.cameraButton);
@@ -178,13 +177,11 @@ public class PostsFragment extends Fragment
 
         progressBar.setVisibility(View.VISIBLE);
 
-        callback.addHomeActivityStateChangeListener(this);
-
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if(postsReference!=null)
-                    postsReference.addValueEventListener(PostsFragment.this);
+                    postsReference.addValueEventListener(HomePageFragment.this);
             }
         });
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -192,12 +189,13 @@ public class PostsFragment extends Fragment
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        viewAlive = true;
+
         return view;
     }
 
     @Override
     public void onDestroyView() {
-        callback.removeHomeActivityStateChangeListener(this);
         postsReference.removeEventListener(this);
 
         floatingActionButton.setOnClickListener(null);
@@ -218,23 +216,22 @@ public class PostsFragment extends Fragment
         progressBar = null;
 
         swipeContainer.setOnRefreshListener(null);
-        swipeContainer = null;
+        swipeContainer = null;  //MainActivity callback;
 
         monthCount = -1;
 
         super.onDestroyView();
+
+        viewAlive = false;
     }
 
     @Override
     public void onDetach() {
-        callback = null;
         super.onDetach();
     }
     @Override
     public void onDestroy() {
-        database = null;
         postsReference = null;
-        homePageClient = null;
         recyclerViewAdapter = null;
         super.onDestroy();
         System.gc();
@@ -243,11 +240,11 @@ public class PostsFragment extends Fragment
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.cameraButton) {
-            System.out.println("cameraButton pressed"+trialMember);
-            if (signedInMember != null ) {
+            if (SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
                 onCameraButtonClick();
             }
-            else if(trialMember!=null) {
+            else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+                TrialMember trialMember = SessionManager.getInstance().getGuestMember();
                 long trialPeriod=30*24*60*60*(1000L);
                 long elapsedTime = Calendar.getInstance().getTimeInMillis() - Long.parseLong(trialMember.getCreationTimeStamp());
                 System.out.println("trialPerion : "+trialPeriod);
@@ -261,8 +258,9 @@ public class PostsFragment extends Fragment
                 }
             }
             else {
-                LoginDialogFragment loginDialogFragment =new LoginDialogFragment();
-                loginDialogFragment.show(getActivity().getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));
+               /* LoginFragment loginDialogFragment =new LoginFragment();
+                loginDialogFragment.show(getActivity().getSupportFragmentManager(),getString(R.string.dialog_fragment_tag_login));*/
+                interactionListener.onPostFragmentInteraction(REQUEST_AUTHENTICATION,null);
                 Toast.makeText(getContext(), "Please Login First", Toast.LENGTH_SHORT).show();
             }
         }
@@ -313,20 +311,7 @@ public class PostsFragment extends Fragment
                 if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                     fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-                    //                File imageFile = null;
-//                try {
-//                    imageFile = createImageFile();
-//                }catch(IOException ioe) {
-//                    ioe.printStackTrace();
-//                }
-//                if(imageFile !=null) {
-//                    imageUri = FileProvider.getUriForFile(getContext(),
-//                            "org.upesacm.acmacmw.fileprovider",imageFile);
-//                    System.out.println("imageUri : "+imageUri);
-//                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                    // }
                 }
             }
             catch (OutOfMemoryError error)
@@ -335,7 +320,6 @@ public class PostsFragment extends Fragment
 
             }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
         if(grantResults!=null) {
@@ -348,7 +332,6 @@ public class PostsFragment extends Fragment
             }
         }
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -404,13 +387,12 @@ public class PostsFragment extends Fragment
             }
         }
     }
-
     public void onCameraButtonClick() {
         if(!(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)) {
             System.out.println("Permission for camera or storage not granted. Requesting Permission");
             requestPermissions(new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PostsFragment.CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE);
+                    HomePageFragment.CAMERA_AND_STORAGE_PERMISSION_REQUEST_CODE);
 
             return;
         }
@@ -427,7 +409,7 @@ public class PostsFragment extends Fragment
                     Intent intent = new Intent();
                     intent.setType("image/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_FROM_GALLERY);
+                    HomePageFragment.this.startActivityForResult(Intent.createChooser(intent, "Select Photo"), CHOOSE_FROM_GALLERY);
                 } else if (options[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
@@ -508,7 +490,7 @@ public class PostsFragment extends Fragment
                     Calendar c = Calendar.getInstance();
                     c.add(Calendar.MONTH, monthCount);
                     if (c.get(Calendar.YEAR) >= 2018 && c.get(Calendar.MONTH) >= 5) {
-                        homePageClient.getPosts("Y" + c.get(Calendar.YEAR),
+                        RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR),
                                 "M" + c.get(Calendar.MONTH),Config.AUTH_TOKEN)
                                 .enqueue(this);
                     } else {
@@ -524,13 +506,12 @@ public class PostsFragment extends Fragment
             }
         }
     }
-
     @Override
     public void onFailure(Call<HashMap<String, Post>> call, Throwable t) {
         System.out.println("failed");
         if(recyclerViewAdapter!=null) {
             t.printStackTrace();
-            if (swipeContainer.isRefreshing()) {
+            if (swipeContainer!=null&&swipeContainer.isRefreshing()) {
                 swipeContainer.setRefreshing(false);
             } else {
                 recyclerViewAdapter.removePost();//remove the null post
@@ -542,30 +523,23 @@ public class PostsFragment extends Fragment
 
     public void onNewPostDataAvailable(Bundle args) {
         System.out.println("on new post data available called");
-        ((HomeActivity)getContext()).getSupportActionBar().hide();
-        ((HomeActivity)getContext()).setDrawerEnabled(false);
-        ImageUploadFragment imageUploadFragment= ImageUploadFragment.newInstance(homePageClient);
 
         String ownerName=null;
         String ownerSapId=null;
-        if(signedInMember!=null) {
-            ownerSapId=signedInMember.getSap();
-            ownerName=signedInMember.getName();
+        if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
+            ownerSapId=SessionManager.getInstance().getLoggedInMember().getSap();
+            ownerName=SessionManager.getInstance().getLoggedInMember().getName();
         }
-        else if(trialMember!=null) {
-            ownerSapId=trialMember.getSap();
-            ownerName=trialMember.getName();
+        else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+            ownerSapId=SessionManager.getInstance().getGuestMember().getSap();
+            ownerName=SessionManager.getInstance().getGuestMember().getName();
 
             System.out.println("trial memeber : "+ownerSapId);
             System.out.println("trial member : "+ownerName);
         }
         args.putString(getString(R.string.post_owner_id_key),ownerSapId);
         args.putString(getString(R.string.post_owner_name_key),ownerName);
-        imageUploadFragment.setArguments(args);
-
-        FragmentTransaction ft=((HomeActivity)getContext()).getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frame_layout,imageUploadFragment,getString(R.string.fragment_tag_image_upload));
-        ft.commit();
+        interactionListener.onPostFragmentInteraction(UPLOAD_IMAGE,args);
     }
 
 
@@ -582,40 +556,12 @@ public class PostsFragment extends Fragment
 
             Calendar c = Calendar.getInstance();
             c.add(Calendar.MONTH, monthCount);
-            loadMoreCall = homePageClient.getPosts("Y" + c.get(Calendar.YEAR), "M" + c.get(Calendar.MONTH),Config.AUTH_TOKEN);
+            loadMoreCall = RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR), "M" + c.get(Calendar.MONTH),Config.AUTH_TOKEN);
             loadMoreCall.enqueue(this);
         }
         else {
             System.out.println("still loading");
         }
-    }
-
-    @Override
-    public void onSignedInMemberStateChange(@NonNull Member signedInMember) {
-        System.out.println("postfragment onSignedInMemberStateChange : "+signedInMember);
-        this.signedInMember=signedInMember;
-        recyclerViewAdapter.setSignedInMember(signedInMember);
-    }
-
-    @Override
-    public void onMemberLogout() {
-        System.out.println("postfragment onMemberLogout : ");
-        this.signedInMember=null;
-        recyclerViewAdapter.setSignedInMember(null);
-    }
-
-    @Override
-    public void onTrialMemberStateChange(TrialMember trialMember) {
-        System.out.println("post fragment on google sign in callback called"+trialMember);
-        this.trialMember=trialMember;
-        recyclerViewAdapter.setTrialMember(trialMember);
-    }
-
-    @Override
-    public void onGoogleSignOut() {
-        System.out.println("post fragment on google sign out");
-        this.trialMember=null;
-        recyclerViewAdapter.setTrialMember(null);
     }
 
     public String compressImage(String imageUri) {
@@ -777,4 +723,115 @@ public class PostsFragment extends Fragment
         return inSampleSize;
     }
 
+
+
+
+    @Override
+    public void onRecyclerItemSelect(View view,final Post post, int position) {
+        if(view.getId() == R.id.image_button_post_like) {
+            Log.i(TAG,"Post by "+post.getPostId()+"Liked");
+            SessionManager sessionManager = SessionManager.getInstance();
+            if(sessionManager.isSessionAlive()) {
+                String loggedInUserSap = null;
+                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                    loggedInUserSap = SessionManager.getInstance().getLoggedInMember().getSap();
+                else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID)
+                    loggedInUserSap = SessionManager.getInstance().getGuestMember().getSap();
+
+                int noOfLikes = post.getLikesIds().size();
+                int i = 0;
+                while(i<noOfLikes) {
+                    if(post.getLikesIds().get(i).equals(loggedInUserSap)) {
+                        post.getLikesIds().remove(i);
+                        break;
+                    }
+                    i++;
+                }
+                // if no current user id is not present in likesIds then add
+                if(i==noOfLikes) {
+                    System.out.println("liked");
+                    post.getLikesIds().add(loggedInUserSap);
+                }
+                //save the like in database
+                String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
+                DatabaseReference postReference = FirebaseDatabase.getInstance().getReference(postUrl);
+                postReference.setValue(post);
+
+                //update the UI
+                recyclerViewAdapter.modifyPost(post);
+
+            } else {
+                Log.i(TAG,"unable to like as user session is not in progress");
+                interactionListener.onPostFragmentInteraction(REQUEST_AUTHENTICATION,null);
+                Toast.makeText(this.getContext(),"Please log in to like the post",Toast.LENGTH_LONG).show();
+            }
+        }
+        else if(view.getId() == R.id.image_button_post_delete) {
+            Log.i(TAG,"Post by "+post.getPostId()+" Deleted");
+
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.getContext());
+            alertDialog.setTitle("Delete this Post");
+            alertDialog.setMessage("Are you Sure ? ");
+            alertDialog.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String postUrl = "posts/"+post.getYearId()+"/"+post.getMonthId()+"/"+post.getPostId();
+                    DatabaseReference postReference = FirebaseDatabase.getInstance().getReference(postUrl);
+                    Post nullPost = new Post();
+                    postReference.setValue(nullPost);
+
+                    recyclerViewAdapter.removePost(post.getPostId());
+                    Toast.makeText(HomePageFragment.this.getContext(),"Deleted Sucessfully by Post Controller",Toast.LENGTH_SHORT).show();
+                }
+            });
+            alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    // DO SOMETHING HERE
+
+                }
+            });
+
+            AlertDialog dialog = alertDialog.create();
+            dialog.show();
+        }
+
+    }
+
+    @Override
+    public void onRecyclerAddToCartClick(Post event) {
+
+    }
+
+    public void addPost(Post post) {
+        recyclerViewAdapter.addPostv2(post);
+    }
+
+    public void removePost(Post post) {
+        recyclerViewAdapter.removePost(post.getPostId());
+    }
+
+    public void modifyPost(Post newPost) {
+        recyclerViewAdapter.modifyPost(newPost);
+    }
+
+    public boolean isViewAlive() {
+        return viewAlive;
+    }
+
+    public interface FragmentInteractionListener {
+        void onPostFragmentInteraction(int code,Bundle data);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.post_menu,menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 }
