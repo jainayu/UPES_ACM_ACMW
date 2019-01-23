@@ -799,6 +799,11 @@ public class HomePageFragment extends Fragment
 
     }
 
+    @Override
+    public void onRecyclerAddToCartClick(Post event) {
+
+    }
+
     public void addPost(Post post) {
         recyclerViewAdapter.addPostv2(post);
     }

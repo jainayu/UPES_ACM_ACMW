@@ -71,6 +71,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                     setCurrentFragment(EventDetailFragment.newInstance(event),false);
                     break;
                 }
+
                 default: {
                     break;
                 }

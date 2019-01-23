@@ -43,6 +43,7 @@ public class SessionManager  {
     private static final String GUEST_OTP_KEY = "guest otp key";
     private static final String GUEST_VERIFIED_KEY = "guest verified";
 
+
     private static SessionManager sessionManager;
     /* ********************************************************************************************************* */
 

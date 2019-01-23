@@ -17,8 +17,7 @@
             android:id="@+id/image_view_cover"
             android:layout_width="match_parent"
             android:layout_height="160dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/acm_app_logo" />
+            android:scaleType="centerCrop" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,8 +76,13 @@
                     android:layout_height="wrap_content"
                     />
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
             <Button
-                android:layout_width="100dp"
+                android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:background="@drawable/button_background_events"
                 android:textColor="#fff"
@@ -87,6 +91,18 @@
                 android:id="@+id/details"
                 android:layout_gravity="center_vertical"
                 android:text="Details"/>
+            <Button
+                android:layout_width="70dp"
+                android:layout_height="20dp"
+                android:layout_margin="10sp"
+                android:background="@drawable/button_background_events"
+                android:textColor="#fff"
+                android:textSize="10sp"
+                android:layout_weight="1"
+                android:id="@+id/button_add_to_cart"
+                android:layout_gravity="center_vertical"
+                android:text="Add To Cart"/>
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

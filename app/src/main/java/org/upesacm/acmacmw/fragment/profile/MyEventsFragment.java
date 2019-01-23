@@ -82,6 +82,11 @@ public class MyEventsFragment extends Fragment implements MyEventDetailFragment.
                 myEventDetailFragment.setArguments(bundle);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout_activity_profile,myEventDetailFragment).addToBackStack(null).commit();
             }
+
+            @Override
+            public void onRecyclerAddToCartClick(Event event) {
+
+            }
         });
         // fix if user has no events
         FirebaseDatabase.getInstance().getReference().child(FirebaseConfig.EVENTS_DB)

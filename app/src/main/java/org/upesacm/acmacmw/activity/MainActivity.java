@@ -3,7 +3,9 @@ package org.upesacm.acmacmw.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.fragment.event.CartFragment;
 import org.upesacm.acmacmw.fragment.main.HomePageFragment;
 import org.upesacm.acmacmw.fragment.hompage.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.hompage.SponsorsFragment;
@@ -29,7 +32,9 @@ import org.upesacm.acmacmw.fragment.main.EventsListFragment;
 import org.upesacm.acmacmw.fragment.main.HierarchyFragment;
 import org.upesacm.acmacmw.fragment.main.ProfileFragment;
 import org.upesacm.acmacmw.model.Event;
+import org.upesacm.acmacmw.util.Cart;
 import org.upesacm.acmacmw.util.Config;
+import org.upesacm.acmacmw.util.SessionManager;
 
 public class MainActivity extends AppCompatActivity implements
         BottomNavigationView.OnNavigationItemSelectedListener,
@@ -49,11 +54,12 @@ public class MainActivity extends AppCompatActivity implements
     private int selectedFragmentId;
     private BottomNavigationView bottomNavigationView;
     private FrameLayout frameLayout;
+    ConstraintLayout constraintLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_home_page);
-
+        constraintLayout=findViewById(R.id.constraintLayout);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if(currentUser==null)
         {
@@ -83,8 +89,8 @@ public class MainActivity extends AppCompatActivity implements
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w("tag", "signInAnonymously:failure", task.getException());
-                                Toast.makeText(MainActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
+                                Snackbar.make(constraintLayout, "Authentication failed.",
+                                        Toast.LENGTH_LONG).show();
                             }
                         }
                     });
@@ -209,6 +215,36 @@ public class MainActivity extends AppCompatActivity implements
         eventActIntent.putExtra(Event.PARCEL_KEY,event);
         eventActIntent.putExtra(EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY,R.layout.fragment_event_detail);
         startActivity(eventActIntent);
+    }
+
+    @Override
+    public void onAddToCartClicked(Event event) {
+        boolean alreadyAdded=false;
+        for(Event event1:Cart.cartEvents)
+        {
+            if(event1.getEventID().equals(event.getEventID()))
+            {
+                alreadyAdded=true;
+            }
+        }
+        if(!alreadyAdded)
+        {
+            Cart.cartEvents.add(event);
+            Snackbar.make(constraintLayout, event.getEventName()+" Added to Cart", Snackbar.LENGTH_LONG).show();
+        }
+        else {
+            Snackbar.make(constraintLayout, event.getEventName()+" Already in Cart", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onCartButtonPressed() {
+        if(Cart.cartEvents.isEmpty())
+        {
+            Snackbar.make(constraintLayout,"Cart is Empty",Snackbar.LENGTH_LONG).show();
+        }
+        else
+        setCurrentFragment(new CartFragment(),true);
     }
 
     @Override

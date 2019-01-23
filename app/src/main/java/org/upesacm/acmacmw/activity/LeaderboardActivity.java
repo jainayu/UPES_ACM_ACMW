@@ -185,7 +185,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                     return true;
                 }
-                final List<Participant> filteredModelList = filter(adapter.getParticipants(), s);
+                final List<Participant> filteredModelList = filter(participants, s);
                 adapter.setItem(filteredModelList);
                 adapter.notifyDataSetChanged();
                 return true;
