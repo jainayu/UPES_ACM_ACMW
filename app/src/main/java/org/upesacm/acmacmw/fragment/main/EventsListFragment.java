@@ -114,9 +114,15 @@ public class EventsListFragment extends Fragment implements
         return view;
     }
 
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        listener=null;
+//    }
+
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDetach() {
+        super.onDetach();
         listener=null;
     }
 
@@ -127,8 +133,18 @@ public class EventsListFragment extends Fragment implements
         listener.onClickEventDetails(dataItem);
     }
 
+    @Override
+    public void onRecyclerAddToCartClick(Event event) {
+        listener.onAddToCartClicked(event);
+    }
+
     public interface FragmentInteractionListener {
         void onClickEventDetails(Event event);
+
+
+        void onAddToCartClicked(Event event);
+
+        void onCartButtonPressed();
     }
 
     @Override
@@ -143,6 +159,11 @@ public class EventsListFragment extends Fragment implements
         {
             Intent intent=new Intent(getActivity(),LeaderboardActivity.class);
             startActivity(intent);
+        }
+        if(item.getItemId()==R.id.cart)
+        {
+            if(listener!=null)
+           listener.onCartButtonPressed();
         }
         return super.onOptionsItemSelected(item);
     }

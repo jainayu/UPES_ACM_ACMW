@@ -74,6 +74,10 @@ public class LeaderboardActivity extends AppCompatActivity {
                         return p1.getScore() - p2.getScore();
                     }
                 }));
+                for(int r=0; r < participants.size();r++){
+                    Participant p= participants.get(r);
+                    p.setRank(r+1);
+                }
                 adapter.setItem(participants);
             }
 
@@ -122,7 +126,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull ItemViewHolder itemViewHolder, int i) {
             Participant p= participants.get(i);
             itemViewHolder.score.setText(""+p.getScore());
-            itemViewHolder.rank.setText(i+1+"");
+            itemViewHolder.rank.setText(p.getRank()+"");
             itemViewHolder.name.setText(p.getName());
         }
 
@@ -181,7 +185,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                     return true;
                 }
-                final List<Participant> filteredModelList = filter(adapter.getParticipants(), s);
+                final List<Participant> filteredModelList = filter(participants, s);
                 adapter.setItem(filteredModelList);
                 adapter.notifyDataSetChanged();
                 return true;

@@ -24,8 +24,9 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/acm_app_logo"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activity.CheckoutActivity"></activity>
         <activity android:name=".activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -64,12 +65,12 @@
             android:name=".activity.MenuDetailsActivity"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.MemberRegistrationActivity"
-            android:screenOrientation="portrait" ></activity>
-        <activity android:name=".activity.LeaderboardActivity"
-            android:screenOrientation="portrait" >
-
-        </activity>
+        <activity
+            android:name=".activity.MemberRegistrationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.LeaderboardActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

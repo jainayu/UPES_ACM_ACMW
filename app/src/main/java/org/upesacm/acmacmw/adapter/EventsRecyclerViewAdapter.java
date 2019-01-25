@@ -37,6 +37,7 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(holder instanceof EventViewHolder)
             ((EventViewHolder)holder).bindData(eventArrayList.get(position),position);
+
     }
 
     @Override
@@ -93,7 +94,7 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
         TextView textViewEventName,textViewTagline,textViewDay,textViewMonth;
         ImageView imageViewCover;
         TextView textViewDate;
-        Button buttonDetails;
+        Button buttonDetails,buttonAddToCart;
 
         //the values of these variables will change with each call of bindViewHolder()
         Event event;
@@ -103,12 +104,15 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
             this.textViewEventName = itemView.findViewById(R.id.text_view_event_name);
             this.textViewDate = itemView.findViewById(R.id.text_view_event_date);
             this.buttonDetails=itemView.findViewById(R.id.details);
+            this.buttonAddToCart=itemView.findViewById(R.id.button_add_to_cart);
             this.textViewDay=itemView.findViewById(R.id.textview_day);
             this.textViewMonth=itemView.findViewById(R.id.textview_month);
             this.textViewTagline=itemView.findViewById(R.id.textview_tagline);
             this.imageViewCover=itemView.findViewById(R.id.image_view_cover);
+            buttonAddToCart.setVisibility(View.GONE);
             itemView.setOnClickListener(this);
             buttonDetails.setOnClickListener(this);
+            buttonAddToCart.setOnClickListener(this);
         }
 
         public void bindData(Event event, int position) {
@@ -128,11 +132,22 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
                     .load(event.getCover())
                     .thumbnail(Glide.with(itemView.getContext()).load(R.drawable.post_image_holder))
                     .into(imageViewCover);
+            if(event.getMinParticipant()==1) {
+                buttonAddToCart.setVisibility(View.VISIBLE);
+            }
         }
         @Override
         public void onClick(View view) {
-            if(itemSelectListener != null)
-                itemSelectListener.onRecyclerItemSelect(view,event,position);
+            if(view.getId()==R.id.details){
+                if(itemSelectListener != null)
+                    itemSelectListener.onRecyclerItemSelect(view,event,position);
+            }
+            else if(view.getId()==R.id.button_add_to_cart)
+            {
+                itemSelectListener.onRecyclerAddToCartClick(event);
+            }
+
+
         }
     }
 
