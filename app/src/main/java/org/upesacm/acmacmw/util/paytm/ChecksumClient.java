@@ -11,27 +11,11 @@ public interface ChecksumClient {
     Call<ResponseModel> generateChecksum(@Field("MID") String mID,
                                          @Field("ORDER_ID") String orderId,
                                          @Field("CUST_ID") String custId,
-                                         @Field("MOBILE_NO") String mobNo,
-                                         @Field("EMAIL") String email,
                                          @Field("INDUSTRY_TYPE_ID") String indsTypeId,
                                          @Field("CHANNEL_ID") String channelId,
                                          @Field("TXN_AMOUNT") String txnAmt,
                                          @Field("WEBSITE") String website,
                                          @Field("CALLBACK_URL") String callbackUrl);
-
-    @FormUrlEncoded
-    @POST("verifyChecksum.php")
-    Call<VerifyChecksumResultModel> verifyChecksum(@Field("CHECKSUMHASH") String checksumhash,
-                                @Field("MID") String mID,
-                                @Field("ORDER_ID") String orderId,
-                                @Field("CUST_ID") String custId,
-                                @Field("MOBILE_NO") String mobNo,
-                                @Field("EMAIL") String email,
-                                @Field("INDUSTRY_TYPE_ID") String indsTypeId,
-                                @Field("CHANNEL_ID") String channelId,
-                                @Field("TXN_AMOUNT") String txnAmt,
-                                @Field("WEBSITE") String website,
-                                @Field("CALLBACK_URL") String callbackUrl);
 
 
 }

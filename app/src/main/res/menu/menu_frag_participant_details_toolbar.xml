@@ -6,5 +6,5 @@
         android:id="@+id/action_next_toolbar_frag_participant_details"
         android:icon="@drawable/ic_action_next_item"
         android:title="Item"
-        app:showAsAction="always" />
+        app:showAsAction="always|withText" />
 </menu>

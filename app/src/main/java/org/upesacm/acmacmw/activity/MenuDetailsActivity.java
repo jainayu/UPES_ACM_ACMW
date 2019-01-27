@@ -1,12 +1,20 @@
 package org.upesacm.acmacmw.activity;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.main.MenuFragment;
@@ -14,6 +22,7 @@ import org.upesacm.acmacmw.fragment.menu.ContactUsFragment;
 import org.upesacm.acmacmw.fragment.menu.AboutFragment;
 import org.upesacm.acmacmw.fragment.menu.AlumniFragment;
 import org.upesacm.acmacmw.fragment.menu.PolicyFragment;
+import org.upesacm.acmacmw.util.FirebaseConfig;
 
 public class MenuDetailsActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -47,12 +56,6 @@ public class MenuDetailsActivity extends AppCompatActivity {
             case MenuFragment.ACTION_ALUMNI : {
                 setCurrentFragment(new AlumniFragment(),false);
                 getSupportActionBar().setTitle("Alumni");
-                break;
-            }
-            case MenuFragment.ACTION_NEW_REGISTRATION: {
-                Intent memberRegistrationActIntent = new Intent(this,MemberRegistrationActivity.class);
-                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
-                startActivity(memberRegistrationActIntent);
                 break;
             }
             case MenuFragment.ACTION_ABOUT_US: {

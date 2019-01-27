@@ -25,8 +25,6 @@ final public class PaytmUtil {
         paramMap.put( "MID" , Config.MID);
         paramMap.put( "ORDER_ID" , order.getOrderId());
         paramMap.put( "CUST_ID" , order.getCustomerId());
-        paramMap.put( "MOBILE_NO" , order.getMobileNo());
-        paramMap.put( "EMAIL" , order.getEmail());
         paramMap.put( "CHANNEL_ID" , Config.CHANNEL_ID);
         paramMap.put( "TXN_AMOUNT" , order.getAmount());
         paramMap.put( "WEBSITE" , Config.WEBSITE);
@@ -36,8 +34,6 @@ final public class PaytmUtil {
         RetrofitPaytmApiClient.getInstance().getChecksumClient().generateChecksum(Config.MID,
                 order.getOrderId(),
                 order.getCustomerId(),
-                order.getMobileNo(),
-                order.getEmail(),
                 Config.INDUSTRY_TYPE_ID,
                 Config.CHANNEL_ID,
                 order.getAmount(),
@@ -65,7 +61,7 @@ final public class PaytmUtil {
     }
 
     private static void beginTransaction(final Context context,PaytmOrder paytmOrder) {
-        PaytmPGService paytmPGService = PaytmPGService.getStagingService();
+        PaytmPGService paytmPGService = PaytmPGService.getProductionService();
         paytmPGService.initialize(paytmOrder,null);
         paytmPGService.startPaymentTransaction(context, true, true, new PaytmPaymentTransactionCallback() {
             @Override
@@ -73,40 +69,6 @@ final public class PaytmUtil {
                 Log.i(TAG,"response : "+inResponse.toString());
                 Toast.makeText(context,inResponse.toString(),Toast.LENGTH_SHORT).show();
                 Log.i(TAG,"REsponse checksum : "+inResponse.getString("CHECKSUMHASH"));
-
-                String checksumhash = inResponse.getString("CHECKSUMHASH");
-                String orderId = inResponse.getString("ORDER_ID");
-                String custId = inResponse.getString("CUST_ID");
-                String mobNo = inResponse.getString("MOBILE_NO");
-                String email = inResponse.getString("EMAIL");
-                String channelId = inResponse.getString("CHANNEL_ID");
-                String txnAmt = inResponse.getString("TXN_AMOUNT");
-                String website = inResponse.getString("WEBSITE");
-                String industryTypeId = inResponse.getString("INDUSTRY_TYPE_ID");
-                String callbackurl = inResponse.getString("CALLBACK_URL");
-                RetrofitPaytmApiClient.getInstance().getChecksumClient().verifyChecksum(
-                        checksumhash, Config.MID, orderId, custId, mobNo, email,
-                        industryTypeId, channelId, txnAmt, website, callbackurl)
-                        .enqueue(new Callback<VerifyChecksumResultModel>() {
-                            @Override
-                            public void onResponse(Call<VerifyChecksumResultModel> call, Response<VerifyChecksumResultModel> response) {
-                                VerifyChecksumResultModel res = response.body();
-                                Log.i(TAG,"verify response : "+res);
-                                Toast.makeText(context,res.IS_CHECKSUM_VALID,Toast.LENGTH_LONG).show();
-                                if(res.IS_CHECKSUM_VALID.equals("Y")) {
-                                    traCallback.onPaytmTransactionResponse(true);
-                                } else {
-                                    traCallback.onPaytmTransactionResponse(false);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<VerifyChecksumResultModel> call, Throwable t) {
-                                t.printStackTrace();
-                                Toast.makeText(context,"verification failed",Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
             }
 
             @Override
