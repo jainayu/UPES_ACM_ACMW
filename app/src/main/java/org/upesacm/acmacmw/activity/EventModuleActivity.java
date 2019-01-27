@@ -108,11 +108,12 @@ public class EventModuleActivity extends AppCompatActivity implements
     }
 
     private void sendTeamId(Map<String,Participant> participants,Event event,String teamId) {
-        OTPSender sender=new OTPSender();
+
         for(String sap:participants.keySet()) {
             Participant participant = participants.get(sap);
             String mailBody = participant.getName()+"\n"+
                     teamId;
+            OTPSender sender=new OTPSender();
             sender.execute(mailBody,participant.getEmail(),event.getEventName()+" registration initiated");
         }
     }
