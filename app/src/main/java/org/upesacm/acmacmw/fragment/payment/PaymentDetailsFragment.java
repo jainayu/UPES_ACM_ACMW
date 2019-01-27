@@ -115,11 +115,11 @@ public class PaymentDetailsFragment extends Fragment implements
     @Override
     public void onClick(View v) {
         showProgress(true);
-        listener.onClickNext(recipient);
+        listener.onClickNext(recipient,amount);
     }
 
     public interface OnFragmentInteractionListener {
-        void onClickNext(Member recipient);
+        void onClickNext(Member recipient, int amount);
     }
 
 }

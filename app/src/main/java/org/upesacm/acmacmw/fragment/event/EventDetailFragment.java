@@ -34,12 +34,14 @@ import java.util.Calendar;
  */
 public class EventDetailFragment extends Fragment {
     private static final String TAG = "EventDetailsFragment";
-    public static final long UID = Config.EVENT_DETAIL_FRAGMENT_UID;
+    public static final int NEW_TEAM_REGISTRATION = 1;
+    public static final int REGISTRATION_CONFIRMATION = 2;
     FragmentInteractionListener fragmentInteractionListener;
     Button buttonEventDetailRegister;
     Event event;
     Toolbar toolbar;
     TextView textViewDate;
+    TextView textViewConfirmReg;
     ImageView poster,phone,whatsapp;
     private TextView textViewEventName,textViewDay,textViewMonth,textViewTagline,textViewEventDescription;
 
@@ -90,6 +92,7 @@ public class EventDetailFragment extends Fragment {
         textViewDay=view.findViewById(R.id.textview_day);
         textViewMonth=view.findViewById(R.id.textview_month);
         textViewTagline=view.findViewById(R.id.textview_tagline);
+        textViewConfirmReg = view.findViewById(R.id.text_view_event_details_confirm_reg);
         poster=view.findViewById(R.id.poster);
         textViewEventDescription=view.findViewById(R.id.textview_description);
         phone=view.findViewById(R.id.image_view_event_detail_phone);
@@ -115,7 +118,13 @@ public class EventDetailFragment extends Fragment {
         buttonEventDetailRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            fragmentInteractionListener.onClickRegister(event);
+            fragmentInteractionListener.onEventDetailsFragmentInteraction(event,NEW_TEAM_REGISTRATION);
+            }
+        });
+        textViewConfirmReg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragmentInteractionListener.onEventDetailsFragmentInteraction(event,REGISTRATION_CONFIRMATION);
             }
         });
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -152,6 +161,6 @@ public class EventDetailFragment extends Fragment {
         }
     }
     public interface FragmentInteractionListener {
-        void onClickRegister(Event event);
+        void onEventDetailsFragmentInteraction(Event event, int code);
     }
 }

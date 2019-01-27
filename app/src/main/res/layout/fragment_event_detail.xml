@@ -43,7 +43,7 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="200dp">
 
 
             <LinearLayout
@@ -132,8 +132,8 @@
                         android:id="@+id/textview_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:justificationMode="inter_word"/>
+                        android:justificationMode="inter_word"
+                        android:padding="5dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -142,17 +142,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="32dp"
                 android:background="@drawable/button_background_events"
                 android:text="Register"
                 android:textAppearance="@style/TextAppearance.AppCompat"
                 android:textColor="@android:color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout14" />
+
+            <TextView
+                android:id="@+id/text_view_event_details_confirm_reg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="64dp"
+                android:text="Confirm Registration"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/button_event_detail_register"
+                app:layout_constraintStart_toStartOf="@+id/button_event_detail_register"
+                app:layout_constraintTop_toBottomOf="@+id/button_event_detail_register" />
 
 
         </android.support.constraint.ConstraintLayout>

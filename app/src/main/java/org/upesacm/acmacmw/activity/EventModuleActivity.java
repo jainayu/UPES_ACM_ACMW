@@ -1,7 +1,6 @@
 package org.upesacm.acmacmw.activity;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,13 +15,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.EventDetailFragment;
 import org.upesacm.acmacmw.fragment.event.ParticipantDetailFragment;
+import org.upesacm.acmacmw.fragment.event.TeamIdFragment;
 import org.upesacm.acmacmw.fragment.payment.PaymentDetailsFragment;
 import org.upesacm.acmacmw.fragment.event.SAPIDFragment;
 import org.upesacm.acmacmw.fragment.payment.OtpConfirmationFragment;
@@ -30,10 +28,10 @@ import org.upesacm.acmacmw.fragment.payment.RecipientSelectFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
+import org.upesacm.acmacmw.model.Team;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
-import org.upesacm.acmacmw.util.paytm.Order;
 import org.upesacm.acmacmw.util.paytm.PaytmUtil;
 
 import java.util.ArrayList;
@@ -48,7 +46,8 @@ public class EventModuleActivity extends AppCompatActivity implements
         RecipientSelectFragment.FragmentInteractionListener,
         OtpConfirmationFragment.OnFragmentInteractionListener,
         PaymentDetailsFragment.OnFragmentInteractionListener,
-        PaytmUtil.TransactionCallback{
+        PaytmUtil.TransactionCallback,
+        TeamIdFragment.FragmentInteractionListener {
     public static final String TAG = "EventModuleActivity";
     private static final String REGISTERED_EVENT_KEY = "registered event key";
     private static final String PARTICIPANTS_KEY = "participants key";
@@ -92,11 +91,31 @@ public class EventModuleActivity extends AppCompatActivity implements
     }
 
     private void sendOtp(Member recipient,Participant participant,Event event,String otp) {
+        Log.i(TAG,"Sending mail to recipient");
         OTPSender sender=new OTPSender();
         String mailBody = participant.getName()+" "+event.getEventID()+" "+otp;
         sender.execute(mailBody,recipient.getEmail(),"New Participant OTP");
     }
 
+    private void sendTeamDetails(Map<String,Participant> participants,Event event) {
+        OTPSender sender=new OTPSender();
+        for(String sap:participants.keySet()) {
+            Participant participant = participants.get(sap);
+            String mailBody = participant.getName()+"\n"+
+                    event.getEventID();
+            sender.execute(mailBody,participant.getEmail(),"Registration Confirmed");
+        }
+    }
+
+    private void sendTeamId(Map<String,Participant> participants,Event event,String teamId) {
+        OTPSender sender=new OTPSender();
+        for(String sap:participants.keySet()) {
+            Participant participant = participants.get(sap);
+            String mailBody = participant.getName()+"\n"+
+                    teamId;
+            sender.execute(mailBody,participant.getEmail(),event.getEventName()+" registration initiated");
+        }
+    }
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
@@ -105,12 +124,22 @@ public class EventModuleActivity extends AppCompatActivity implements
 
 
     @Override
-    public void onClickRegister(Event event) {
-        Fragment fragment = new SAPIDFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(Event.PARCEL_KEY,event);
-        fragment.setArguments(args);
-        setCurrentFragment(fragment, true);
+    public void onEventDetailsFragmentInteraction(Event event, int code) {
+        tempStorage.putParcelable(REGISTERED_EVENT_KEY,event); //store the event for later use for other callbacks
+        switch (code) {
+            case EventDetailFragment.NEW_TEAM_REGISTRATION: {
+                Fragment fragment = new SAPIDFragment();
+                Bundle args = new Bundle();
+                args.putParcelable(Event.PARCEL_KEY, event);
+                fragment.setArguments(args);
+                setCurrentFragment(fragment, true);
+                break;
+            }
+            case EventDetailFragment.REGISTRATION_CONFIRMATION: {
+                setCurrentFragment(TeamIdFragment.newInstance(),true);
+                break;
+            }
+        }
     }
 
     @Override
@@ -119,13 +148,9 @@ public class EventModuleActivity extends AppCompatActivity implements
         for(String sap:sapIds) {
             System.out.println("id : "+sap);
         }
-        Fragment fragment = new ParticipantDetailFragment();
-        Bundle args = new Bundle();
-        args.putStringArrayList(Participant.PARTICIPANT_SAP_KEY_LIST,(ArrayList<String>)sapIds);
-        args.putParcelable(Event.PARCEL_KEY,selectedEvent);
-        fragment.setArguments(args);
-        setCurrentFragment(fragment, true);
+        setCurrentFragment(ParticipantDetailFragment.newInstance(sapIds,selectedEvent), true);
     }
+
     @Override
     public void onParticipantDetailsAvailable(final List<String> newSapIds, final List<String> acmParticipantsSap,
                                               final List<String> alreadyRegistered, final Map<String,Participant> participants, final Event event, boolean error) {
@@ -135,99 +160,66 @@ public class EventModuleActivity extends AppCompatActivity implements
             return;
         }
         final List<String> allParticipants = new ArrayList<>(participants.keySet());
+        //add the participants to the database
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseConfig.EVENTS_DB)
                 .child(FirebaseConfig.PARTICIPANTS)
-                .updateChildren(new HashMap<String, Object>(participants)) //add the participants to the database
+                .updateChildren(new HashMap<String, Object>(participants))
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
-                            FirebaseDatabase.getInstance().getReference()
-                                .child(FirebaseConfig.EVENTS_DB)
-                                .child(FirebaseConfig.EVENTS)
-                                .child(event.getEventID())
-                                .child(FirebaseConfig.EVENT_TEAMS_COUNT)
-                                .runTransaction(new Transaction.Handler() {
-                                    @NonNull
-                                    @Override
-                                    public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                                        if(mutableData!=null) {
-                                            int teamsCount = mutableData.getValue(Integer.class);
-                                            ++teamsCount;
-                                            mutableData.setValue(teamsCount);
-                                            return Transaction.success(mutableData);
-                                        }
-                                        return Transaction.abort();
-                                    }
-
-                                    @Override
-                                    public void onComplete(@Nullable final DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                                        final int teamId = dataSnapshot.getValue(Integer.class) - 1;//start from 0
-                                        Log.i(TAG,"Transaction Complete "+teamId);
-                                        FirebaseDatabase.getInstance().getReference()
-                                                .child(FirebaseConfig.EVENTS_DB)
-                                                .child(FirebaseConfig.EVENTS)
-                                                .child(event.getEventID())
-                                                .child(FirebaseConfig.TEAMS)
-                                                .child(String.valueOf(teamId))
-                                                .setValue(allParticipants)
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if(task.isSuccessful()) {
-                                                            /*FirebaseDatabase.getInstance().getReference()
-                                                                    .child(FirebaseConfig.EVENTS_DB)
-                                                                    .child(FirebaseConfig.EVENTS)
-                                                                    .child(event.getEventID())
-                                                                    .child(FirebaseConfig.EVENT_OTP_RECIPIENT)
-                                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                            List<String> recipientsSap = new ArrayList<>();
-                                                                            for(DataSnapshot ds:dataSnapshot.getChildren()) {
-                                                                                recipientsSap.add(String.valueOf(ds.getValue(Long.class)));
-                                                                            }
-                                                                            setCurrentFragment(RecipientSelectFragment.newInstance(recipientsSap),true);
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            databaseError.toException().printStackTrace();
-                                                                        }
-                                                                    });*/
-                                                            //TODO: add code to start paytm transaction here
-                                                            String timeStamp = ""+System.currentTimeMillis();
-                                                            Order order = new Order.Builder()
-                                                                    .setOrderId(event.getEventID()+timeStamp+teamId)
-                                                                    .setCustomerId("customer"+teamId)
-                                                                    .setAmount("1.00")
-                                                                    .setMobileNo(participants.get(allParticipants.get(0)).getContact())
-                                                                    .setEmail(participants.get(allParticipants.get(0)).getEmail())
-                                                                    .build();
-                                                            PaytmUtil.initializePayment(EventModuleActivity.this, order, new PaytmUtil.TransactionCallback() {
-                                                                @Override
-                                                                public void onPaytmTransactionResponse(boolean success) {
-
+                        if(task.isSuccessful()) { //after the participants' details have been saved in database
+                            final String teamId = event.getEventID()+allParticipants.get(0);
+                            //Add participants saps to the team node
+                            FirebaseDatabase.getInstance().getReference().child(FirebaseConfig.EVENTS_DB)
+                                    .child(FirebaseConfig.EVENTS).child(event.getEventID())
+                                    .child(FirebaseConfig.TEAMS).child(teamId).setValue(allParticipants)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()) { //after team has been saved under the event node
+                                                //fetch the OTP recipients from the database
+                                                FirebaseDatabase.getInstance().getReference()
+                                                        .child(FirebaseConfig.EVENTS_DB).child(FirebaseConfig.EVENTS)
+                                                        .child(event.getEventID()).child(FirebaseConfig.EVENT_OTP_RECIPIENT)
+                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                List<String> recipientSaps = new ArrayList<>();
+                                                                for(DataSnapshot ds:dataSnapshot.getChildren()) {
+                                                                    recipientSaps.add(String.valueOf(ds.getValue(Long.class)));
                                                                 }
-                                                            });
-                                                        }
-                                                    }
-                                                });
-                                        tempStorage.putInt(CONTEXT_TEAM_KEY,teamId);
-                                    }
-                                });
+                                                                sendTeamId(participants,event,teamId);//send the team id to the participants
+                                                                setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),true);
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                databaseError.toException().printStackTrace();
+                                                            }
+                                                        });
+                                            } else {
+                                                Toast.makeText(EventModuleActivity.this,"Network failure",Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                            //save team id for later use
+                            tempStorage.putString(CONTEXT_TEAM_KEY,teamId);
+                        } else {
+                            Toast.makeText(EventModuleActivity.this,"Failed to save participant details",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-        tempStorage.putParcelable(REGISTERED_EVENT_KEY,event);
+        //save the participants map for later use
         tempStorage.putSerializable(PARTICIPANTS_KEY,(HashMap<String,Participant>)participants);
     }
 
     @Override
-    public void onRecipientSelect(Member recipient) {
-        Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
-        Map<String,Participant> participants = (HashMap<String,Participant>)tempStorage.getSerializable(PARTICIPANTS_KEY);
+    public void onRecipientSelect(final Member recipient) {
+        final Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        final String teamId = tempStorage.getString(CONTEXT_TEAM_KEY);
+        final Map<String,Participant> participants = (HashMap<String,Participant>)tempStorage.getSerializable(PARTICIPANTS_KEY);
+        final List<String> allParticipantsSap = new ArrayList<>(participants.keySet());
         Log.i(TAG,"onRecipientSelect called");
         int amount=0;
         if(event.getEntryFeesTeam()==0)
@@ -246,74 +238,59 @@ public class EventModuleActivity extends AppCompatActivity implements
         else {
             amount=event.getEntryFeesTeam();
         }
-       setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,amount),true);
-    }
-
-    @Override
-    public void onClickNext(final Member recipient) {
-        final Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
-        final int teamId = tempStorage.getInt(CONTEXT_TEAM_KEY);
-        Log.i(TAG,"OnClicknext called "+event.getEventID());
+        final int totalAmout = amount;
         Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
 
         //generate otp
-        String otp = RandomOTPGenerator.generate(teamId,6);
+        final String otp = RandomOTPGenerator.generate(Integer.parseInt(allParticipantsSap.get(0)),6);
         Log.i(TAG,"OTP : "+otp);
-        final String otpUrl = FirebaseConfig.EVENTS_DB+"/"+
-                FirebaseConfig.EVENTS+"/"+
-                event.getEventID()+"/"+
-                FirebaseConfig.EVENT_OTPS+"/"+
-                teamId+"/"+
-                FirebaseConfig.TEAM_OTP;
-        Log.i(TAG,otpUrl);
+        Team team = new Team.Builder()
+                .setOtp(otp)
+                .setRecipient(recipient.getSap())
+                .setConfirmed(false)
+                .setAmount(amount)
+                .build();
         FirebaseDatabase.getInstance().getReference()
-                .child(otpUrl)
-                .setValue(otp)
+                .child(FirebaseConfig.EVENTS_DB).child(FirebaseConfig.EVENTS)
+                .child(event.getEventID()).child(FirebaseConfig.EVENT_OTPS)
+                .child(teamId)
+                .setValue(team)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
-                            FirebaseDatabase.getInstance().getReference().child(FirebaseConfig.EVENTS_DB)
-                                    .child(FirebaseConfig.EVENTS)
-                                    .child(event.getEventID())
-                                    .child(FirebaseConfig.EVENT_OTPS)
-                                    .child(String.valueOf(teamId))
-                                    .child(FirebaseConfig.TEAM_OTP_RECIPIENT)
-                                    .setValue(recipient.getSap())
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful())
-                                                setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl),true);
-                                            else {
-                                                Log.e(TAG,"Failed to save the recipient sap in database");
-                                                Toast.makeText(EventModuleActivity.this,"network error",Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-
-
+                            sendTeamId(participants,event,teamId);
+                            sendOtp(recipient,participants.get(allParticipantsSap.get(0)),event,otp);
+                            setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout),true);
                         } else {
-                            Log.e(TAG,"Failed to save the generated otp");
-                            Toast.makeText(EventModuleActivity.this,"network error",Toast.LENGTH_SHORT).show();
+                            //TODO: display some error message
                         }
                     }
                 });
     }
 
     @Override
-    public void onOtpConfirmationResult(boolean confirmed) {
+    public void onClickNext(final Member recipient, int amount) {
+        String teamId = tempStorage.getString(CONTEXT_TEAM_KEY);
         Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
-        int teamId = tempStorage.getInt(CONTEXT_TEAM_KEY);
+        String otpUrl = FirebaseConfig.EVENTS_DB+"/" + FirebaseConfig.EVENTS+"/"+
+                event.getEventID()+"/" + FirebaseConfig.EVENT_OTPS+"/" + teamId+"/" + FirebaseConfig.TEAM_OTP;
+        Log.i(TAG,"OTP URL : "+otpUrl);
+        setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl), true);
+    }
+
+    @Override
+    public void onOtpConfirmationResult(boolean confirmed) {
+        final Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        String teamId = tempStorage.getString(CONTEXT_TEAM_KEY);
         Log.i(TAG,"confirmed : "+confirmed);
-        Toast.makeText(this,confirmed+"",Toast.LENGTH_SHORT).show();
         if(confirmed) {
             FirebaseDatabase.getInstance().getReference()
                     .child(FirebaseConfig.EVENTS_DB)
                     .child(FirebaseConfig.EVENTS)
                     .child(event.getEventID())
                     .child(FirebaseConfig.EVENT_OTPS)
-                    .child(""+teamId)
+                    .child(teamId)
                     .child(FirebaseConfig.TEAM_OTP_CONFIRMED)
                     .setValue(true)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -322,13 +299,17 @@ public class EventModuleActivity extends AppCompatActivity implements
                             if (task.isSuccessful()) {
                                 Toast.makeText(EventModuleActivity.this, "Registration Successful", Toast.LENGTH_SHORT)
                                         .show();
-
+                                //TODO: Fetch the participant details here to send the registration confirmation mail to them
+//                                Map<String,Participant> participants = (Map<String, Participant>) tempStorage.getSerializable(PARTICIPANTS_KEY);
+//                                sendTeamDetails(participants,event);
                                 int entryId = getSupportFragmentManager().getBackStackEntryAt(0)
                                         .getId();
                                 getSupportFragmentManager().popBackStack(entryId,FragmentManager.POP_BACK_STACK_INCLUSIVE);
                             }
                         }
                     });
+        } else {
+            Toast.makeText(this,"MAX tries exceeded",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -339,5 +320,50 @@ public class EventModuleActivity extends AppCompatActivity implements
         } else {
             Toast.makeText(this,"Payment Failed",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onRegistrationIdAvailable(final String teamId) {
+        Log.i(TAG,"team id : "+teamId);
+        final Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        Log.i(TAG,"event : "+event.getEventID());
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.EVENTS_DB).child(FirebaseConfig.EVENTS)
+                .child(event.getEventID()).child(FirebaseConfig.EVENT_OTPS).child(teamId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        final Team team = dataSnapshot.getValue(Team.class);
+                        Log.i(TAG,"team : "+team);
+                        if(team != null) { //check if such a team has registered or not
+                            if(!team.isConfirmed()) {
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child(FirebaseConfig.ACM_ACMW_MEMBERS).child(team.getRecipient())
+                                        .addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                Member recipient = dataSnapshot.getValue(Member.class);
+                                                setCurrentFragment(PaymentDetailsFragment.newInstance(recipient, team.getAmount()), true);
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                tempStorage.putString(CONTEXT_TEAM_KEY,teamId);
+                            } else {
+                                Toast.makeText(EventModuleActivity.this,"already confirmed",Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(EventModuleActivity.this,"Invalid Team Id",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 }

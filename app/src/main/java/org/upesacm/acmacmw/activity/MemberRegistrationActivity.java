@@ -198,7 +198,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onClickNext(Member recipient) {
+    public void onClickNext(Member recipient, int amount) {
         String sapId = tempStorage.getString(NEW_MEMBER_SAP_KEY);
         String otpUrl = FirebaseConfig.UNCONFIRMED_MEMBERS+"/"+
                 sapId+"/"+
