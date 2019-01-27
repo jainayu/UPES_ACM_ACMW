@@ -227,7 +227,7 @@ public class EventModuleActivity extends AppCompatActivity implements
         {
             for(Map.Entry<String, Participant> participantMap:participants.entrySet())
             {
-                if(participantMap.getValue().isACMMember())
+                if(participantMap.getValue().isAcmmember())
                 {
                     amount=amount+event.getEntryFeesAcm();
                 }
@@ -240,7 +240,7 @@ public class EventModuleActivity extends AppCompatActivity implements
             boolean containsAcmMember=false;
             for(Map.Entry<String, Participant> participantMap:participants.entrySet())
             {
-                if(participantMap.getValue().isACMMember())
+                if(participantMap.getValue().isAcmmember())
                 {
                     containsAcmMember=true;
                     break;
