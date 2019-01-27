@@ -57,6 +57,15 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
     RecyclerViewAdpater recyclerViewAdpater;
     FragmentInteractionListener listener;
 
+    public static ParticipantDetailFragment newInstance(List<String> sapIds,Event selectedEvent) {
+        ParticipantDetailFragment fragment = new ParticipantDetailFragment();
+        Bundle args = new Bundle();
+        args.putStringArrayList(Participant.PARTICIPANT_SAP_KEY_LIST,(ArrayList<String>)sapIds);
+        args.putParcelable(Event.PARCEL_KEY,selectedEvent);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
     @Override
     public void onAttach(Context context) {
         if(context instanceof EventModuleActivity) {

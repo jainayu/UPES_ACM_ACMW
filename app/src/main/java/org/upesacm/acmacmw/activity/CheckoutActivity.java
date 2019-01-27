@@ -1,7 +1,6 @@
 package org.upesacm.acmacmw.activity;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -19,13 +18,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.payment.OtpConfirmationFragment;
 import org.upesacm.acmacmw.fragment.payment.PaymentDetailsFragment;
 import org.upesacm.acmacmw.fragment.payment.RecipientSelectFragment;
 import org.upesacm.acmacmw.model.Event;
@@ -33,13 +30,9 @@ import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
 import org.upesacm.acmacmw.util.Cart;
 import org.upesacm.acmacmw.util.FirebaseConfig;
-import org.upesacm.acmacmw.util.OTPSender;
-import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class CheckoutActivity extends AppCompatActivity
@@ -310,7 +303,7 @@ public class CheckoutActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClickNext(final Member recipient) {
+    public void onClickNext(final Member recipient, int amount) {
 //        final String otp = RandomOTPGenerator.generate(Integer.parseInt(participant.getSap()),6);
 //        FirebaseDatabase.getInstance().getReference()
 //                .child(FirebaseConfig.EVENTS_DB)
