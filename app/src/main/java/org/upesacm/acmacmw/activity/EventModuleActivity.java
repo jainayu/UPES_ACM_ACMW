@@ -236,7 +236,19 @@ public class EventModuleActivity extends AppCompatActivity implements
             }
         }
         else {
-            amount=event.getEntryFeesTeam();
+            boolean containsAcmMember=false;
+            for(Map.Entry<String, Participant> participantMap:participants.entrySet())
+            {
+                if(participantMap.getValue().isACMMember())
+                {
+                    containsAcmMember=true;
+                    break;
+                }
+            }
+            if(containsAcmMember)
+                amount=event.getEntryFeesTeam()-20;
+            else
+                amount=event.getEntryFeesTeam();
         }
         final int totalAmout = amount;
         Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();

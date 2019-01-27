@@ -132,9 +132,9 @@ public class EventsRecyclerViewAdapter extends RecyclerView.Adapter {
                     .load(event.getCover())
                     .thumbnail(Glide.with(itemView.getContext()).load(R.drawable.post_image_holder))
                     .into(imageViewCover);
-            if(event.getMinParticipant()==1) {
-                buttonAddToCart.setVisibility(View.VISIBLE);
-            }
+//            if(event.getMinParticipant()==1) {
+//                buttonAddToCart.setVisibility(View.VISIBLE);
+//            }
         }
         @Override
         public void onClick(View view) {
