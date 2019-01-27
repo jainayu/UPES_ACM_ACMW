@@ -271,8 +271,6 @@ public class CheckoutActivity extends AppCompatActivity
 
                                                             }
                                                         });
-
-
                                             }
                                         }
                                     });
@@ -285,8 +283,7 @@ public class CheckoutActivity extends AppCompatActivity
     @Override
     public void onRecipientSelect(Member recipient) {
         int amount=0;
-        if(participant.isACMMember()) {
-
+        if(participant.isAcmmember()) {
             for(Event event:Cart.cartEvents) {
                 amount=amount+event.getEntryFeesAcm();
             }
@@ -299,7 +296,6 @@ public class CheckoutActivity extends AppCompatActivity
         }
         PaymentDetailsFragment paymentDetailsFragment=PaymentDetailsFragment.newInstance(recipient,amount);
         getSupportFragmentManager().beginTransaction().replace(R.id.frame,paymentDetailsFragment).commit();
-
     }
 
     @Override

@@ -70,7 +70,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
             case ProfileFragment.MY_PROFILE:
             case ProfileFragment.PROFILE_IMAGE: {
                 if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
-                    setCurrentFragment(UserProfileFragment.newInstance(SessionManager.getInstance().getLoggedInMember()),false);
+                    setCurrentFragment(UserProfileFragment.newInstance(),false);
                 else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
                     Toast.makeText(this,"Please sign in as ACM member",Toast.LENGTH_SHORT).show();
                     this.finish();;

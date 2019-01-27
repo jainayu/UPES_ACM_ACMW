@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class Participant implements Parcelable {
         eventsList = in.createStringArrayList();
         boolean[] array = new boolean[1];
         in.readBooleanArray(array);
-        isACMMember = array[0];
+        acmmember = array[0];
         teamId = in.readString();
         score = in.readInt();
     }
@@ -55,38 +54,26 @@ public class Participant implements Parcelable {
     }
 
 
-
-    @JsonProperty("sap")
     private String sap;
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("email")
     String email;
 
-    @JsonProperty("contact")
     String contact;
 
-    @JsonProperty("whatsapp")
     String whatsapp;
 
-    @JsonProperty("branch")
     String branch;
 
-    @JsonProperty("year")
     String year;
 
-    @JsonProperty("EVENTS_LIST")
     List<String> eventsList;
 
-    @JsonProperty("acmmember")
-    private boolean isACMMember;
+    private boolean acmmember;
 
-    @JsonProperty("teamId")
     private String teamId;
 
-    @JsonProperty("score")
     private int score;
 
     public  int getScore() {
@@ -119,8 +106,8 @@ public class Participant implements Parcelable {
     }
 
 
-    public boolean isACMMember() {
-        return isACMMember;
+    public boolean isAcmmember() {
+        return acmmember;
     }
 
     public String getEmail() {
@@ -173,7 +160,7 @@ public class Participant implements Parcelable {
         parcel.writeString(year);
         parcel.writeStringList(eventsList);
         boolean[] boolArray = new boolean[1];
-        boolArray[0] = isACMMember;
+        boolArray[0] = acmmember;
         parcel.writeBooleanArray(boolArray);
         parcel.writeString(teamId);
         parcel.writeInt(score);
@@ -207,7 +194,7 @@ public class Participant implements Parcelable {
             this.name = participant.name;
             this.whatsapp = participant.whatsapp;
             this.year = participant.year;
-            this.isAcmMember = participant.isACMMember;
+            this.isAcmMember = participant.acmmember;
             this.teamId = participant.teamId;
             this.score = participant.score;
         }
@@ -233,7 +220,7 @@ public class Participant implements Parcelable {
             participant.sap = this.sap;
             participant.whatsapp = this.whatsapp;
             participant.year = this.year;
-            participant.isACMMember = this.isAcmMember;
+            participant.acmmember = this.isAcmMember;
             participant.teamId = this.teamId;
             participant.score = this.score;
             return participant;

@@ -32,6 +32,7 @@ import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.retrofit.ResponseModel;
 import org.upesacm.acmacmw.util.Config;
+import org.upesacm.acmacmw.util.SessionManager;
 import org.upesacm.acmacmw.util.UploadService;
 
 import java.io.ByteArrayOutputStream;
@@ -63,6 +64,7 @@ public class UserProfileFragment extends Fragment implements
     //MainActivity homeActivity;
 
     ImageView imageViewProfilePic;
+    ImageView editImage;
     TextView textViewName;
     TextView textViewYear;
     TextView textViewBranch;
@@ -86,17 +88,8 @@ public class UserProfileFragment extends Fragment implements
     public UserProfileFragment() {
         // Required empty public constructor
     }
-    public static UserProfileFragment fragment=null;
-    public static UserProfileFragment newInstance(Member member) {
-        if(member ==  null) {
-            throw new IllegalStateException("Member not signed in");
-        }
-        if(fragment==null){
-            fragment=new UserProfileFragment();
-        fragment.member = member;
-        }
-        else
-            fragment.member=member;
+    public static UserProfileFragment newInstance() {
+        UserProfileFragment fragment=new UserProfileFragment();
         return fragment;
     }
 
@@ -124,7 +117,7 @@ public class UserProfileFragment extends Fragment implements
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
-        ImageView editImage=view.findViewById(R.id.edit_image);
+        editImage=view.findViewById(R.id.edit_image);
         imageViewProfilePic = view.findViewById(R.id.image_view_profile_pic);
         textViewName = view.findViewById(R.id.text_view__frag_profile_name);
         textViewYear = view.findViewById(R.id.text_view_profile_year);
@@ -140,6 +133,26 @@ public class UserProfileFragment extends Fragment implements
         fabEdit = view.findViewById(R.id.fab_profile_edit);
         fabLogout = view.findViewById(R.id.fab_profile_logout);
         progressBarUserProfile.setVisibility(View.GONE);
+
+        fabEdit.setOnClickListener(this);
+        fabLogout.setOnClickListener(this);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        member = SessionManager.getInstance().getLoggedInMember();
+        updataUI();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
+    void updataUI() {
         if(member.getProfilePicture()!=null)
         {
             Glide.with(getContext()).load(member.getProfilePicture()).into(imageViewProfilePic);
@@ -176,17 +189,6 @@ public class UserProfileFragment extends Fragment implements
 
         Typeface regular = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
         textViewName.setTypeface(regular);
-
-
-        fabEdit.setOnClickListener(this);
-        fabLogout.setOnClickListener(this);
-        return view;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 
     @Override
