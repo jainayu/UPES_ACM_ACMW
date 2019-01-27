@@ -22,13 +22,16 @@ import org.upesacm.acmacmw.model.Member;
 public class PaymentDetailsFragment extends Fragment implements
         View.OnClickListener{
     private static final String AMOUNT_KEY = "amount key";
+    private static final String TEAM_ID_KEY = "team_id_key";
     OnFragmentInteractionListener listener;
     private Member recipient;
     private int amount;
+    private String teamId;
     private TextView textViewAmount;
     private TextView textViewName;
     private TextView textViewContact;
     private TextView textViewEmail;
+    private TextView textViewTeamId;
     private Button buttonProceed;
     private Toolbar toolbar;
     private ProgressBar progressBar;
@@ -42,6 +45,17 @@ public class PaymentDetailsFragment extends Fragment implements
         Bundle args = new Bundle();
         args.putParcelable(Member.PARCEL_KEY,recipient);
         args.putInt(AMOUNT_KEY,amount);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    public static PaymentDetailsFragment newInstance(Member recipient,int amount,String teamId) {
+        PaymentDetailsFragment fragment = new PaymentDetailsFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(Member.PARCEL_KEY,recipient);
+        args.putInt(AMOUNT_KEY,amount);
+        args.putString(TEAM_ID_KEY,teamId);
         fragment.setArguments(args);
 
         return fragment;
@@ -68,6 +82,7 @@ public class PaymentDetailsFragment extends Fragment implements
         }
         recipient = args.getParcelable(Member.PARCEL_KEY);
         amount = args.getInt(AMOUNT_KEY);
+        teamId = args.getString(TEAM_ID_KEY);
         super.onCreate(savedInstanceState);
     }
 
@@ -76,11 +91,12 @@ public class PaymentDetailsFragment extends Fragment implements
                              Bundle savedInstanceState) {
        // int amount=calculateAmountToPay();
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_payment_details, container, false);
+        View view= inflater.inflate(R.layout.fragment_payment_details_2, container, false);
         textViewAmount = view.findViewById(R.id.text_view_frag_payment_details_amount);
         textViewName = view.findViewById(R.id.text_view_frag_payment_details_recip_name);
         textViewContact = view.findViewById(R.id.text_view_frag_payment_details_recip_contact_no);
         textViewEmail = view.findViewById(R.id.text_view_frag_payment_details_recip_email);
+        textViewTeamId = view.findViewById(R.id.text_view_frag_payment_details_teamid);
         buttonProceed = view.findViewById(R.id.button_frag_payment_details_proceed);
         toolbar = view.findViewById(R.id.toolbar_frag_payment_details);
         progressBar = view.findViewById(R.id.progress_bar_frag_payment_details);
@@ -90,6 +106,7 @@ public class PaymentDetailsFragment extends Fragment implements
         textViewName.setText(recipient.getName());
         textViewContact.setText(recipient.getContact());
         textViewEmail.setText(recipient.getEmail());
+        textViewTeamId.setText(teamId);
         buttonProceed.setOnClickListener(this);
         showProgress(false);
         //textView.setText("Pay :"+amount);
