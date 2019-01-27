@@ -21,6 +21,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.CartFragment;
@@ -34,6 +38,7 @@ import org.upesacm.acmacmw.fragment.main.ProfileFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Cart;
 import org.upesacm.acmacmw.util.Config;
+import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.SessionManager;
 
 public class MainActivity extends AppCompatActivity implements
@@ -251,9 +256,25 @@ public class MainActivity extends AppCompatActivity implements
     public void onMenuItemSelected(int menuItemId) {
         if(menuItemId==MenuFragment.ACTION_NEW_REGISTRATION)
         {
-            Intent memberRegistrationActIntent = new Intent(this,MemberRegistrationActivity.class);
-            memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
-            startActivity(memberRegistrationActIntent);
+            FirebaseDatabase.getInstance().getReference()
+                    .child(FirebaseConfig.REGISTRATIONS_OPEN)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            boolean open = dataSnapshot.getValue(Boolean.class);
+                            if(open) {
+                                Intent memberRegistrationActIntent = new Intent(MainActivity.this,MemberRegistrationActivity.class);
+                                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
+                                startActivity(memberRegistrationActIntent);
+                            } else {
+                                Snackbar.make(frameLayout,"Registrations Closed",Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
         }
         else {
             Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);

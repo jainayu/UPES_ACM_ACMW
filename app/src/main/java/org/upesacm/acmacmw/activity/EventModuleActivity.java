@@ -176,7 +176,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if(task.isSuccessful()) {
-                                                            FirebaseDatabase.getInstance().getReference()
+                                                            /*FirebaseDatabase.getInstance().getReference()
                                                                     .child(FirebaseConfig.EVENTS_DB)
                                                                     .child(FirebaseConfig.EVENTS)
                                                                     .child(event.getEventID())
@@ -195,13 +195,13 @@ public class EventModuleActivity extends AppCompatActivity implements
                                                                         public void onCancelled(@NonNull DatabaseError databaseError) {
                                                                             databaseError.toException().printStackTrace();
                                                                         }
-                                                                    });
+                                                                    });*/
                                                             //TODO: add code to start paytm transaction here
-                                                            /*String timeStamp = ""+System.currentTimeMillis();
+                                                            String timeStamp = ""+System.currentTimeMillis();
                                                             Order order = new Order.Builder()
-                                                                    .setOrderId(timeStamp+event.getEventID()+teamId)
-                                                                    .setCustomerId(""+teamId)
-                                                                    .setAmount("1")
+                                                                    .setOrderId(event.getEventID()+timeStamp+teamId)
+                                                                    .setCustomerId("customer"+teamId)
+                                                                    .setAmount("1.00")
                                                                     .setMobileNo(participants.get(allParticipants.get(0)).getContact())
                                                                     .setEmail(participants.get(allParticipants.get(0)).getEmail())
                                                                     .build();
@@ -210,7 +210,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                                                                 public void onPaytmTransactionResponse(boolean success) {
 
                                                                 }
-                                                            });*/
+                                                            });
                                                         }
                                                     }
                                                 });
