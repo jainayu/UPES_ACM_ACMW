@@ -66,7 +66,7 @@ public class MenuFragment extends Fragment {
 
         toolbar.setTitle("Menu");
         recyclerViewAdapter.addMenuItem("Alumni");
-        recyclerViewAdapter.addMenuItem("New Registration");
+        recyclerViewAdapter.addMenuItem("New Member Registration");
         recyclerViewAdapter.addMenuItem("About Us");
         recyclerViewAdapter.addMenuItem("Contact Us");
         recyclerViewAdapter.addMenuItem("Privacy Policy");

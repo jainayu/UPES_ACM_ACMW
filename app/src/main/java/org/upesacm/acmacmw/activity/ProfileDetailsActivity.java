@@ -12,6 +12,10 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +30,7 @@ import org.upesacm.acmacmw.fragment.profile.MyEventDetailFragment;
 import org.upesacm.acmacmw.fragment.profile.MyEventsFragment;
 import org.upesacm.acmacmw.fragment.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.profile.UserProfileFragment;
+import org.upesacm.acmacmw.fragment.registration.GoogleSignInFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.FirebaseConfig;
@@ -66,7 +71,10 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
             case ProfileFragment.PROFILE_IMAGE: {
                 if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
                     setCurrentFragment(UserProfileFragment.newInstance(SessionManager.getInstance().getLoggedInMember()),false);
-                else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE)
+                else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+                    Toast.makeText(this,"Please sign in as ACM member",Toast.LENGTH_SHORT).show();
+                    this.finish();;
+                } else
                     requestUserAuthentication();
                 break;
             }
@@ -77,8 +85,33 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
             case ProfileFragment.MY_EVENTS: {
                 if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
                     setCurrentFragment(MyEventsFragment.newInstance(),false);
-                else if(SessionManager.getInstance().getSessionID() == SessionManager.NONE)
+                else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+                    Toast.makeText(this,"Please sign in as ACM member",Toast.LENGTH_SHORT).show();
+                    this.finish();;
+                } else
                     requestUserAuthentication();
+                break;
+            }
+            case ProfileFragment.GUEST_SIGN_OUT: {
+                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+                if(account!=null) {
+                    GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestEmail()
+                            .build();
+                    GoogleSignInClient signInClient = GoogleSignIn.getClient(this, signInOptions);
+                    signInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()) {
+                                Toast.makeText(ProfileDetailsActivity.this,"Signed out successfully",Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(ProfileDetailsActivity.this,"Error while signing out",Toast.LENGTH_SHORT).show();
+                            }
+                            ProfileDetailsActivity.this.finish();
+                        }
+                    });
+                }
+                SessionManager.getInstance().destroySession();
                 break;
             }
             default: {
@@ -188,18 +221,17 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
 
     @Override
     public void onLoginDialogFragmentInteraction(int resultCode) {
-        String msg="";
         switch (resultCode) {
             case LoginFragment.LOGIN_SUCCESSFUL: {
-                msg = "Login Successful";
+                Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
                 this.finish();
-                ///
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
                 Intent intent = new Intent(this,MemberRegistrationActivity.class);
                 intent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
                 startActivity(intent);
+                this.finish();
                 break;
             }
             case LoginFragment.CANCELLED: {
@@ -210,16 +242,17 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                 Intent intent = new Intent(this,MemberRegistrationActivity.class);
                 intent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.GUEST_SIGN_UP);
                 startActivity(intent);
+                this.finish();
                 break;
             }
             case LoginFragment.LOGIN_FAILED: {
+                Toast.makeText(this,"Incorrect Username or Password",Toast.LENGTH_SHORT).show();
                 this.finish();
-                msg = "Incorrect Username or Password";
                 break;
             }
             case LoginFragment.NETWORK_ERROR: {
+                Toast.makeText(this,"Network Error",Toast.LENGTH_SHORT).show();
                 this.finish();
-                msg = "Network Error";
             }
             case LoginFragment.FORGOT_PASSWORD: {
                 setCurrentFragment(ForgotPasswordFragment.newInstance(),true);
@@ -229,7 +262,6 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                 break;
             }
         }
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
 
     @Override

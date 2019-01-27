@@ -21,9 +21,7 @@
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -36,9 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
 
-            app:layout_constraintBottom_toBottomOf="@+id/image_button_card_view"
             app:layout_constraintEnd_toEndOf="@+id/text_view__frag_profile_name"
             app:layout_constraintStart_toStartOf="@+id/text_view__frag_profile_name"
             app:layout_constraintTop_toBottomOf="@+id/text_view__frag_profile_name" />
@@ -58,6 +54,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/image_button_card_view"
             app:layout_constraintTop_toTopOf="@+id/image_button_card_view" />
+
+        <TextView
+            android:id="@+id/text_view_frag_profile_guest_sign_out"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Click here to sign out"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_button_card_view"
+            app:layout_constraintEnd_toEndOf="@+id/text_view_frag_profile_extra"
+            app:layout_constraintStart_toStartOf="@+id/text_view_frag_profile_extra"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_frag_profile_extra" />
+
         <android.support.v7.widget.CardView
             android:id="@+id/image_button_card_view"
             android:layout_width="wrap_content"

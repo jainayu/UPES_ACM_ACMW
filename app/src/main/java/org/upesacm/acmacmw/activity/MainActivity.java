@@ -254,34 +254,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onMenuItemSelected(int menuItemId) {
-        if(menuItemId==MenuFragment.ACTION_NEW_REGISTRATION)
-        {
-            FirebaseDatabase.getInstance().getReference()
-                    .child(FirebaseConfig.REGISTRATIONS_OPEN)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            boolean open = dataSnapshot.getValue(Boolean.class);
-                            if(open) {
-                                Intent memberRegistrationActIntent = new Intent(MainActivity.this,MemberRegistrationActivity.class);
-                                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
-                                startActivity(memberRegistrationActIntent);
-                            } else {
-                                Snackbar.make(frameLayout,"Registrations Closed",Snackbar.LENGTH_SHORT).show();
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-        }
-        else {
-            Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);
-            menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
-            startActivity(menuActivityIntent);
-        }
-
+        Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);
+        menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
+        startActivity(menuActivityIntent);
     }
 
     @Override

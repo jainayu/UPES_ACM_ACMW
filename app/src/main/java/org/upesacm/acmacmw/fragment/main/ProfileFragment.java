@@ -29,12 +29,14 @@ public class ProfileFragment extends Fragment {
     public static final int MY_PROFILE = 2;
     public static final int PRIVILEGED_ACTION_REQUEST = 3;
     public static final int MY_EVENTS = 4;
+    public static final int GUEST_SIGN_OUT = 5;
     private Toolbar toolbar;
     private OnFragmentInteractionListener listener;
     private RecyclerView recyclerView;
     private ImageView imageViewProfile;
     private TextView textViewName;
     private TextView textViewExtra;
+    private TextView textViewGuestSignout;
     RecyclerViewAdapter recyclerViewAdapter;
     public ProfileFragment() {
         // Required empty public constructor
@@ -72,6 +74,7 @@ public class ProfileFragment extends Fragment {
         imageViewProfile = view.findViewById(R.id.image_view_frag_profile);
         textViewName = view.findViewById(R.id.text_view__frag_profile_name);
         textViewExtra = view.findViewById(R.id.text_view_frag_profile_extra);
+        textViewGuestSignout = view.findViewById(R.id.text_view_frag_profile_guest_sign_out);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerViewAdapter = new RecyclerViewAdapter();
@@ -80,6 +83,12 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 listener.onProfileFragmentInteraction(PROFILE_IMAGE);
+            }
+        });
+        textViewGuestSignout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onProfileFragmentInteraction(GUEST_SIGN_OUT);
             }
         });
         recyclerViewAdapter.addMenuItem("My Profile");
@@ -94,19 +103,22 @@ public class ProfileFragment extends Fragment {
             textViewExtra.setText("Welcome");
             Glide.with(getContext())
                     .load(SessionManager.getInstance().getLoggedInMember().getProfilePicture()).thumbnail(0.9f).into(imageViewProfile);
+            textViewGuestSignout.setVisibility(View.GONE);
             show = true;
         } else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
             textViewName.setText(SessionManager.getInstance().getGuestMember().getName());
             textViewExtra.setText(SessionManager.getInstance().getGuestMember().getEmail());
             RequestOptions requestOptions=new RequestOptions();
-            requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE);
+            requestOptions.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
             Glide.with(this)
                     .load(SessionManager.getInstance().getGuestMember().getImageUrl())
                     .apply(requestOptions)
                     .into(imageViewProfile);
+            textViewGuestSignout.setVisibility(View.VISIBLE);
             show = true;
         } else {
             imageViewProfile.setImageResource(R.drawable.sign_in);
+            textViewGuestSignout.setVisibility(View.GONE);
             show = false;
         }
         textViewExtra.setVisibility(show?View.VISIBLE:View.GONE);

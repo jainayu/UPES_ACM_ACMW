@@ -1,6 +1,7 @@
 package org.upesacm.acmacmw.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -74,11 +75,28 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
         if(args == null)
             args = getIntent().getExtras();
         signUpType = args.getInt(MemberRegistrationActivity.SIGN_UP_TYPE_KEY);
-        if(signUpType == MemberRegistrationActivity.MEMBER_SIGN_UP)
-            setCurrentFragment(SapIdFragment.newInstance(),false);
-        else
-            setCurrentFragment(GoogleSignInFragment.newInstance(),false);
+        if(signUpType == MemberRegistrationActivity.MEMBER_SIGN_UP) {
+            FirebaseDatabase.getInstance().getReference()
+                    .child(FirebaseConfig.REGISTRATIONS_OPEN)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            boolean open = dataSnapshot.getValue(Boolean.class);
+                            if(open) {
+                                setCurrentFragment(SapIdFragment.newInstance(), false);
+                            } else {
+                                Toast.makeText(MemberRegistrationActivity.this,"Registrations closed",Toast.LENGTH_SHORT).show();
+                                MemberRegistrationActivity.this.finish();
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                        }
+                    });
+        } else {
+            setCurrentFragment(GoogleSignInFragment.newInstance(), false);
+        }
     }
 
     void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
@@ -322,8 +340,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                             sender.execute(mailBody,trialMember.getSap()+"@"+ getString(R.string.upes_domain),"ACM");
 
                                             setCurrentFragment(TrialMemberOTPVerificationFragment.newInstance(trialMember),true);
-
-                                            getSupportActionBar().show();
                                         }
 
                                         @Override
@@ -350,10 +366,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     @Override
     public void onTrialOTPVerificationResult(TrialMember trialMember, int code) {
         if(code == TrialMemberOTPVerificationFragment.SUCCESSFUL_VERIFICATION) {
-            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preference_file_key),
-                    Context.MODE_PRIVATE).edit();
-            editor.putString(getString(R.string.trial_member_sap),trialMember.getSap());
-            editor.commit();
             //Create the Guest Session Here
             SessionManager.getInstance().createGuestSession(trialMember);
 
@@ -363,11 +375,12 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
             System.out.println("inside home activity onTrialMemberStateChange"+trialMember);
             System.out.println(trialMember.getName()+trialMember.getEmail());
-            Toast.makeText(this, "trial member created", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Signed in as Guest", Toast.LENGTH_LONG).show();
             onBackPressed();
         }
         else {
             Toast.makeText(this,"Maximum tries exceeded",Toast.LENGTH_LONG);
         }
+        this.finish();
     }
 }

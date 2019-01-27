@@ -46,7 +46,7 @@ public class TrialMemberOTPVerificationFragment extends Fragment
     }
     @Override
     public void onAttach(Context context) {
-        if(context instanceof MainActivity) {
+        if(context instanceof TrialOTPVerificationListener) {
             super.onAttach(context);
             listener = (TrialOTPVerificationListener)context;
         }
