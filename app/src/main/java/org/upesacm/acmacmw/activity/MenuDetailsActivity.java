@@ -50,8 +50,6 @@ public class MenuDetailsActivity extends AppCompatActivity {
         state.putInt(MenuFragment.SELECTED_MENU_ITEM_KEY,selectedMenu);
     }
     void updateUI() {
-
-
         switch (selectedMenu) {
             case MenuFragment.ACTION_ALUMNI : {
                 setCurrentFragment(new AlumniFragment(),false);
@@ -66,6 +64,13 @@ public class MenuDetailsActivity extends AppCompatActivity {
             case MenuFragment.ACTION_CONTACT_US: {
                 setCurrentFragment(new ContactUsFragment(),false);
                 getSupportActionBar().setTitle("Contact Us");
+                break;
+            }
+            case MenuFragment.ACTION_NEW_REGISTRATION: {
+                Intent intent = new Intent(this,MemberRegistrationActivity.class);
+                intent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
+                startActivity(intent);
+                this.finish();
                 break;
             }
             case MenuFragment.ACTION_PRIVACY_POLICY: {

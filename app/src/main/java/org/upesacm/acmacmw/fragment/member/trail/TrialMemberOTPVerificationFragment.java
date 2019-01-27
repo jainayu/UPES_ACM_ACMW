@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.member.trail;
+package org.upesacm.acmacmw.fragment.registration;
 
 
 import android.content.Context;
@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.model.TrialMember;
 
 /**
@@ -46,8 +47,8 @@ public class TrialMemberOTPVerificationFragment extends Fragment
     @Override
     public void onAttach(Context context) {
         if(context instanceof TrialOTPVerificationListener) {
-            listener=(TrialOTPVerificationListener) context;
             super.onAttach(context);
+            listener = (TrialOTPVerificationListener)context;
         }
         else
             throw new IllegalStateException(context.toString()+

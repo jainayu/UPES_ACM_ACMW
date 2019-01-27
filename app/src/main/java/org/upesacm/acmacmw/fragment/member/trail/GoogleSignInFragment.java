@@ -89,7 +89,6 @@ public class GoogleSignInFragment extends Fragment
                     startActivityForResult(signInIntent,RC_SIGN_IN);
                 }
                 else {
-                    Toast.makeText(getContext(),"already signed in",Toast.LENGTH_SHORT).show();
                     listener.onGoogleSignIn(sap,account);
                 }
             }
