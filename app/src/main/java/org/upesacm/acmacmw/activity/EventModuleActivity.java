@@ -274,7 +274,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                         if(task.isSuccessful()) {
                             sendTeamId(participants,event,teamId);
                             sendOtp(recipient,participants.get(allParticipantsSap.get(0)),event,otp);
-                            setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout),true);
+                            setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout,teamId),true);
                         } else {
                             //TODO: display some error message
                         }
@@ -289,7 +289,7 @@ public class EventModuleActivity extends AppCompatActivity implements
         String otpUrl = FirebaseConfig.EVENTS_DB+"/" + FirebaseConfig.EVENTS+"/"+
                 event.getEventID()+"/" + FirebaseConfig.EVENT_OTPS+"/" + teamId+"/" + FirebaseConfig.TEAM_OTP;
         Log.i(TAG,"OTP URL : "+otpUrl);
-        setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl), true);
+        //setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl), true);
     }
 
     @Override

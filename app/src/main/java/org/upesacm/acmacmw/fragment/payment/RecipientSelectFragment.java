@@ -104,7 +104,9 @@ public class RecipientSelectFragment extends Fragment {
                         for(String sap:recipientMap.keySet()) {
                             if(recipientSapList.contains(sap)) {
                                 System.out.println("addding recipient");
-                                recyclerViewAdapter.addRecipient(recipientMap.get(sap));
+                                //recyclerViewAdapter.addRecipient(recipientMap.get(sap));
+                                listener.onRecipientSelect(recipientMap.get(sap));
+                                break;
                             }
                         }
                         showProgress(false);
