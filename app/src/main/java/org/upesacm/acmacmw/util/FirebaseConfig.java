@@ -20,4 +20,5 @@ public interface FirebaseConfig {
     String TEAM_OTP = "otp";
     String TEAM_OTP_RECIPIENT = "recipient";
     String TEAM_OTP_CONFIRMED = "confirmed";
+    String NON_UPES__PARTICIPANT_UID = "non_upes_participant_uid";
 }

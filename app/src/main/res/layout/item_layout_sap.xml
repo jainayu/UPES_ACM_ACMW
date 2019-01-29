@@ -6,6 +6,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ProgressBar
+        android:id="@+id/progress_bar_item_layout_sapid_nonupes"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/check_box_non_upes_participant"
+        app:layout_constraintEnd_toEndOf="@+id/text_input_layout_sap"
+        app:layout_constraintTop_toTopOf="@+id/check_box_non_upes_participant"
+        tools:visibility="invisible" />
+
+    <CheckBox
+        android:id="@+id/check_box_non_upes_participant"
+        android:layout_width="0dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Non-UPES Participant"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/progress_bar_item_layout_sapid_nonupes"
+        app:layout_constraintStart_toStartOf="@+id/text_input_layout_sap"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_layout_sap" />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/text_input_layout_sap"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -14,8 +39,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -23,7 +46,6 @@
         <android.support.design.widget.TextInputEditText
             android:id="@+id/edit_text_sap"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter Sap Id of Participant" />
+            android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
 </android.support.constraint.ConstraintLayout>
