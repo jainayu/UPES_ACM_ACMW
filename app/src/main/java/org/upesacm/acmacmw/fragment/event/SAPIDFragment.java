@@ -4,6 +4,7 @@ package org.upesacm.acmacmw.fragment.event;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -20,28 +21,40 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.EventModuleActivity;
 import org.upesacm.acmacmw.model.Event;
+import org.upesacm.acmacmw.model.Participant;
+import org.upesacm.acmacmw.util.FirebaseConfig;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SAPIDFragment extends Fragment {
+    public static final String TAG = "SAPIDFragment";
 
     Event selectedEvent;
     FragmentInteractionListener listener;
     RecyclerView recyclerView;
     FloatingActionButton addButton;
     private Toolbar toolbar;
-    private CheckBox checkBox;
     private RecyclerViewAdapter sapIdAdapter;
     public SAPIDFragment() {
         // Required empty public constructor
@@ -81,13 +94,6 @@ public class SAPIDFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view_sapid);
         addButton = view.findViewById(R.id.floating_action_button_sapids);
         toolbar = view.findViewById(R.id.toolbar_frag_sapid);
-        checkBox = view.findViewById(R.id.check_box_non_upes);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-            }
-        });
 
         sapIdAdapter = new RecyclerViewAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -203,17 +209,17 @@ public class SAPIDFragment extends Fragment {
             return sapIds[index];
         }
 
-        public void invalidateDataset() {
-
-        }
-
     }
 
     private class InputViewHolder extends RecyclerView.ViewHolder {
         TextInputLayout textInputLayout;
+        CheckBox checkBox;
+        ProgressBar progressBar;
         TextWatcher tW;
         int position;
         RecyclerViewAdapter callbackRef;
+        private String newUid;
+        private String sapPattern = "5000[\\d]{5}";//default sap pattern
         public InputViewHolder(View itemView, final RecyclerViewAdapter callbackRef) {
             super(itemView);
             this.callbackRef = callbackRef;
@@ -229,11 +235,10 @@ public class SAPIDFragment extends Fragment {
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
                 }
-
                 @Override
                 public void afterTextChanged(Editable editable) {
                     String sap = editable.toString();
-                    boolean valid = Pattern.compile("5000[\\d]{5}").matcher(sap).matches();
+                    boolean valid = Pattern.compile(sapPattern).matcher(sap).matches();
                     if(!valid)
                         textInputLayout.setError("Invalid SAP ID");
                     else
@@ -242,8 +247,59 @@ public class SAPIDFragment extends Fragment {
                     callbackRef.afterTextChanged(position,sap,valid);
                 }
             };
-
             textInputLayout.getEditText().addTextChangedListener(tW);
+            checkBox = itemView.findViewById(R.id.check_box_non_upes_participant);
+            progressBar = itemView.findViewById(R.id.progress_bar_item_layout_sapid_nonupes);
+            textInputLayout.getEditText().setHint("Enter SAP ID");
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked) {
+                        sapPattern = "\\d{10,20}";
+                        textInputLayout.getEditText().setEnabled(false);
+                        textInputLayout.getEditText().setHint("Participant UID");
+                        progressBar.setVisibility(View.VISIBLE);
+                        FirebaseDatabase.getInstance().getReference()
+                                .child(FirebaseConfig.EVENTS_DB)
+                                .child(FirebaseConfig.NON_UPES__PARTICIPANT_UID)
+                                .runTransaction(new Transaction.Handler() {
+                                    @NonNull
+                                    @Override
+                                    public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                                        String latestUid = mutableData.getValue(String.class);
+                                        String newUid;
+                                        if(latestUid != null) {
+                                            newUid = String.valueOf(Long.parseLong(latestUid) + 1);
+                                        } else {
+                                            newUid = "40000000000";
+                                        }
+                                        InputViewHolder.this.newUid = newUid;
+                                        mutableData.setValue(newUid);
+                                        return Transaction.success(mutableData);
+                                    }
+
+                                    @Override
+                                    public void onComplete(@Nullable DatabaseError databaseError,boolean commited, @Nullable DataSnapshot dataSnapshot) {
+                                        progressBar.setVisibility(View.INVISIBLE);
+                                        if(commited) {
+                                            textInputLayout.getEditText().setText(newUid);
+                                        } else {
+                                            databaseError.toException().printStackTrace();
+                                            textInputLayout.getEditText().setText("");
+                                            Toast.makeText(SAPIDFragment.this.getContext(),"Network error",Toast.LENGTH_SHORT).show();
+                                            checkBox.setChecked(false);
+                                        }
+                                    }
+                                });
+                    } else {
+                        textInputLayout.getEditText().setHint("Enter SAP ID");
+                        sapPattern = "5000[\\d]{5}";
+                        textInputLayout.getEditText().setText("");
+                        textInputLayout.getEditText().setEnabled(true);
+                        //Destroy the newSap
+                    }
+                }
+            });
         }
 
         void bindData(int position) {
