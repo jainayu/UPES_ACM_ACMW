@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import org.upesacm.acmacmw.R;
@@ -39,6 +41,7 @@ public class SAPIDFragment extends Fragment {
     RecyclerView recyclerView;
     FloatingActionButton addButton;
     private Toolbar toolbar;
+    private CheckBox checkBox;
     private RecyclerViewAdapter sapIdAdapter;
     public SAPIDFragment() {
         // Required empty public constructor
@@ -78,6 +81,14 @@ public class SAPIDFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view_sapid);
         addButton = view.findViewById(R.id.floating_action_button_sapids);
         toolbar = view.findViewById(R.id.toolbar_frag_sapid);
+        checkBox = view.findViewById(R.id.check_box_non_upes);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            }
+        });
+
         sapIdAdapter = new RecyclerViewAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerView.setAdapter(sapIdAdapter);
@@ -88,8 +99,8 @@ public class SAPIDFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if(menuItem.getItemId() == R.id.action_next_toolbar_frag_sapid) {
                     List<String> sapIds = new ArrayList<>();
-                    System.out.println("sap id count : "+sapIdAdapter.getCount());
-                    for(int i=0;i<sapIdAdapter.getCount();++i) {
+                    System.out.println("sap id count : "+sapIdAdapter.getItemCount());
+                    for(int i=0;i<sapIdAdapter.getItemCount();++i) {
                         System.out.println("adding ids : "+sapIdAdapter.getSapId(i));
                         if(!sapIdAdapter.isSapValid(i)) {
                             Toast.makeText(SAPIDFragment.this.getContext(),"Please check all the sap ids",Toast.LENGTH_LONG)
@@ -158,7 +169,7 @@ public class SAPIDFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull InputViewHolder holder, int position) {
             System.out.println("on BindView holder called");
-            holder.setPosition(position);
+            holder.bindData(position);
         }
 
         @Override
@@ -192,8 +203,8 @@ public class SAPIDFragment extends Fragment {
             return sapIds[index];
         }
 
-        public int getCount() {
-            return count;
+        public void invalidateDataset() {
+
         }
 
     }
@@ -235,7 +246,7 @@ public class SAPIDFragment extends Fragment {
             textInputLayout.getEditText().addTextChangedListener(tW);
         }
 
-        void setPosition(int position) {
+        void bindData(int position) {
             this.position = position;
         }
     }
