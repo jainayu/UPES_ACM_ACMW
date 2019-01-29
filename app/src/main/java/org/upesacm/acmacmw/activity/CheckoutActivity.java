@@ -203,7 +203,7 @@ public class CheckoutActivity extends AppCompatActivity
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseConfig.EVENTS_DB)
                 .child(FirebaseConfig.PARTICIPANTS)
-                .child(participant.getSap())
+                .child(participant.getUid())
                 .setValue(participant).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -223,7 +223,7 @@ public class CheckoutActivity extends AppCompatActivity
                                             ++teamcount;
                                             mutableData.child(eventId).child(FirebaseConfig.EVENT_TEAMS_COUNT).setValue(teamcount);
                                             List<String> p=new ArrayList<>();
-                                            p.add(participant.getSap());
+                                            p.add(participant.getUid());
                                             mutableData.child(eventId).child(FirebaseConfig.TEAMS).child(teamcount+"").setValue(p);
 
                                         }
@@ -300,7 +300,7 @@ public class CheckoutActivity extends AppCompatActivity
 
     @Override
     public void onClickNext(final Member recipient, int amount) {
-//        final String otp = RandomOTPGenerator.generate(Integer.parseInt(participant.getSap()),6);
+//        final String otp = RandomOTPGenerator.generate(Integer.parseInt(participant.getUid()),6);
 //        FirebaseDatabase.getInstance().getReference()
 //                .child(FirebaseConfig.EVENTS_DB)
 //                .child(FirebaseConfig.EVENTS)
@@ -313,12 +313,12 @@ public class CheckoutActivity extends AppCompatActivity
 //                            for(String event:newEventList)
 //                            {
 //
-//                                mutableData.child(event).child("otps").child(participant.getSap())
+//                                mutableData.child(event).child("otps").child(participant.getUid())
 //                                        .child(FirebaseConfig.TEAM_OTP)
 //                                        .setValue(otp);
-//                                mutableData.child(event).child("otps").child(participant.getSap())
+//                                mutableData.child(event).child("otps").child(participant.getUid())
 //                                        .child(FirebaseConfig.TEAM_OTP_RECIPIENT)
-//                                        .setValue(recipient.getSap());
+//                                        .setValue(recipient.getUid());
 //
 //                            }
 //                            return Transaction.success(mutableData);

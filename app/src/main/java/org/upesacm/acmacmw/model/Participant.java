@@ -4,8 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class Participant implements Parcelable {
     };
 
     protected Participant(@NonNull  Parcel in) {
-        sap = in.readString();
+        uid = in.readString();
         name = in.readString();
         email = in.readString();
         contact = in.readString();
@@ -37,7 +35,6 @@ public class Participant implements Parcelable {
         boolean[] array = new boolean[1];
         in.readBooleanArray(array);
         acmmember = array[0];
-        teamId = in.readString();
         score = in.readInt();
     }
 
@@ -54,7 +51,7 @@ public class Participant implements Parcelable {
     }
 
 
-    private String sap;
+    private String uid;
 
     private String name;
 
@@ -72,16 +69,14 @@ public class Participant implements Parcelable {
 
     private boolean acmmember;
 
-    private String teamId;
-
     private int score;
 
     public  int getScore() {
         return score;
     }
 
-    public String getSap() {
-        return sap;
+    public String getUid() {
+        return uid;
     }
 
     public String getName() {
@@ -140,9 +135,6 @@ public class Participant implements Parcelable {
         return eventsList;
     }
 
-    public String getTeamId() {
-        return teamId;
-    }
 
     @Override
     public int describeContents() {
@@ -151,7 +143,7 @@ public class Participant implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(sap);
+        parcel.writeString(uid);
         parcel.writeString(name);
         parcel.writeString(email);
         parcel.writeString(contact);
@@ -162,7 +154,6 @@ public class Participant implements Parcelable {
         boolean[] boolArray = new boolean[1];
         boolArray[0] = acmmember;
         parcel.writeBooleanArray(boolArray);
-        parcel.writeString(teamId);
         parcel.writeInt(score);
     }
 
@@ -186,7 +177,7 @@ public class Participant implements Parcelable {
         }
 
         public Builder(Participant participant) {
-            this.sap = participant.sap;
+            this.sap = participant.uid;
             this.branch = participant.branch;
             this.contact = participant.contact;
             this.email = participant.email;
@@ -195,7 +186,6 @@ public class Participant implements Parcelable {
             this.whatsapp = participant.whatsapp;
             this.year = participant.year;
             this.isAcmMember = participant.acmmember;
-            this.teamId = participant.teamId;
             this.score = participant.score;
         }
 
@@ -217,11 +207,10 @@ public class Participant implements Parcelable {
             participant.email = this.email;
             participant.eventsList = this.eventsList;
             participant.name = this.name;
-            participant.sap = this.sap;
+            participant.uid = this.sap;
             participant.whatsapp = this.whatsapp;
             participant.year = this.year;
             participant.acmmember = this.isAcmMember;
-            participant.teamId = this.teamId;
             participant.score = this.score;
             return participant;
         }
@@ -272,11 +261,6 @@ public class Participant implements Parcelable {
 
         public Builder setIsAcmMember(boolean isAcmMember) {
             this.isAcmMember = isAcmMember;
-            return this;
-        }
-
-        public Builder setTeamId(String teamId) {
-            this.teamId = teamId;
             return this;
         }
 
