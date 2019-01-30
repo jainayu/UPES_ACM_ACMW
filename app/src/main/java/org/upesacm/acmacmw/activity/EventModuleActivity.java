@@ -85,8 +85,8 @@ public class EventModuleActivity extends AppCompatActivity implements
     private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout_event_activity,fragment);
-        if(addToBackStack)
-            ft.addToBackStack(null);
+//        if(addToBackStack)
+//            ft.addToBackStack(null);
         ft.commit();
     }
 
@@ -174,7 +174,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                             //Add participants saps to the team node
                             FirebaseDatabase.getInstance().getReference().child(FirebaseConfig.EVENTS_DB)
                                     .child(FirebaseConfig.EVENTS).child(event.getEventID())
-                                    .child(FirebaseConfig.TEAMS).child(teamId).setValue(allParticipants)
+                                    .child(FirebaseConfig.TEAMS).child(teamId).child(FirebaseConfig.SAPID).setValue(allParticipants)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
@@ -191,7 +191,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                                                                     recipientSaps.add(String.valueOf(ds.getValue(Long.class)));
                                                                 }
                                                                 sendTeamId(participants,event,teamId);//send the team id to the participants
-                                                                setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),true);
+                                                                setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),false);
                                                             }
 
                                                             @Override
@@ -253,33 +253,33 @@ public class EventModuleActivity extends AppCompatActivity implements
         }
         final int totalAmout = amount;
         Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
-
-        //generate otp
-        final String otp = RandomOTPGenerator.generate(Integer.parseInt(allParticipantsSap.get(0)),6);
-        Log.i(TAG,"OTP : "+otp);
-        Team team = new Team.Builder()
-                .setOtp(otp)
-                .setRecipient(recipient.getSap())
-                .setConfirmed(false)
-                .setAmount(amount)
-                .build();
-        FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseConfig.EVENTS_DB).child(FirebaseConfig.EVENTS)
-                .child(event.getEventID()).child(FirebaseConfig.EVENT_OTPS)
-                .child(teamId)
-                .setValue(team)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
-                            sendTeamId(participants,event,teamId);
-                            sendOtp(recipient,participants.get(allParticipantsSap.get(0)),event,otp);
-                            setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout,teamId),true);
-                        } else {
-                            //TODO: display some error message
-                        }
-                    }
-                });
+        setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout,teamId),false);
+//        //generate otp
+//        final String otp = RandomOTPGenerator.generate(Integer.parseInt(allParticipantsSap.get(0).substring(7)),6);
+//        Log.i(TAG,"OTP : "+otp);
+//        Team team = new Team.Builder()
+//                .setOtp(otp)
+//                .setRecipient(recipient.getSap())
+//                .setConfirmed(false)
+//                .setAmount(amount)
+//                .build();
+//        FirebaseDatabase.getInstance().getReference()
+//                .child(FirebaseConfig.EVENTS_DB).child(FirebaseConfig.EVENTS)
+//                .child(event.getEventID()).child(FirebaseConfig.EVENT_OTPS)
+//                .child(teamId)
+//                .setValue(team)
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if(task.isSuccessful()) {
+//                            sendTeamId(participants,event,teamId);
+//                            sendOtp(recipient,participants.get(allParticipantsSap.get(0)),event,otp);
+//
+//                        } else {
+//                            //TODO: display some error message
+//                        }
+//                    }
+//                });
     }
 
     @Override
@@ -356,7 +356,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 Member recipient = dataSnapshot.getValue(Member.class);
-                                                setCurrentFragment(PaymentDetailsFragment.newInstance(recipient, team.getAmount()), true);
+                                                setCurrentFragment(PaymentDetailsFragment.newInstance(recipient, team.getAmount()), false);
                                             }
 
                                             @Override
