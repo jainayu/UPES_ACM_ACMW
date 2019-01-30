@@ -94,6 +94,13 @@ public class SAPIDFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view_sapid);
         addButton = view.findViewById(R.id.floating_action_button_sapids);
         toolbar = view.findViewById(R.id.toolbar_frag_sapid);
+//        checkBox = view.findViewById(R.id.check_box_non_upes);
+//        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//
+//            }
+//        });
 
         sapIdAdapter = new RecyclerViewAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -124,11 +131,11 @@ public class SAPIDFragment extends Fragment {
                     System.out.println(sapIds.size());
                     Toast.makeText(SAPIDFragment.this.getContext(),"everything is valid"+sapIds.size(),Toast.LENGTH_LONG).show();
                     //Hide the keyboard if it is visible
-                    InputMethodManager inputManager = (InputMethodManager)
-                            getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-
-                    inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                            InputMethodManager.HIDE_NOT_ALWAYS);
+//                    InputMethodManager inputManager = (InputMethodManager)
+//                            getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//
+//                    inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+//                            InputMethodManager.HIDE_NOT_ALWAYS);
 
                     //call the callback method
                     listener.onSAPIDAvailable(selectedEvent,sapIds);

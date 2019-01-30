@@ -60,6 +60,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:textSize="18sp"
                         android:text="Recipient Name"
                         android:textColor="@android:color/black"
                         android:textStyle="bold" />
@@ -70,6 +71,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="TextView"
+                        android:textSize="18sp"
                         android:textAlignment="viewEnd" />
                 </LinearLayout>
 
@@ -84,6 +86,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Contact"
+                        android:textSize="18sp"
                         android:textColor="@android:color/black"
                         android:textStyle="bold" />
 
@@ -92,7 +95,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:textIsSelectable="true"
                         android:text="TextView"
+                        android:textSize="18sp"
                         android:textAlignment="viewEnd" />
                 </LinearLayout>
 
@@ -107,6 +112,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Email"
+                        android:textSize="18sp"
                         android:textColor="@android:color/black"
                         android:textStyle="bold" />
 
@@ -116,6 +122,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="TextView"
+                        android:textSize="18sp"
                         android:textAlignment="viewEnd" />
                 </LinearLayout>
 
@@ -131,6 +138,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:textSize="18sp"
                         android:text="Amount to be Paid"
                         android:textColor="@android:color/black"
                         android:textStyle="bold" />
@@ -140,6 +148,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:textSize="18sp"
                         android:text="TextView"
                         android:textAlignment="viewEnd"
                         android:textColor="@android:color/black"
@@ -153,6 +162,7 @@
                     android:layout_gravity="center"
                     android:background="@drawable/round_button_blue"
                     android:text="Proceed"
+                    android:visibility="gone"
                     android:textAppearance="@style/TextAppearance.AppCompat"
                     android:textColor="@android:color/white" />
             </LinearLayout>
