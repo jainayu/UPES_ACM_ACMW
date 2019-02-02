@@ -78,6 +78,8 @@ public class Event implements Comparable<Event>, Parcelable {
     @JsonProperty("maxParticipants")
     private int maxParticipant;
 
+    private boolean registrationOpen;
+
     protected Event(@NonNull Parcel in) {
         eventID = in.readString();
         eventName = in.readString();
@@ -99,6 +101,9 @@ public class Event implements Comparable<Event>, Parcelable {
         }
         in.readList(prizeMoney,this.getClass().getClassLoader());
         maxParticipant = in.readInt();
+        boolean[] boolArray = new boolean[1];
+        in.readBooleanArray(boolArray);
+        registrationOpen = boolArray[0];
     }
 
 
@@ -178,6 +183,10 @@ public class Event implements Comparable<Event>, Parcelable {
         return teamsCount;
     }
 
+    public boolean isRegistrationOpen() {
+        return registrationOpen;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -206,6 +215,7 @@ public class Event implements Comparable<Event>, Parcelable {
         }
         parcel.writeList(prizeMoney);
         parcel.writeInt(maxParticipant);
+        parcel.writeBooleanArray(new boolean[]{registrationOpen});
     }
 
 
@@ -232,6 +242,7 @@ public class Event implements Comparable<Event>, Parcelable {
         private String whatsapp;
         private String phone;
         private int maxParticipant;
+        private boolean registrationOpen;
         public Builder() {
 
         }
@@ -247,6 +258,7 @@ public class Event implements Comparable<Event>, Parcelable {
             this.prizeMoney = event.getPrizeMoney();
             this.eventTimeStamp = event.getEventTimeStamp();
             this.maxParticipant = event.getMaxParticipant();
+            this.registrationOpen = event.isRegistrationOpen();
         }
 
         public Event build() {
@@ -267,6 +279,7 @@ public class Event implements Comparable<Event>, Parcelable {
             event.whatsapp = this.whatsapp;
             event.phone = this.phone;
             event.maxParticipant = this.maxParticipant;
+            event.registrationOpen = this.registrationOpen;
 
             return event;
         }
@@ -334,6 +347,11 @@ public class Event implements Comparable<Event>, Parcelable {
 
         public Builder setNoOfTeams(int teamsCount) {
             this.teamsCount = teamsCount;
+            return this;
+        }
+
+        public Builder setRegistrationOpen(boolean registrationOpen) {
+            this.registrationOpen = registrationOpen;
             return this;
         }
     }

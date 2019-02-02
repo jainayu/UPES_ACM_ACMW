@@ -41,7 +41,9 @@
                 android:layout_weight="1"
                 android:textColor="#3F51B5"
                 android:gravity="fill"
-                android:text="Please make your payment through Paytm in the following Paytm Number: xxxxxxx While making the payment please write your TEAM ID in the payment description field in PayTm"
+                android:text="Please make your payment through Paytm in the Paytm Number given below. While making the payment please write your TEAM ID in the payment description field in PayTm.
+                              \nAfter you click Done the same information will be sent to your mail ID.
+                              \nNOTE : If amount is zero you dont have to pay anything, you have been registered with us."
                 android:padding="8dp"/>
 
             <android.support.v7.widget.CardView xmlns:card_layout="http://schemas.android.com/apk/res-auto"
@@ -75,7 +77,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:text="Recipient Name"
                             android:textColor="@android:color/black"
                             android:textStyle="bold" />
@@ -86,7 +88,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="TextView"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textAlignment="viewEnd" />
                     </LinearLayout>
 
@@ -101,7 +103,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Paytm Number"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textColor="@android:color/black"
                             android:textStyle="bold" />
 
@@ -113,7 +115,7 @@
                             android:text="TextView"
                             android:textStyle="bold"
                             android:textColor="#000000"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textIsSelectable="true"
                             android:textAlignment="viewEnd" />
                     </LinearLayout>
@@ -130,7 +132,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Email"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textColor="@android:color/black"
                             android:textStyle="bold" />
 
@@ -140,7 +142,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="TextView"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textAlignment="viewEnd" />
                     </LinearLayout>
 
@@ -154,7 +156,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:text="Amount to be Paid"
                             android:textColor="@android:color/black"
                             android:textStyle="bold" />
@@ -164,7 +166,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:text="TextView"
                             android:textAlignment="viewEnd"
                             android:textColor="@android:color/black"
@@ -207,10 +209,10 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:background="@drawable/round_button_blue"
-                        android:text="Proceed"
-                        android:visibility="gone"
+                        android:text="Done"
                         android:textAppearance="@style/TextAppearance.AppCompat"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"
+                        android:visibility="visible" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
