@@ -263,6 +263,7 @@ public class EventModuleActivity extends AppCompatActivity implements
         }
         final int totalAmout = amount;
        // Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
+        sendTeamId(participants,event,teamId,recipient,amount);//send the team id to the participants
         setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout,teamId),false);
 //        //generate otp
 //        final String otp = RandomOTPGenerator.generate(Integer.parseInt(allParticipantsSap.get(0).substring(7)),6);
@@ -303,7 +304,6 @@ public class EventModuleActivity extends AppCompatActivity implements
 //                event.getEventID()+"/" + FirebaseConfig.EVENT_OTPS+"/" + teamId+"/" + FirebaseConfig.TEAM_OTP;
 //        Log.i(TAG,"OTP URL : "+otpUrl);
 //        //setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl), true);
-        sendTeamId(participants,event,teamId,recipient,amount);//send the team id to the participants
         this.finish();
     }
 

@@ -42,7 +42,7 @@
                 android:textColor="#3F51B5"
                 android:gravity="fill"
                 android:text="Please make your payment through Paytm in the Paytm Number given below. While making the payment please write your TEAM ID in the payment description field in PayTm.
-                              \nAfter you click Done the same information will be sent to your mail ID.
+                              \nThe same information will be sent to your mail ID.
                               \nNOTE : If amount is zero you dont have to pay anything, you have been registered with us."
                 android:padding="8dp"/>
 
