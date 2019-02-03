@@ -69,7 +69,7 @@ public class Event implements Comparable<Event>, Parcelable {
     @JsonProperty("eventDescription")
     private String eventDescription;
 
-    @JsonProperty("whatsapp")
+    @JsonProperty("whatsappNo")
     private String whatsapp;
 
     @JsonProperty("phone")

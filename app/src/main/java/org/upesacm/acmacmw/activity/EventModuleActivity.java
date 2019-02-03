@@ -140,7 +140,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                     Bundle args = new Bundle();
                     args.putParcelable(Event.PARCEL_KEY, event);
                     fragment.setArguments(args);
-                    setCurrentFragment(fragment, true);
+                    setCurrentFragment(fragment, false);
                     break;
                 }
                 case EventDetailFragment.REGISTRATION_CONFIRMATION: {
@@ -262,7 +262,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                 amount=event.getEntryFeesTeam();
         }
         final int totalAmout = amount;
-        Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
         setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout,teamId),false);
 //        //generate otp
 //        final String otp = RandomOTPGenerator.generate(Integer.parseInt(allParticipantsSap.get(0).substring(7)),6);

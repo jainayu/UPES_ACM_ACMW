@@ -166,9 +166,9 @@ public class CheckoutActivity extends AppCompatActivity
                                                                 .setContact(contact.getText().toString())
                                                                 .setEmail(email.getText().toString())
                                                                 .setBranch(branch.getText().toString())
-                                                                .setWhatsapp(whatsapp.getText().toString())
+                                                                .setWhatsappNo(whatsapp.getText().toString())
                                                                 .setYear(year.getText().toString())
-                                                                .setSap(sapID)
+                                                                .setUid(sapID)
                                                                 .build();
                                                         participantDataAvailable(participant);
                                                         //redirect payment

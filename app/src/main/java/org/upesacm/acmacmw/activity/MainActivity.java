@@ -21,10 +21,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.event.CartFragment;
@@ -38,8 +34,6 @@ import org.upesacm.acmacmw.fragment.main.ProfileFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.util.Cart;
 import org.upesacm.acmacmw.util.Config;
-import org.upesacm.acmacmw.util.FirebaseConfig;
-import org.upesacm.acmacmw.util.SessionManager;
 
 public class MainActivity extends AppCompatActivity implements
         BottomNavigationView.OnNavigationItemSelectedListener,
@@ -155,18 +149,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
-        /*drawerLayout.removeDrawerListener(toggle);
-        toggle = null;
-        drawerLayout = null;
-
-        navigationView.setNavigationItemSelectedListener(null);
-        navigationView = null;
-
-        retrofit = null;
-        homePageClient = null;
-        membershipClient  = null;
-
-        headerLayout = null;*/
         super.onDestroy();
     }
 
@@ -277,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPostFragmentInteraction(int code,Bundle data) {
+    public void onPostFragmentInteraction(int code) {
         switch (code) {
             case HomePageFragment.REQUEST_AUTHENTICATION: {
                 Intent profileActivityIntent = new Intent(this, ProfileDetailsActivity.class);
@@ -285,10 +267,9 @@ public class MainActivity extends AppCompatActivity implements
                 startActivity(profileActivityIntent);
                 break;
             }
-            case HomePageFragment.UPLOAD_IMAGE: {
+            case HomePageFragment.UPLOAD_POST: {
                 Intent homePageActivityIntent = new Intent(this, HomePageActivity.class);
-                homePageActivityIntent.putExtra(HomePageFragment.INTERACTION_CODE_KEY, HomePageFragment.UPLOAD_IMAGE);
-                homePageActivityIntent.putExtra(ImageUploadFragment.UPLOAD_DATA_KEY,data);
+                homePageActivityIntent.putExtra(HomePageFragment.INTERACTION_CODE_KEY, HomePageFragment.UPLOAD_POST);
                 startActivity(homePageActivityIntent);
                 break;
             }

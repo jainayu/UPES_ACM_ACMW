@@ -134,11 +134,11 @@ public class ImageUploadFragment extends Fragment implements
 
     @Override
     public void onClick(View view) {
-        InputMethodManager inputManager = (InputMethodManager)
-                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+//        InputMethodManager inputManager = (InputMethodManager)
+//                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//
+//        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+//                InputMethodManager.HIDE_NOT_ALWAYS);
         System.out.println("upload button clicked");
         showProgress(true);
         Calendar calendar = Calendar.getInstance();
