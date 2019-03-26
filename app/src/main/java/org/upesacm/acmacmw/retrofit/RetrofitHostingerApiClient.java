@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitHostingerApiClient {
 
-    public static final String BASE_URL = "http://upesacm.org";
+    public static final String BASE_URL = "https://upesacm.org";
     private static Retrofit retrofit = null;
     private HomePageClient homePageClient = null;
     private MembershipClient membershipClient = null;

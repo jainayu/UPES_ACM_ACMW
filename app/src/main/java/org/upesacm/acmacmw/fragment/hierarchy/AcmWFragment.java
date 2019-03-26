@@ -50,12 +50,14 @@ public class AcmWFragment extends android.support.v4.app.Fragment implements Val
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(heirarchyAdapter);
         acmWheirarchyModels=new ArrayList<>();
-        if(mDatabaseReference!=null)
+        if(mDatabaseReference!=null&&acmWheirarchyModels.isEmpty())
         {
             mDatabaseReference.addValueEventListener(this);
         }
 
-
+        if (acmWheirarchyModels != null && heirarchyAdapter != null) {
+            heirarchyAdapter.setHeirarchyModels(acmWheirarchyModels);
+        }
         return view;
 
     }

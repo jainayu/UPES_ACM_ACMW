@@ -37,7 +37,7 @@ public interface MembershipClient  {
     Call<HashMap<String,String>> getOTPRecipients(@Query("auth") String idToken);
     @Multipart
     @POST("/upesacmacmwapp/upload.php")
-    Call<ResponseModel> uploadFile(@Part ("name") RequestBody name,@Part MultipartBody.Part filepart,@Query("auth") String idToken );
+    Call<ResponseModel> uploadFile(@Part ("name") RequestBody name,@Part MultipartBody.Part filepart);
 
     @GET("email_msg.json")
     Call<EmailMsg> getEmailMsg(@Query("auth") String idToken);

@@ -208,7 +208,7 @@ public class ImageUploadFragment extends Fragment implements
         RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
 // Change base URL to your upload server URL.
         MembershipClient membershipClient = RetrofitHostingerApiClient.getInstance().create(MembershipClient.class);
-        membershipClient.uploadFile(name,filePart,Config.AUTH_TOKEN).enqueue(new Callback<ResponseModel>() {
+        membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
                 Log.d("Tag", "code" + response.code() + "");
