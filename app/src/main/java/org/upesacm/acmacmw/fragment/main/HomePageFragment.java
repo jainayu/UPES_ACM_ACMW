@@ -295,7 +295,7 @@ public class HomePageFragment extends Fragment
         if(recyclerViewAdapter!=null) {
             HashMap<String, Post> hashMap = response.body();
             monthCount--;
-            if (hashMap != null) {
+            if (hashMap != null && !hashMap.isEmpty()) {
                 System.out.println("onResponse hashmap : " + hashMap);
                 ArrayList<Post> posts = new ArrayList<>();
                 for (String key : hashMap.keySet()) {
