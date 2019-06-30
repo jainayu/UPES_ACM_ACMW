@@ -7,10 +7,8 @@
     android:layout_height="match_parent"
     android:background="@color/colorSecondaryDrak">
 
-
-
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/acm_office_bearer"
+        android:id="@+id/executives"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="8dp"

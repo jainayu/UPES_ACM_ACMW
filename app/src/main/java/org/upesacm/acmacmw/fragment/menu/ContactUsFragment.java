@@ -256,15 +256,16 @@ public class ContactUsFragment extends Fragment implements
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
                 final HeirarchyModel model = ds.getValue(HeirarchyModel.class);
                 System.out.println("contact us available in campus membe chair : " + model.getAvailableInCampus());
-                if (model.getSapId() == 500053778L && getActivity() != null) {
+                if (model.getSapId() == 500061112L && getActivity() != null) {
                     RequestOptions requestOptions=new RequestOptions();
-                    requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE)
-                            ;
+                    requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE);
+
                     Glide.with(this)
                             .load(model.getImage())
                             .apply(requestOptions)
                             .thumbnail(Glide.with(this).load(R.drawable.loading_profile_pic))
                             .into(imageViewPrExecPic);
+
                     if (model.getAvailableInCampus() == 1) {
                         imageViewAvailablePrExec.setImageResource(R.drawable.ic_check_circle_green_24dp);
                     } else {
@@ -279,10 +280,10 @@ public class ContactUsFragment extends Fragment implements
                             getActivity().startActivity(callIntent);
                         }
                     });
-                } else if (model.getSapId() == 500052158L && getActivity() != null) {
+                } else if (model.getSapId() == 500068749L && getActivity() != null) {
                     RequestOptions requestOptions=new RequestOptions();
-                    requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE)
-                            ;
+                    requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE);
+
                     Glide.with(this)
                             .load(model.getImage())
                             .apply(requestOptions)
