@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.fragment.homepage.post;
+package org.upesacm.acmacmw.fragment.hompage;
 
 
 import android.content.Context;
@@ -19,14 +19,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.MainActivity;
 import org.upesacm.acmacmw.model.Post;
-import org.upesacm.acmacmw.retrofit.ApiClient;
-import org.upesacm.acmacmw.retrofit.HomePageClient;
+import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
+import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
 import org.upesacm.acmacmw.retrofit.MembershipClient;
 import org.upesacm.acmacmw.retrofit.ResponseModel;
 import org.upesacm.acmacmw.util.Config;
@@ -50,21 +49,19 @@ import retrofit2.Response;
 public class ImageUploadFragment extends Fragment implements
         View.OnClickListener,
         Callback<Post> {
-
+    public static final String UPLOAD_DATA_KEY = "upload data key";
     public static final int UPLOAD_SUCCESSFUL = 1;
     public static final int UPLOAD_CANCELLED = 2;
     public static final int UPLOAD_CANCEL_OPERATION_FAILED = 4;
     public static final int UPLOAD_FAILED = 3;
 
-    HomePageClient homePageClient;
+    //HomePageClient homePageClient;
     byte[] byteArray;
     Post post;
 
     EditText caption;
     FloatingActionButton upload;
     ProgressBar progressBar;
-    FirebaseStorage storage = FirebaseStorage.getInstance();
-    StorageReference storageRef = storage.getReference();
     UploadResultListener resultListener;
     TextView textViewUpload;
     String ownerSapId;
@@ -77,21 +74,22 @@ public class ImageUploadFragment extends Fragment implements
     UploadTask uploadTask;
     private File destination;
 
+    private MainActivity callback;
+
     public ImageUploadFragment() {
         // Required empty public constructor
     }
 
-    public static ImageUploadFragment newInstance(HomePageClient homePageClient) {
+    public static ImageUploadFragment newInstance(Bundle args) {
         ImageUploadFragment fragment = new ImageUploadFragment();
-        fragment.homePageClient = homePageClient;
-
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onAttach(Context context) {
         if (context instanceof UploadResultListener) {
-            resultListener = (UploadResultListener) context;
+            resultListener = (UploadResultListener)context;
             super.onAttach(context);
         } else {
             throw new IllegalStateException(context.toString() + " must " +
@@ -136,11 +134,11 @@ public class ImageUploadFragment extends Fragment implements
 
     @Override
     public void onClick(View view) {
-        InputMethodManager inputManager = (InputMethodManager)
-                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+//        InputMethodManager inputManager = (InputMethodManager)
+//                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//
+//        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+//                InputMethodManager.HIDE_NOT_ALWAYS);
         System.out.println("upload button clicked");
         showProgress(true);
         Calendar calendar = Calendar.getInstance();
@@ -209,8 +207,8 @@ public class ImageUploadFragment extends Fragment implements
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("image", destination.getName(), fileBody);
         RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), destination.getName());
 // Change base URL to your upload server URL.
-        MembershipClient membershipClient = ApiClient.getClient().create(MembershipClient.class);
-        membershipClient.uploadFile(name,filePart,Config.AUTH_TOKEN).enqueue(new Callback<ResponseModel>() {
+        MembershipClient membershipClient = RetrofitHostingerApiClient.getInstance().create(MembershipClient.class);
+        membershipClient.uploadFile(name,filePart).enqueue(new Callback<ResponseModel>() {
             @Override
             public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
                 Log.d("Tag", "code" + response.code() + "");
@@ -230,7 +228,7 @@ public class ImageUploadFragment extends Fragment implements
                                 .setOwnerSapId(ownerSapId)
                                 .setOwnerName(ownerName)
                                 .build();
-                        Call<Post> newPostCall = homePageClient.createPost(post.getYearId(),
+                        Call<Post> newPostCall = RetrofitFirebaseApiClient.getInstance().getHomePageClient().createPost(post.getYearId(),
                                 post.getMonthId(),
                                 post.getPostId(),
                                 post, Config.AUTH_TOKEN);

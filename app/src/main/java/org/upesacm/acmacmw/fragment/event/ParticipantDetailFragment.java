@@ -150,7 +150,7 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
                             .setBranch(inputMap.get(sapId).getBranch())
                             .setYear(inputMap.get(sapId).getYear())
                             .setEmail(inputMap.get(sapId).getEmail())
-                            .setWhatsapp(inputMap.get(sapId).getWhatsappNo())
+                            .setWhatsappNo(inputMap.get(sapId).getWhatsappNo())
                             .setEventsList(eventList)
                             .build());
                 }
@@ -187,7 +187,7 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
                         for (String sapid:sapIds)
                         {
                             Participant participant=participantMap.get(sapid);
-                            if(participant!=null)
+                            if(participant!=null)//participant has registered in atleast one event previously
                             {
                                 // Check for any duplicate member in the event if found return with toast and end registration process
                                 if(participant.getEventsList().contains(event.getEventID()))
@@ -207,7 +207,6 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
                                     //add the event id to the participant event list
                                     participants.get(sapid).getEventsList().add(event.getEventID());
                                 }
-
                             }
                         }
                         //remove already registered from list of sapids and check for acm non acm members
@@ -235,7 +234,6 @@ public class ParticipantDetailFragment extends Fragment implements Toolbar.OnMen
                                                     eventIdList.add(event.getEventID());
                                                     Participant newAcmParticipant = new Participant.Builder(member)
                                                             .setEventsList(eventIdList)
-                                                            .setIsAcmMember(true)
                                                             .build();
                                                     //add participant to the acm participant list
                                                     participants.put(sapIds.get(i),newAcmParticipant);

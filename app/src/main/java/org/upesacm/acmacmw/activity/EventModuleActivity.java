@@ -85,8 +85,8 @@ public class EventModuleActivity extends AppCompatActivity implements
     private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.frame_layout_event_activity,fragment);
-//        if(addToBackStack)
-//            ft.addToBackStack(null);
+        if(addToBackStack)
+            ft.addToBackStack(null);
         ft.commit();
     }
 
@@ -107,12 +107,17 @@ public class EventModuleActivity extends AppCompatActivity implements
         }
     }
 
-    private void sendTeamId(Map<String,Participant> participants,Event event,String teamId) {
+    private void sendTeamId(Map<String,Participant> participants,Event event,String teamId,Member recipient,int amount) {
 
         for(String sap:participants.keySet()) {
             Participant participant = participants.get(sap);
-            String mailBody = participant.getName()+"\n"+
-                    teamId;
+            String mailBody = "<b>Name</b>: "+participant.getName()+"<br>"+
+                    "<b>Unique ID</b>: "+participant.getUid()+"<br>"+
+                    "<b>Your Team Id</b>: "+teamId+"<br>"+
+                    "<b>Amount</b>: "+amount+"<br>"+
+                    "<b>Payment Recipient's Number</b>: "+recipient.getContact()+"<br>"+
+                    "(Please pay the fee on this number)"+"<br><br>";
+
             OTPSender sender=new OTPSender();
             sender.execute(mailBody,participant.getEmail(),event.getEventName()+" registration initiated");
         }
@@ -127,19 +132,24 @@ public class EventModuleActivity extends AppCompatActivity implements
     @Override
     public void onEventDetailsFragmentInteraction(Event event, int code) {
         tempStorage.putParcelable(REGISTERED_EVENT_KEY,event); //store the event for later use for other callbacks
-        switch (code) {
-            case EventDetailFragment.NEW_TEAM_REGISTRATION: {
-                Fragment fragment = new SAPIDFragment();
-                Bundle args = new Bundle();
-                args.putParcelable(Event.PARCEL_KEY, event);
-                fragment.setArguments(args);
-                setCurrentFragment(fragment, true);
-                break;
+        if(System.currentTimeMillis()<event.getEventTimeStamp() &&
+                event.isRegistrationOpen()) {
+            switch (code) {
+                case EventDetailFragment.NEW_TEAM_REGISTRATION: {
+                    Fragment fragment = new SAPIDFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelable(Event.PARCEL_KEY, event);
+                    fragment.setArguments(args);
+                    setCurrentFragment(fragment, false);
+                    break;
+                }
+                case EventDetailFragment.REGISTRATION_CONFIRMATION: {
+                    setCurrentFragment(TeamIdFragment.newInstance(), false);
+                    break;
+                }
             }
-            case EventDetailFragment.REGISTRATION_CONFIRMATION: {
-                setCurrentFragment(TeamIdFragment.newInstance(),true);
-                break;
-            }
+        } else {
+            Toast.makeText(this,"Registrations for this event has been closed",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -149,7 +159,7 @@ public class EventModuleActivity extends AppCompatActivity implements
         for(String sap:sapIds) {
             System.out.println("id : "+sap);
         }
-        setCurrentFragment(ParticipantDetailFragment.newInstance(sapIds,selectedEvent), true);
+        setCurrentFragment(ParticipantDetailFragment.newInstance(sapIds,selectedEvent), false);
     }
 
     @Override
@@ -190,7 +200,7 @@ public class EventModuleActivity extends AppCompatActivity implements
                                                                 for(DataSnapshot ds:dataSnapshot.getChildren()) {
                                                                     recipientSaps.add(String.valueOf(ds.getValue(Long.class)));
                                                                 }
-                                                                sendTeamId(participants,event,teamId);//send the team id to the participants
+                                                                //sendTeamId(participants,event,teamId);//send the team id to the participants
                                                                 setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),false);
                                                             }
 
@@ -252,7 +262,8 @@ public class EventModuleActivity extends AppCompatActivity implements
                 amount=event.getEntryFeesTeam();
         }
         final int totalAmout = amount;
-        Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this,recipient.getName()+" selected",Toast.LENGTH_SHORT).show();
+        sendTeamId(participants,event,teamId,recipient,amount);//send the team id to the participants
         setCurrentFragment(PaymentDetailsFragment.newInstance(recipient,totalAmout,teamId),false);
 //        //generate otp
 //        final String otp = RandomOTPGenerator.generate(Integer.parseInt(allParticipantsSap.get(0).substring(7)),6);
@@ -284,12 +295,16 @@ public class EventModuleActivity extends AppCompatActivity implements
 
     @Override
     public void onClickNext(final Member recipient, int amount) {
-        String teamId = tempStorage.getString(CONTEXT_TEAM_KEY);
-        Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
-        String otpUrl = FirebaseConfig.EVENTS_DB+"/" + FirebaseConfig.EVENTS+"/"+
-                event.getEventID()+"/" + FirebaseConfig.EVENT_OTPS+"/" + teamId+"/" + FirebaseConfig.TEAM_OTP;
-        Log.i(TAG,"OTP URL : "+otpUrl);
-        //setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl), true);
+        final Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+        final String teamId = tempStorage.getString(CONTEXT_TEAM_KEY);
+        final Map<String,Participant> participants = (HashMap<String,Participant>)tempStorage.getSerializable(PARTICIPANTS_KEY);
+//        String teamId = tempStorage.getString(CONTEXT_TEAM_KEY);
+//        Event event = tempStorage.getParcelable(REGISTERED_EVENT_KEY);
+//        String otpUrl = FirebaseConfig.EVENTS_DB+"/" + FirebaseConfig.EVENTS+"/"+
+//                event.getEventID()+"/" + FirebaseConfig.EVENT_OTPS+"/" + teamId+"/" + FirebaseConfig.TEAM_OTP;
+//        Log.i(TAG,"OTP URL : "+otpUrl);
+//        //setCurrentFragment(OtpConfirmationFragment.newInstance(otpUrl), true);
+        this.finish();
     }
 
     @Override

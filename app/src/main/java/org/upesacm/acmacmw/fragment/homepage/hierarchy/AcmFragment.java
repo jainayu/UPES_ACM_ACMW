@@ -49,13 +49,13 @@ public class AcmFragment extends android.support.v4.app.Fragment implements Valu
         mProgressBar=view.findViewById(R.id.progress_bar_heirarchy);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(heirarchyAdapter);
-       acmheirarchyModels=new ArrayList<>();
-        if(mDatabaseReference!=null) {
+        acmheirarchyModels=new ArrayList<>();
+        if(mDatabaseReference!=null&&acmheirarchyModels.isEmpty()) {
             mDatabaseReference.addValueEventListener(this);
         }
-
-
-
+        if (acmheirarchyModels != null && heirarchyAdapter != null) {
+                heirarchyAdapter.setHeirarchyModels(acmheirarchyModels);
+        }
         return view;
 
     }

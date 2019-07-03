@@ -129,7 +129,7 @@ public class SAPIDFragment extends Fragment {
                         return true;
                     }
                     System.out.println(sapIds.size());
-                    Toast.makeText(SAPIDFragment.this.getContext(),"everything is valid"+sapIds.size(),Toast.LENGTH_LONG).show();
+                    //Toast.makeText(SAPIDFragment.this.getContext(),"everything is valid"+sapIds.size(),Toast.LENGTH_LONG).show();
                     //Hide the keyboard if it is visible
 //                    InputMethodManager inputManager = (InputMethodManager)
 //                            getContext().getSystemService(Context.INPUT_METHOD_SERVICE);

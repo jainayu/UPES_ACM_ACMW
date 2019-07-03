@@ -28,7 +28,7 @@ public class Participant implements Parcelable {
         name = in.readString();
         email = in.readString();
         contact = in.readString();
-        whatsapp = in.readString();
+        whatsappNo = in.readString();
         branch = in.readString();
         year = in.readString();
         eventsList = in.createStringArrayList();
@@ -59,7 +59,7 @@ public class Participant implements Parcelable {
 
     String contact;
 
-    String whatsapp;
+    String whatsappNo;
 
     String branch;
 
@@ -115,7 +115,7 @@ public class Participant implements Parcelable {
 
 
     public String getWhatsappNo() {
-        return whatsapp;
+        return whatsappNo;
     }
 
     public String getBranch() {
@@ -147,7 +147,7 @@ public class Participant implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(email);
         parcel.writeString(contact);
-        parcel.writeString(whatsapp);
+        parcel.writeString(whatsappNo);
         parcel.writeString(branch);
         parcel.writeString(year);
         parcel.writeStringList(eventsList);
@@ -159,7 +159,7 @@ public class Participant implements Parcelable {
 
 
     public static class Builder {
-        private String sap;
+        private String uid;
         private String name;
         private String email;
         private String contact;
@@ -177,20 +177,20 @@ public class Participant implements Parcelable {
         }
 
         public Builder(Participant participant) {
-            this.sap = participant.uid;
+            this.uid = participant.uid;
             this.branch = participant.branch;
             this.contact = participant.contact;
             this.email = participant.email;
             this.eventsList = participant.getEventsList();
             this.name = participant.name;
-            this.whatsapp = participant.whatsapp;
+            this.whatsapp = participant.whatsappNo;
             this.year = participant.year;
             this.isAcmMember = participant.acmmember;
             this.score = participant.score;
         }
 
         public Builder(Member participant) {
-            this.sap = participant.getSap();
+            this.uid = participant.getSap();
             this.branch = participant.getBranch();
             this.contact = participant.getContact();
             this.email = participant.getEmail();
@@ -198,6 +198,7 @@ public class Participant implements Parcelable {
             this.whatsapp = participant.getWhatsappNo();
             this.year = participant.getYear();
             this.isAcmMember = true;
+            this.score = 0;
         }
 
         public Participant build() {
@@ -207,16 +208,16 @@ public class Participant implements Parcelable {
             participant.email = this.email;
             participant.eventsList = this.eventsList;
             participant.name = this.name;
-            participant.uid = this.sap;
-            participant.whatsapp = this.whatsapp;
+            participant.uid = this.uid;
+            participant.whatsappNo = this.whatsapp;
             participant.year = this.year;
             participant.acmmember = this.isAcmMember;
             participant.score = this.score;
             return participant;
         }
 
-        public Builder setSap(String sap) {
-            this.sap = sap;
+        public Builder setUid(String uid) {
+            this.uid = uid;
             return this;
         }
 
@@ -249,7 +250,7 @@ public class Participant implements Parcelable {
             return this;
         }
 
-        public Builder setWhatsapp(String whatsapp) {
+        public Builder setWhatsappNo(String whatsapp) {
             this.whatsapp = whatsapp;
             return this;
         }
