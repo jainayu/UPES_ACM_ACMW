@@ -19,8 +19,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.adapter.hierarchy.HeirarchyAdapter;
 import org.upesacm.acmacmw.fragment.main.HomePageFragment;
 import org.upesacm.acmacmw.fragment.hompage.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.hompage.SponsorsFragment;
@@ -216,9 +220,16 @@ public class MainActivity extends AppCompatActivity implements
     public void onMenuItemSelected(int menuItemId) {
         if(menuItemId==MenuFragment.ACTION_NEW_REGISTRATION)
         {
-            Intent memberRegistrationActIntent = new Intent(this,MemberRegistrationActivity.class);
-            memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY,MemberRegistrationActivity.MEMBER_SIGN_UP);
-            startActivity(memberRegistrationActIntent);
+            FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference mDatabaseReference = mFirebaseDatabase.getReference().child("registration_open");
+            if(mDatabaseReference.getKey().equals("true")) {
+                Intent memberRegistrationActIntent = new Intent(this, MemberRegistrationActivity.class);
+                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY, MemberRegistrationActivity.MEMBER_SIGN_UP);
+                startActivity(memberRegistrationActIntent);
+            }
+            else {
+                Toast.makeText(this, "Registration Closed", Toast.LENGTH_SHORT).show();
+            }
         }
         else {
             Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);
