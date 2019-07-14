@@ -99,13 +99,13 @@ indulging, you may apply for an yearly membership.\n\nFollowing is your Google S
     <string name="link_acmw_linkedin"><u>https://www.linkedin.com/company/upesacmw</u></string>
     <string name="link_acm_youtube"><u>https://www.youtube.com/channel/UCaUFOX5cSycV23KhG_WEsag</u></string>
     <string name="link_acmw_youtube"><u>https://www.youtube.com/channel/UCaUFOX5cSycV23KhG_WEsag</u></string>
-    <string name="whatsapp_acm"><u>9716869106</u></string>
-    <string name="whatsapp_acmw"><u>9971775533</u></string>
+    <string name="whatsapp_acm"><u>7340007145</u></string>
+    <string name="whatsapp_acmw"><u>9001010661</u></string>
 
-    <string name="contact_us_member_1_title">Membership Chair</string>
-    <string name="contact_us_member_1_name">Poorva Mahara</string>
-    <string name="contact_us_member_2_title">Secretary</string>
-    <string name="contact_us_member_2_name">Sugandh Agarwal</string>
+    <string name="contact_us_member_1_title">Membership Head ACM-W</string>
+    <string name="contact_us_member_1_name">Krishna</string>
+    <string name="contact_us_member_2_title">Membership Head ACM</string>
+    <string name="contact_us_member_2_name">Amey Pownikar</string>
     <string name="key_user_selected_home_page_fragment">user selected homepage fragment</string>
     <string name="title_activity_leaderboard">LeaderboardActivity</string>
 </resources>

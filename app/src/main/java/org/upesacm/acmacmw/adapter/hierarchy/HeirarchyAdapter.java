@@ -49,7 +49,13 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             Typeface regular = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_regular.ttf");
             Typeface bold = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_bold.ttf");
             holder.name.setText(heirarchyModels.get(position).getName());
-            holder.position.setText(heirarchyModels.get(position).getPostion());
+            if(heirarchyModels.get(position).getAcm_acmw().equals("ACM")|| heirarchyModels.get(position).getAcm_acmw().equals("ACMW")) {
+                holder.position.setText(heirarchyModels.get(position).getPostion());
+                holder.position.setTextSize(20);
+            }
+            /*else
+                holder.position.setVisibility(View.INVISIBLE);*/
+
             holder.position.setTypeface(bold);
             holder.about.setText(heirarchyModels.get(position).getAbout());
             holder.whatsapp.setOnClickListener(new View.OnClickListener() {

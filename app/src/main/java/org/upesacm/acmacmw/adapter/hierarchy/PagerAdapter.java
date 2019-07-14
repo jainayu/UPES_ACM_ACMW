@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import org.upesacm.acmacmw.fragment.hierarchy.AcmFragment;
 import org.upesacm.acmacmw.fragment.hierarchy.AcmWFragment;
+import org.upesacm.acmacmw.fragment.hierarchy.AdvisoryFragment;
+import org.upesacm.acmacmw.fragment.hierarchy.ExecutivesFragment;
 
 public class PagerAdapter extends FragmentPagerAdapter {
 
@@ -22,6 +24,10 @@ public class PagerAdapter extends FragmentPagerAdapter {
                 return new AcmFragment();
             case 1:
                 return new AcmWFragment();
+            case 2:
+                return new ExecutivesFragment();
+            case 3:
+                return new AdvisoryFragment();
             default:
                 return new Fragment();
         }
@@ -30,15 +36,22 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 4;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        if(position==0)
-            return "ACM";
-        else if(position==1)
-            return "ACM-W";
-        return "Undefined";
+        switch (position) {
+            case 0:
+                return "ACM";
+            case 1:
+                return "ACM-W";
+            case 2:
+                return "Board Of Executives";
+            case 3:
+                return "Technical Advisory";
+            default:
+                return "Undefined";
+        }
     }
 }

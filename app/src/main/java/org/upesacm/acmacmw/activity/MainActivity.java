@@ -21,8 +21,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.adapter.hierarchy.HeirarchyAdapter;
 import org.upesacm.acmacmw.fragment.event.CartFragment;
 import org.upesacm.acmacmw.fragment.main.HomePageFragment;
 import org.upesacm.acmacmw.fragment.hompage.ImageUploadFragment;
@@ -42,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements
         ProfileFragment.OnFragmentInteractionListener,
         HomePageFragment.FragmentInteractionListener {
     public static final String TAG = "MainActivity";
-    public static final String BASE_URL="https://acm-acmw-app-e79a3.firebaseio.com/";
+    public static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
     public static final String EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY = "event activity current fragment key";
     private static final int POSTS_FRAGMENT_ID = 1;
     private static final int EVENTS_FRAGMENT_ID = 2;
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements
     private BottomNavigationView bottomNavigationView;
     private FrameLayout frameLayout;
     ConstraintLayout constraintLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -203,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements
         eventActIntent.putExtra(EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY,R.layout.fragment_event_detail);
         startActivity(eventActIntent);
     }
-
     @Override
     public void onAddToCartClicked(Event event) {
         boolean alreadyAdded=false;
@@ -223,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements
             Snackbar.make(constraintLayout, event.getEventName()+" Already in Cart", Snackbar.LENGTH_LONG).show();
         }
     }
-
     @Override
     public void onCartButtonPressed() {
         if(Cart.cartEvents.isEmpty())
@@ -231,15 +234,28 @@ public class MainActivity extends AppCompatActivity implements
             Snackbar.make(constraintLayout,"Cart is Empty",Snackbar.LENGTH_LONG).show();
         }
         else
-        setCurrentFragment(new CartFragment(),true);
+            setCurrentFragment(new CartFragment(),true);
     }
-
     @Override
     public void onMenuItemSelected(int menuItemId) {
-        Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);
-        menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
-        startActivity(menuActivityIntent);
-    }
+        if(menuItemId==MenuFragment.ACTION_NEW_REGISTRATION)
+        {
+            FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference mDatabaseReference = mFirebaseDatabase.getReference().child("registration_open");
+            if(mDatabaseReference.getKey().equals("true")) {
+                Intent memberRegistrationActIntent = new Intent(this, MemberRegistrationActivity.class);
+                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY, MemberRegistrationActivity.MEMBER_SIGN_UP);
+                startActivity(memberRegistrationActIntent);
+            }
+            else {
+                Toast.makeText(this, "Registration Closed", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);
+            menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
+            startActivity(menuActivityIntent);
+        }
 
     @Override
     public void onProfileFragmentInteraction(int selectedOptId) {
