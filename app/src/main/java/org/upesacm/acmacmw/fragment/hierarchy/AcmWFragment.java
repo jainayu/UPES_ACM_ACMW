@@ -35,23 +35,21 @@ public class AcmWFragment extends android.support.v4.app.Fragment implements Val
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFirebaseDatabase= FirebaseDatabase.getInstance();
-        mDatabaseReference=mFirebaseDatabase.getReference().child("Heirarchy");
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference().child("Heirarchy");
         heirarchyAdapter = new HeirarchyAdapter(acmWheirarchyModels);//empty list intially
     }
 
     @Nullable
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_acm_w, container, false);
-        mRecyclerView=view.findViewById(R.id.acm_w_office_bearer);
-        mProgressBar=view.findViewById(R.id.progress_bar_heirarchy);
+        mRecyclerView = view.findViewById(R.id.acm_w_office_bearer);
+        mProgressBar = view.findViewById(R.id.progress_bar_heirarchy);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(heirarchyAdapter);
-        acmWheirarchyModels=new ArrayList<>();
-        if(mDatabaseReference!=null&&acmWheirarchyModels.isEmpty())
-        {
+        acmWheirarchyModels = new ArrayList<>();
+        if (mDatabaseReference != null && acmWheirarchyModels.isEmpty()) {
             mDatabaseReference.addValueEventListener(this);
         }
 
@@ -84,14 +82,12 @@ public class AcmWFragment extends android.support.v4.app.Fragment implements Val
     @Override
     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
         acmWheirarchyModels.removeAll(acmWheirarchyModels);
-        for (DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
-        {
-            HeirarchyModel heirarchyModel=dataSnapshot1.getValue(HeirarchyModel.class);
-            if(heirarchyModel.getAcm_acmw().equals("ACMW")){
+        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+            HeirarchyModel heirarchyModel = dataSnapshot1.getValue(HeirarchyModel.class);
+            if (heirarchyModel.getAcm_acmw().equals("ACMW")) {
                 acmWheirarchyModels.add(heirarchyModel);
             }
-            if(acmWheirarchyModels!=null && heirarchyAdapter != null)
-            {
+            if (acmWheirarchyModels != null && heirarchyAdapter != null) {
                 heirarchyAdapter.setHeirarchyModels(acmWheirarchyModels);
                 mProgressBar.setVisibility(View.GONE);
             }
