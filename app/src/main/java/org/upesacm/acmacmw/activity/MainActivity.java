@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements
             menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
             startActivity(menuActivityIntent);
         }
+    }
 
     @Override
     public void onProfileFragmentInteraction(int selectedOptId) {
