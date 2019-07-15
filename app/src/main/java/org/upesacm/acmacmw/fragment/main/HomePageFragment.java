@@ -319,7 +319,7 @@ public class HomePageFragment extends Fragment
                     //necesary to remove the null post when no changes are made to dataset
                     Calendar c = Calendar.getInstance();
                     c.add(Calendar.MONTH, monthCount);
-                    if (c.get(Calendar.YEAR) >= 2018 && c.get(Calendar.MONTH) >= 5) {
+                    if (c.get(Calendar.YEAR) >= 2018 && c.get(Calendar.MONTH) >= 0) {
                         RetrofitFirebaseApiClient.getInstance().getHomePageClient().getPosts("Y" + c.get(Calendar.YEAR),
                                 "M" + c.get(Calendar.MONTH),Config.AUTH_TOKEN)
                                 .enqueue(this);

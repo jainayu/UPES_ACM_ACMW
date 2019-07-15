@@ -51,7 +51,13 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             Typeface regular = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_regular.ttf");
             final Typeface bold = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_bold.ttf");
             holder.name.setText(heirarchyModels.get(position).getName());
-            holder.position.setText(heirarchyModels.get(position).getPostion());
+            if (heirarchyModels.get(position).getAcm_acmw().equals("ACM") || heirarchyModels.get(position).getAcm_acmw().equals("ACMW")) {
+                holder.position.setText(heirarchyModels.get(position).getPostion());
+                holder.position.setTextSize(20);
+            }
+            /*else
+                holder.position.setVisibility(View.INVISIBLE);*/
+
             holder.position.setTypeface(bold);
             holder.about.setText(heirarchyModels.get(position).getAbout());
 
@@ -76,9 +82,11 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
                     Log.d(TAG, "onClick: Starts");
 
                     BottomsheetFragment bottomsheetFragment = new BottomsheetFragment();
-                    bottomsheetFragment.GetData(heirarchyModels.get(position).getName(), heirarchyModels.get(position).getAbout(),  // passing Data in BottomSheetFragment class
-                            heirarchyModels.get(position).getImage(), heirarchyModels.get(position).getWhatsapp(),
-                            heirarchyModels.get(position).getLinkedin(), heirarchyModels.get(position).getContact());
+
+                    // passing Data in BottomSheetFragment class
+                    bottomsheetFragment.GetData(heirarchyModels.get(position).getName(), heirarchyModels.get(position).getImage(),
+                            heirarchyModels.get(position).getWhatsapp(), heirarchyModels.get(position).getLinkedin(),
+                            heirarchyModels.get(position).getContact());
 
                     BottomSheetDialogFragment bottomSheetDialogFragment = new BottomsheetFragment();
                     bottomSheetDialogFragment.show(((FragmentActivity) context).getSupportFragmentManager(), bottomSheetDialogFragment.getTag());   // initiating Bottomsheet
@@ -124,7 +132,6 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
 
         }
     }
-
 
     public class HeirarchyViewHolder extends RecyclerView.ViewHolder {
         ImageView image;

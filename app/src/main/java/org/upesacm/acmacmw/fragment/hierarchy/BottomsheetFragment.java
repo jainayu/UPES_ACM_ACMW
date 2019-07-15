@@ -30,7 +30,6 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
 
 
     TextView Name_bottomsheet;
-    TextView About_bottomsheet;
     ImageView Profile_bottomsheet;
     TextView Current_project;
     ImageView Whatsapp;
@@ -39,7 +38,6 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
     ImageView Github;
 
     static String Name;
-    static String About;
     static String Image;
     static long getWhatsappNo;
     static String LinkedinUrl;
@@ -47,9 +45,8 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
     static String GithubUrl;
 
 
-    public BottomsheetFragment GetData(String name, String about, String image, long whatsappno, String linkedinUrl, long contactNo) {
+    public BottomsheetFragment GetData(String name, String image, long whatsappno, String linkedinUrl, long contactNo) {
         Name = name;
-//        About = about;
         Image = image;
         getWhatsappNo = whatsappno;
         LinkedinUrl = linkedinUrl;
@@ -64,7 +61,6 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
         View v = inflater.inflate(R.layout.heirarchy_bottomsheet, container, false);
 
         Name_bottomsheet = (TextView) v.findViewById(R.id.name_bottomsheet);
-//        About_bottomsheet = (TextView) v.findViewById(R.id.about_bottomsheet);
         Profile_bottomsheet = (ImageView) v.findViewById(R.id.profile_bottomsheet);
         Current_project = (TextView) v.findViewById(R.id.current_project);
         Whatsapp = (ImageView) v.findViewById(R.id.whatsapp_bottomsheet);
@@ -78,7 +74,6 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
             final Typeface bold = Typeface.createFromAsset(getContext().getAssets(), "Fonts/product_sans_bold.ttf");
             Name_bottomsheet.setTypeface(bold);
             Name_bottomsheet.setText(Name);
-//            About_bottomsheet.setText(About);
             if (Image.equals("")) {
                 Profile_bottomsheet.setImageResource(R.drawable.acm);
             } else {
