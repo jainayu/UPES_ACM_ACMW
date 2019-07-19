@@ -41,7 +41,7 @@
     </ScrollView>
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/constraintLayout2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/caption_bg"

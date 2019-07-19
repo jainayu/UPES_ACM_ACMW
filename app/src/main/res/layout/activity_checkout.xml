@@ -52,7 +52,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/contact"
+                android:id="@+id/contact_bottomsheet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Contact" />
@@ -104,7 +104,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/whatsapp"
+                android:id="@+id/whatsapp_bottomsheet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Whatsapp No." />

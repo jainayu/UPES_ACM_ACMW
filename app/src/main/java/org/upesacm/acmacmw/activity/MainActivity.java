@@ -29,7 +29,6 @@ import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.adapter.hierarchy.HeirarchyAdapter;
 import org.upesacm.acmacmw.fragment.event.CartFragment;
 import org.upesacm.acmacmw.fragment.main.HomePageFragment;
-import org.upesacm.acmacmw.fragment.hompage.ImageUploadFragment;
 import org.upesacm.acmacmw.fragment.hompage.SponsorsFragment;
 import org.upesacm.acmacmw.fragment.main.MenuFragment;
 import org.upesacm.acmacmw.fragment.main.EventsListFragment;
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_home_page);
-        constraintLayout=findViewById(R.id.constraintLayout);
+        constraintLayout=findViewById(R.id.constraintLayout2);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if(currentUser==null)
         {
