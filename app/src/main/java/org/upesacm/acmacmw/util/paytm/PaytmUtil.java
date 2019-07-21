@@ -9,6 +9,10 @@ import com.paytm.pgsdk.PaytmOrder;
 import com.paytm.pgsdk.PaytmPGService;
 import com.paytm.pgsdk.PaytmPaymentTransactionCallback;
 
+import org.upesacm.acmacmw.util.paytm.model.Order;
+import org.upesacm.acmacmw.util.paytm.model.ResponseModel;
+import org.upesacm.acmacmw.util.paytm.model.VerifyTxnResultModel;
+
 import java.util.HashMap;
 
 import javax.annotation.Nullable;
@@ -21,7 +25,7 @@ final public class PaytmUtil {
     public static final String TAG = "PaytmUtil";
     private static TransactionCallback traCallback;
     private static HashMap<String,String> paramMap;
-    public static void initializePayment(final Context context, Order order,TransactionCallback traCallback) {
+    public static void initializePayment(final Context context, Order order, TransactionCallback traCallback) {
         PaytmUtil.traCallback = traCallback;
         Log.i(TAG,"begin Transaction");
         paramMap = new HashMap<>();
@@ -71,9 +75,9 @@ final public class PaytmUtil {
             @Override
             public void onTransactionResponse(Bundle inResponse) {
                 Log.i(TAG,"response : "+inResponse.toString());
-                Toast.makeText(context,inResponse.toString(),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,inResponse.toString(),Toast.LENGTH_SHORT).show();
                 Log.i(TAG,"REsponse checksum : "+inResponse.getString("CHECKSUMHASH"));
-                verifyResponse(inResponse);
+                verifyTransaction(inResponse);
             }
 
             @Override
@@ -108,7 +112,7 @@ final public class PaytmUtil {
         });
     }
 
-    private static void verifyResponse(final Bundle inResponse) {
+    private static void verifyTransaction(final Bundle inResponse) {
         RetrofitPaytmApiClient.getInstance().getChecksumClient()
                 .verifyChecksum(inResponse.getString("STATUS"),
                         inResponse.getString("CHECKSUMHASH"),
@@ -124,65 +128,39 @@ final public class PaytmUtil {
                         inResponse.getString("CURRENCY"),
                         inResponse.getString("GATEWAYNAME"),
                         inResponse.getString("RESPMSG"))
-                .enqueue(new Callback<VerifyChecksumResultModel>() {
+                .enqueue(new Callback<VerifyTxnResultModel>() {
                     @Override
-                    public void onResponse(Call<VerifyChecksumResultModel> call, Response<VerifyChecksumResultModel> response) {
+                    public void onResponse(Call<VerifyTxnResultModel> call, Response<VerifyTxnResultModel> response) {
                         try {
                             Log.i(TAG,"onResponse of verifyChecksum");
                             if (response.isSuccessful()) {
-                                VerifyChecksumResultModel model = response.body();
+                                VerifyTxnResultModel model = response.body();
+                                Log.i(TAG,response.toString());
                                 if (model != null) {
                                     Log.i(TAG,"message : "+response.message());
-                                    if (model.IS_VALID_CHECKSUM.equals("Y")) {
+                                    Log.i(TAG,"status : "+model.getSTATUS());
+                                    if (model.getSTATUS().equals("TXN_SUCCESS")) {
                                         Log.i(TAG,"valid");
-                                        verifyTransaction();
+                                        traCallback.onPaytmTransactionComplete(true,null);
                                     } else {
                                         Log.i(TAG,"not valid");
-                                        traCallback.onPaytmTransactionComplete(false,"Paytm Server error");
+                                        traCallback.onPaytmTransactionComplete(false,model.getRESPMSG());
                                     }
                                 }
                             } else {
-                                Log.i(TAG, response.errorBody().toString());
+                                Log.i(TAG, "error : "+response.message()+":"+response.code());
                             }
                         }catch(Exception e) {
+                            Log.i(TAG," exception occured");
                             e.printStackTrace();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<VerifyChecksumResultModel> call, Throwable t) {
+                    public void onFailure(Call<VerifyTxnResultModel> call, Throwable t) {
+                        Log.i(TAG,"FAilure");
                         t.printStackTrace();
-                    }
-                });
-    }
-
-    private static void verifyTransaction() {
-        RetrofitPaytmApiClient.getInstance().getChecksumClient()
-                .verifyTransaction(paramMap.get("MID"),
-                        paramMap.get("ORDER_ID"),
-                        paramMap.get("CHECKSUMHASH"))
-                .enqueue(new Callback<TxnStatusResponseModel>() {
-                    @Override
-                    public void onResponse(Call<TxnStatusResponseModel> call, Response<TxnStatusResponseModel> response) {
-                        try {
-                            if (response.isSuccessful()) {
-                                Log.i(TAG, "txn status" + response.message());
-                                TxnStatusResponseModel model = response.body();
-                                System.out.println("model "+model.STATUS);
-                                if(model.STATUS.equals("TXN_SUCCESS")) {
-                                    traCallback.onPaytmTransactionComplete(true, null);
-                                } else {
-                                    traCallback.onPaytmTransactionComplete(false, "Transaction failed. Please try again");
-                                }
-                            }
-                        }catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<TxnStatusResponseModel> call, Throwable t) {
-                        t.printStackTrace();
+                        traCallback.onPaytmTransactionComplete(false,"Network error");
                     }
                 });
     }

@@ -1,6 +1,6 @@
-package org.upesacm.acmacmw.util.paytm;
+package org.upesacm.acmacmw.util.paytm.model;
 
-public class TxnStatusResponseModel {
+public class VerifyTxnResultModel {
     String TXNID;
     String BANKTXNID;
     String ORDERID;
@@ -15,6 +15,9 @@ public class TxnStatusResponseModel {
     String PAYMENTMODE;
     String REFUNDAMT;
     String TXNDATE;
+    String ERROR;
+
+    VerifyTxnResultModel() {}
 
     public String getTXNID() {
         return TXNID;
@@ -71,4 +74,6 @@ public class TxnStatusResponseModel {
     public String getTXNDATE() {
         return TXNDATE;
     }
+
+    public String getERROR() { return ERROR; }
 }

@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.auth.ActionCodeResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -29,7 +30,7 @@ import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 import org.upesacm.acmacmw.util.SessionManager;
-import org.upesacm.acmacmw.util.paytm.Order;
+import org.upesacm.acmacmw.util.paytm.model.Order;
 import org.upesacm.acmacmw.util.paytm.PaytmUtil;
 
 import java.util.Calendar;
@@ -169,8 +170,29 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 //                });
 //    }
     @Override
-    public void onSAPIDAvailable(String sapId) {
-       setCurrentFragment(MemberRegistrationFragment.newInstance(sapId),false);
+    public void onSAPIDAvailable(final String sapId) {
+                //Check if the SAP ID is alread registered in the ACM database
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.ACM_ACMW_MEMBERS)
+                .child(sapId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Member acmMember = dataSnapshot.getValue(Member.class);
+                        if (acmMember == null) {
+                            setCurrentFragment(MemberRegistrationFragment.newInstance(sapId),false);
+                        } else {
+                            makeToast("Already an ACM Member");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        databaseError.toException().printStackTrace();
+                    }
+
+                });
+
     }
 
     @Override
@@ -405,8 +427,10 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
         if(success) {
             NewMember newMember = tempStorage.getParcelable(NEW_MEMBER_KEY);
             Member member = new Member.Builder(newMember).build();
+            makeToast("Transaction Successful.");
             //TODO: save the member into the acmmembers database
         } else {
+            makeToast("Transaction failed : "+errorMsg);
             //TODO: Display the appropirate error message
         }
     }
