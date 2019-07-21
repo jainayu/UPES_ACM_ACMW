@@ -30,7 +30,6 @@ import org.upesacm.acmacmw.fragment.profile.MyEventDetailFragment;
 import org.upesacm.acmacmw.fragment.profile.MyEventsFragment;
 import org.upesacm.acmacmw.fragment.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.profile.UserProfileFragment;
-import org.upesacm.acmacmw.fragment.registration.GoogleSignInFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.FirebaseConfig;
@@ -69,9 +68,9 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         switch (selectedOptId) {
             case ProfileFragment.MY_PROFILE:
             case ProfileFragment.PROFILE_IMAGE: {
-                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                if(SessionManager.getInstance(this).getSessionID() == SessionManager.MEMBER_SESSION_ID)
                     setCurrentFragment(UserProfileFragment.newInstance(),false);
-                else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+                else if(SessionManager.getInstance(this).getSessionID() == SessionManager.GUEST_SESSION_ID) {
                     Toast.makeText(this,"Please sign in as ACM member",Toast.LENGTH_SHORT).show();
                     this.finish();;
                 } else
@@ -83,9 +82,9 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                 break;
             }
             case ProfileFragment.MY_EVENTS: {
-                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                if(SessionManager.getInstance(this).getSessionID() == SessionManager.MEMBER_SESSION_ID)
                     setCurrentFragment(MyEventsFragment.newInstance(),false);
-                else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
+                else if(SessionManager.getInstance(this).getSessionID() == SessionManager.GUEST_SESSION_ID) {
                     Toast.makeText(this,"Please sign in as ACM member",Toast.LENGTH_SHORT).show();
                     this.finish();;
                 } else
@@ -111,7 +110,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                         }
                     });
                 }
-                SessionManager.getInstance().destroySession();
+                SessionManager.getInstance(this).destroySession();
                 break;
             }
             default: {
@@ -143,7 +142,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                SessionManager.getInstance().destroySession();
+                                SessionManager.getInstance(ProfileDetailsActivity.this).destroySession();
                                 getSupportFragmentManager().popBackStack();
                                 Toast.makeText(ProfileDetailsActivity.this,"Successfully Logged Out",
                                         Toast.LENGTH_SHORT).show();
@@ -161,7 +160,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                 break;
             }
             case UserProfileFragment.EDIT_PROFILE: {
-                setCurrentFragment(EditProfileFragment.newInstance(SessionManager.getInstance().getLoggedInMember()),true);
+                setCurrentFragment(EditProfileFragment.newInstance(SessionManager.getInstance(this).getLoggedInMember()),true);
                 break;
             }
             case UserProfileFragment.UPDATE_PROFILE_PIC: {
@@ -180,8 +179,8 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         switch (resultCode) {
             case EditProfileFragment.SUCESSFULLY_SAVED_NEW_DATA : {
                 msg="Saved";
-                SessionManager.getInstance().destroySession();
-                SessionManager.getInstance().createMemberSession(member);
+                SessionManager.getInstance(this).destroySession();
+                SessionManager.getInstance(this).createMemberSession(member);
                 break;
             }
 

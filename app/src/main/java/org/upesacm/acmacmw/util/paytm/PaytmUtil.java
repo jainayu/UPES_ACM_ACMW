@@ -9,7 +9,13 @@ import com.paytm.pgsdk.PaytmOrder;
 import com.paytm.pgsdk.PaytmPGService;
 import com.paytm.pgsdk.PaytmPaymentTransactionCallback;
 
+import org.upesacm.acmacmw.util.paytm.model.Order;
+import org.upesacm.acmacmw.util.paytm.model.ResponseModel;
+import org.upesacm.acmacmw.util.paytm.model.VerifyTxnResultModel;
+
 import java.util.HashMap;
+
+import javax.annotation.Nullable;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -18,15 +24,16 @@ import retrofit2.Response;
 final public class PaytmUtil {
     public static final String TAG = "PaytmUtil";
     private static TransactionCallback traCallback;
-    public static void initializePayment(final Context context, Order order,TransactionCallback traCallback) {
+    private static HashMap<String,String> paramMap;
+    public static void initializePayment(final Context context, Order order, TransactionCallback traCallback) {
         PaytmUtil.traCallback = traCallback;
         Log.i(TAG,"begin Transaction");
-        final HashMap<String, String> paramMap = new HashMap<>();
+        paramMap = new HashMap<>();
         paramMap.put( "MID" , Config.MID);
         paramMap.put( "ORDER_ID" , order.getOrderId());
         paramMap.put( "CUST_ID" , order.getCustomerId());
         paramMap.put( "CHANNEL_ID" , Config.CHANNEL_ID);
-        paramMap.put( "TXN_AMOUNT" , order.getAmount());
+        paramMap.put( "TXN_AMOUNT" , order.getAmount()); Log.i(TAG,order.getAmount());
         paramMap.put( "WEBSITE" , Config.WEBSITE);
         paramMap.put( "INDUSTRY_TYPE_ID" , Config.INDUSTRY_TYPE_ID);
         paramMap.put( "CALLBACK_URL", Config.CALLBACK_URL+"?ORDER_ID="+order.getOrderId());
@@ -61,14 +68,16 @@ final public class PaytmUtil {
     }
 
     private static void beginTransaction(final Context context,PaytmOrder paytmOrder) {
-        PaytmPGService paytmPGService = PaytmPGService.getProductionService();
+        //PaytmPGService paytmPGService = PaytmPGService.getProductionService();
+        PaytmPGService paytmPGService = PaytmPGService.getStagingService();
         paytmPGService.initialize(paytmOrder,null);
         paytmPGService.startPaymentTransaction(context, true, true, new PaytmPaymentTransactionCallback() {
             @Override
             public void onTransactionResponse(Bundle inResponse) {
                 Log.i(TAG,"response : "+inResponse.toString());
-                Toast.makeText(context,inResponse.toString(),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,inResponse.toString(),Toast.LENGTH_SHORT).show();
                 Log.i(TAG,"REsponse checksum : "+inResponse.getString("CHECKSUMHASH"));
+                verifyTransaction(inResponse);
             }
 
             @Override
@@ -103,7 +112,60 @@ final public class PaytmUtil {
         });
     }
 
+    private static void verifyTransaction(final Bundle inResponse) {
+        RetrofitPaytmApiClient.getInstance().getChecksumClient()
+                .verifyChecksum(inResponse.getString("STATUS"),
+                        inResponse.getString("CHECKSUMHASH"),
+                        inResponse.getString("BANKNAME"),
+                        inResponse.getString("ORDERID"),
+                        inResponse.getString("TXNAMOUNT"),
+                        inResponse.getString("TXNDATE"),
+                        inResponse.getString("MID"),
+                        inResponse.getString("TXNID"),
+                        inResponse.getString("RESPCODE"),
+                        inResponse.getString("PAYMENTMODE"),
+                        inResponse.getString("BANKTXNID"),
+                        inResponse.getString("CURRENCY"),
+                        inResponse.getString("GATEWAYNAME"),
+                        inResponse.getString("RESPMSG"))
+                .enqueue(new Callback<VerifyTxnResultModel>() {
+                    @Override
+                    public void onResponse(Call<VerifyTxnResultModel> call, Response<VerifyTxnResultModel> response) {
+                        try {
+                            Log.i(TAG,"onResponse of verifyChecksum");
+                            if (response.isSuccessful()) {
+                                VerifyTxnResultModel model = response.body();
+                                Log.i(TAG,response.toString());
+                                if (model != null) {
+                                    Log.i(TAG,"message : "+response.message());
+                                    Log.i(TAG,"status : "+model.getSTATUS());
+                                    if (model.getSTATUS().equals("TXN_SUCCESS")) {
+                                        Log.i(TAG,"valid");
+                                        traCallback.onPaytmTransactionComplete(true,null);
+                                    } else {
+                                        Log.i(TAG,"not valid");
+                                        traCallback.onPaytmTransactionComplete(false,model.getRESPMSG());
+                                    }
+                                }
+                            } else {
+                                Log.i(TAG, "error : "+response.message()+":"+response.code());
+                            }
+                        }catch(Exception e) {
+                            Log.i(TAG," exception occured");
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<VerifyTxnResultModel> call, Throwable t) {
+                        Log.i(TAG,"FAilure");
+                        t.printStackTrace();
+                        traCallback.onPaytmTransactionComplete(false,"Network error");
+                    }
+                });
+    }
+
     public interface TransactionCallback {
-        void onPaytmTransactionResponse(boolean success);
+        void onPaytmTransactionComplete(boolean success,@Nullable String errorMsg);
     }
 }

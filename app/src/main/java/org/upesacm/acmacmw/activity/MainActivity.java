@@ -238,24 +238,24 @@ public class MainActivity extends AppCompatActivity implements
     }
     @Override
     public void onMenuItemSelected(int menuItemId) {
-        if(menuItemId==MenuFragment.ACTION_NEW_REGISTRATION)
-        {
-            FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
-            DatabaseReference mDatabaseReference = mFirebaseDatabase.getReference().child("registration_open");
-            if(mDatabaseReference.getKey().equals("true")) {
-                Intent memberRegistrationActIntent = new Intent(this, MemberRegistrationActivity.class);
-                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY, MemberRegistrationActivity.MEMBER_SIGN_UP);
-                startActivity(memberRegistrationActIntent);
-            }
-            else {
-                Toast.makeText(this, "Registration Closed", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else {
+//        if(menuItemId==MenuFragment.ACTION_NEW_REGISTRATION)
+//        {
+//            FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+//            DatabaseReference mDatabaseReference = mFirebaseDatabase.getReference().child("registration_open");
+//            if(mDatabaseReference.getKey().equals("true")) {
+//                Intent memberRegistrationActIntent = new Intent(this, MemberRegistrationActivity.class);
+//                memberRegistrationActIntent.putExtra(MemberRegistrationActivity.SIGN_UP_TYPE_KEY, MemberRegistrationActivity.MEMBER_SIGN_UP);
+//                startActivity(memberRegistrationActIntent);
+//            }
+//            else {
+//                Toast.makeText(this, "Registration Closed", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//        else {
             Intent menuActivityIntent = new Intent(this,MenuDetailsActivity.class);
             menuActivityIntent.putExtra(MenuFragment.SELECTED_MENU_ITEM_KEY,menuItemId);
             startActivity(menuActivityIntent);
-        }
+//        }
     }
 
     @Override

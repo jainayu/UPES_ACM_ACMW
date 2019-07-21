@@ -1,4 +1,4 @@
-package org.upesacm.acmacmw.util.paytm;
+package org.upesacm.acmacmw.util.paytm.model;
 
 public class ResponseModel {
     String CHECKSUMHASH;
