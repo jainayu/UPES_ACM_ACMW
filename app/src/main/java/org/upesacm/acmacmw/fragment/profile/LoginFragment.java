@@ -105,7 +105,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                             if(member!=null) {
                                 Log.i(TAG,"name : "+member.getName());
                                 if(member.getPassword().equals(password)) {
-                                    SessionManager.getInstance().createMemberSession(member);
+                                    SessionManager.getInstance(LoginFragment.this.getContext()).createMemberSession(member);
                                     interactionListener.onLoginDialogFragmentInteraction(LOGIN_SUCCESSFUL);
                                 }
                                 else {

@@ -271,13 +271,13 @@ public class HomePageActivity extends AppCompatActivity implements
 
         String ownerName=null;
         String ownerSapId=null;
-        if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
-            ownerSapId=SessionManager.getInstance().getLoggedInMember().getSap();
-            ownerName=SessionManager.getInstance().getLoggedInMember().getName();
+        if(SessionManager.getInstance(this).getSessionID() == SessionManager.MEMBER_SESSION_ID) {
+            ownerSapId=SessionManager.getInstance(this).getLoggedInMember().getSap();
+            ownerName=SessionManager.getInstance(this).getLoggedInMember().getName();
         }
-        else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
-            ownerSapId=SessionManager.getInstance().getGuestMember().getSap();
-            ownerName=SessionManager.getInstance().getGuestMember().getName();
+        else if(SessionManager.getInstance(this).getSessionID() == SessionManager.GUEST_SESSION_ID) {
+            ownerSapId=SessionManager.getInstance(this).getGuestMember().getSap();
+            ownerName=SessionManager.getInstance(this).getGuestMember().getName();
 
             System.out.println("trial memeber : "+ownerSapId);
             System.out.println("trial member : "+ownerName);

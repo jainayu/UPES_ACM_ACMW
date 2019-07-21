@@ -107,8 +107,8 @@ public class PasswordChangeDialogFragment extends DialogFragment
                                         @Override
                                         public void onResponse(Call<Member> call, Response<Member> response) {
                                             System.out.println("password successfully changed");
-                                            SessionManager.getInstance().destroySession();
-                                            SessionManager.getInstance().createMemberSession(member);
+                                            SessionManager.getInstance(PasswordChangeDialogFragment.this.getContext()).destroySession();
+                                            SessionManager.getInstance(PasswordChangeDialogFragment.this.getContext()).createMemberSession(member);
                                             changeListener.onPasswordChange(PASSWORD_SUCCESSSFULLY_CHANGED);
                                             PasswordChangeDialogFragment.this.dismiss();
                                         }

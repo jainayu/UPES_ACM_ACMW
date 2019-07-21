@@ -56,7 +56,7 @@ public class MyEventsFragment extends Fragment implements MyEventDetailFragment.
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_my_events, container, false);
 
-        mSessionManager = SessionManager.getInstance();
+        mSessionManager = SessionManager.getInstance(MyEventsFragment.this.getContext());
         recyclerView  = view.findViewById(R.id.myEventsRecycler);
         mUser = mSessionManager.getLoggedInMember();
 

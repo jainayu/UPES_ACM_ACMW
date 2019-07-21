@@ -216,12 +216,12 @@ public class HomePageFragment extends Fragment
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.cameraButton) {
-            if (SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
+            if (SessionManager.getInstance(HomePageFragment.this.getContext()).getSessionID() == SessionManager.MEMBER_SESSION_ID) {
                 //onCameraButtonClick();
                 interactionListener.onPostFragmentInteraction(UPLOAD_POST);
             }
-            else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
-                TrialMember trialMember = SessionManager.getInstance().getGuestMember();
+            else if(SessionManager.getInstance(HomePageFragment.this.getContext()).getSessionID() == SessionManager.GUEST_SESSION_ID) {
+                TrialMember trialMember = SessionManager.getInstance(HomePageFragment.this.getContext()).getGuestMember();
                 long trialPeriod=30*24*60*60*(1000L);
                 long elapsedTime = Calendar.getInstance().getTimeInMillis() - Long.parseLong(trialMember.getCreationTimeStamp());
                 System.out.println("trialPerion : "+trialPeriod);
@@ -378,13 +378,13 @@ public class HomePageFragment extends Fragment
     public void onRecyclerItemSelect(View view,final Post post, int position) {
         if(view.getId() == R.id.image_button_post_like) {
             Log.i(TAG,"Post by "+post.getPostId()+"Liked");
-            SessionManager sessionManager = SessionManager.getInstance();
+            SessionManager sessionManager = SessionManager.getInstance(HomePageFragment.this.getContext());
             if(sessionManager.isSessionAlive()) {
                 String loggedInUserSap = null;
-                if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID)
-                    loggedInUserSap = SessionManager.getInstance().getLoggedInMember().getSap();
-                else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID)
-                    loggedInUserSap = SessionManager.getInstance().getGuestMember().getSap();
+                if(SessionManager.getInstance(HomePageFragment.this.getContext()).getSessionID() == SessionManager.MEMBER_SESSION_ID)
+                    loggedInUserSap = SessionManager.getInstance(HomePageFragment.this.getContext()).getLoggedInMember().getSap();
+                else if(SessionManager.getInstance(HomePageFragment.this.getContext()).getSessionID() == SessionManager.GUEST_SESSION_ID)
+                    loggedInUserSap = SessionManager.getInstance(HomePageFragment.this.getContext()).getGuestMember().getSap();
 
                 int noOfLikes = post.getLikesIds().size();
                 int i = 0;

@@ -102,10 +102,9 @@ public class SessionManager  {
         }
     }
 
-    public static SessionManager getInstance() {
+    public static SessionManager getInstance(Context context) {
         if(sessionManager==null)
-            throw new SessionManagerNotInitializedException("Session Manager must be initialized before use." +
-                    "Use SessionManager.init(Context)");
+            SessionManager.init(context);
         return sessionManager;
     }
 

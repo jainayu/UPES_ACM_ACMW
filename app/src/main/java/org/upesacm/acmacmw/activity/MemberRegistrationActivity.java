@@ -1,8 +1,5 @@
 package org.upesacm.acmacmw.activity;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -39,6 +36,8 @@ import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 import org.upesacm.acmacmw.util.SessionManager;
+import org.upesacm.acmacmw.util.paytm.Order;
+import org.upesacm.acmacmw.util.paytm.PaytmUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -81,7 +80,10 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Log.i(TAG,"ondatachange member reg acitivity");
                             boolean open = dataSnapshot.getValue(Boolean.class);
+                            Log.i(TAG,open+"");
+
                             if(open) {
                                 setCurrentFragment(SapIdFragment.newInstance(), false);
                             } else {
@@ -97,6 +99,10 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
         } else {
             setCurrentFragment(GoogleSignInFragment.newInstance(), false);
         }
+    }
+
+    void makeToast(String msg) {
+        Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
     }
 
     void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
@@ -176,16 +182,33 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRegistrationDataAvailable(int resultCode, NewMember newMember) {
+    public void onRegistrationDataAvailable(int resultCode, final NewMember newMember) {
         tempStorage.putParcelable(NEW_MEMBER_KEY,newMember);
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseConfig.REGISTRATION_OTP_RECIPIENT)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Map<String,String> recipientMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, String>>() {});
-                        List<String> recipientSaps = new ArrayList<>(recipientMap.values());
-                        setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),false);
+//                        Map<String,String> recipientMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, String>>() {});
+//                        List<String> recipientSaps = new ArrayList<>(recipientMap.values());
+//                        setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),false);
+                        Order order = new Order.Builder()
+                                .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                                .setAmount("1.00")
+                                .setCustomerId(newMember.getSapId())
+                                .setEmail(newMember.getEmail())
+                                .setMobileNo(newMember.getPhoneNo())
+                                .build();
+                        PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, new PaytmUtil.TransactionCallback() {
+                            @Override
+                            public void onPaytmTransactionResponse(boolean success) {
+                                if(success) {
+                                    makeToast("transaction successful");
+                                } else {
+                                    makeToast("Transaction failed");
+                                }
+                            }
+                        });
                     }
 
                     @Override
@@ -246,7 +269,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()) {
-                                                SessionManager.getInstance().createMemberSession(member);
+                                                SessionManager.getInstance(MemberRegistrationActivity.this).createMemberSession(member);
                                                 //Obtain the mail to be sent from the database and send it
                                                 FirebaseDatabase.getInstance().getReference()
                                                         .child(FirebaseConfig.EMAIL_MSG)
@@ -367,7 +390,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     public void onTrialOTPVerificationResult(TrialMember trialMember, int code) {
         if(code == TrialMemberOTPVerificationFragment.SUCCESSFUL_VERIFICATION) {
             //Create the Guest Session Here
-            SessionManager.getInstance().createGuestSession(trialMember);
+            SessionManager.getInstance(this).createGuestSession(trialMember);
 
             FirebaseDatabase.getInstance().getReference("postsTrialLogin/")
                     .child(trialMember.getSap())

@@ -26,7 +26,7 @@ final public class PaytmUtil {
         paramMap.put( "ORDER_ID" , order.getOrderId());
         paramMap.put( "CUST_ID" , order.getCustomerId());
         paramMap.put( "CHANNEL_ID" , Config.CHANNEL_ID);
-        paramMap.put( "TXN_AMOUNT" , order.getAmount());
+        paramMap.put( "TXN_AMOUNT" , order.getAmount()); Log.i(TAG,order.getAmount());
         paramMap.put( "WEBSITE" , Config.WEBSITE);
         paramMap.put( "INDUSTRY_TYPE_ID" , Config.INDUSTRY_TYPE_ID);
         paramMap.put( "CALLBACK_URL", Config.CALLBACK_URL+"?ORDER_ID="+order.getOrderId());
@@ -69,6 +69,7 @@ final public class PaytmUtil {
                 Log.i(TAG,"response : "+inResponse.toString());
                 Toast.makeText(context,inResponse.toString(),Toast.LENGTH_SHORT).show();
                 Log.i(TAG,"REsponse checksum : "+inResponse.getString("CHECKSUMHASH"));
+                traCallback.onPaytmTransactionResponse(true);
             }
 
             @Override

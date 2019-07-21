@@ -98,20 +98,20 @@ public class ProfileFragment extends Fragment {
 
     void customizeProfilePage() {
         boolean show;
-        if(SessionManager.getInstance().getSessionID() == SessionManager.MEMBER_SESSION_ID) {
-            textViewName.setText(SessionManager.getInstance().getLoggedInMember().getName());
+        if(SessionManager.getInstance(this.getContext()).getSessionID() == SessionManager.MEMBER_SESSION_ID) {
+            textViewName.setText(SessionManager.getInstance(this.getContext()).getLoggedInMember().getName());
             textViewExtra.setText("Welcome");
             Glide.with(getContext())
-                    .load(SessionManager.getInstance().getLoggedInMember().getProfilePicture()).thumbnail(0.9f).into(imageViewProfile);
+                    .load(SessionManager.getInstance(this.getContext()).getLoggedInMember().getProfilePicture()).thumbnail(0.9f).into(imageViewProfile);
             textViewGuestSignout.setVisibility(View.GONE);
             show = true;
-        } else if(SessionManager.getInstance().getSessionID() == SessionManager.GUEST_SESSION_ID) {
-            textViewName.setText(SessionManager.getInstance().getGuestMember().getName());
-            textViewExtra.setText(SessionManager.getInstance().getGuestMember().getEmail());
+        } else if(SessionManager.getInstance(this.getContext()).getSessionID() == SessionManager.GUEST_SESSION_ID) {
+            textViewName.setText(SessionManager.getInstance(this.getContext()).getGuestMember().getName());
+            textViewExtra.setText(SessionManager.getInstance(this.getContext()).getGuestMember().getEmail());
             RequestOptions requestOptions=new RequestOptions();
             requestOptions.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
             Glide.with(this)
-                    .load(SessionManager.getInstance().getGuestMember().getImageUrl())
+                    .load(SessionManager.getInstance(this.getContext()).getGuestMember().getImageUrl())
                     .apply(requestOptions)
                     .into(imageViewProfile);
             textViewGuestSignout.setVisibility(View.VISIBLE);

@@ -142,7 +142,7 @@ public class UserProfileFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        member = SessionManager.getInstance().getLoggedInMember();
+        member = SessionManager.getInstance(this.getContext()).getLoggedInMember();
         updataUI();
     }
 
