@@ -23,8 +23,6 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.fragment.payment.PaymentDetailsFragment;
-import org.upesacm.acmacmw.fragment.payment.RecipientSelectFragment;
 import org.upesacm.acmacmw.model.Event;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.model.Participant;
@@ -35,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class CheckoutActivity extends AppCompatActivity
-        implements RecipientSelectFragment.FragmentInteractionListener ,PaymentDetailsFragment.OnFragmentInteractionListener{
+public class CheckoutActivity extends AppCompatActivity {
+        //implements RecipientSelectFragment.FragmentInteractionListener ,PaymentDetailsFragment.OnFragmentInteractionListener{
     TextInputEditText sapidEditText;
     TextInputLayout textInputLayout;
     Button proceedButton;
@@ -259,8 +257,8 @@ public class CheckoutActivity extends AppCompatActivity
                                                                 proceedButton.setVisibility(View.GONE);
                                                                 textInputLayout.setVisibility(View.GONE);
                                                                 frame.setVisibility(View.VISIBLE);
-                                                                RecipientSelectFragment recipientSelectFragment=RecipientSelectFragment.newInstance(recipientsSap);
-                                                                getSupportFragmentManager().beginTransaction().replace(R.id.frame,recipientSelectFragment).commit();
+                                                               // RecipientSelectFragment recipientSelectFragment=RecipientSelectFragment.newInstance(recipientsSap);
+                                                                //getSupportFragmentManager().beginTransaction().replace(R.id.frame,recipientSelectFragment).commit();
                                                                 //proceed payment
                                                                 Toast.makeText(CheckoutActivity.this, "Registered  Successfully", Toast.LENGTH_SHORT).show();
                                                                 progressDialog.dismiss();
@@ -280,26 +278,26 @@ public class CheckoutActivity extends AppCompatActivity
         });
     }
 
-    @Override
-    public void onRecipientSelect(Member recipient) {
-        int amount=0;
-        if(participant.isAcmmember()) {
-            for(Event event:Cart.cartEvents) {
-                amount=amount+event.getEntryFeesAcm();
-            }
-        }
-
-        else {
-            for(Event event:Cart.cartEvents) {
-                amount=amount+event.getEntryFeesNonAcm();
-            }
-        }
-        PaymentDetailsFragment paymentDetailsFragment=PaymentDetailsFragment.newInstance(recipient,amount);
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame,paymentDetailsFragment).commit();
-    }
-
-    @Override
-    public void onClickNext(final Member recipient, int amount) {
+//   // @Override
+//    public void onRecipientSelect(Member recipient) {
+//        int amount=0;
+//        if(participant.isAcmmember()) {
+//            for(Event event:Cart.cartEvents) {
+//                amount=amount+event.getEntryFeesAcm();
+//            }
+//        }
+//
+//        else {
+//            for(Event event:Cart.cartEvents) {
+//                amount=amount+event.getEntryFeesNonAcm();
+//            }
+//        }
+////        PaymentDetailsFragment paymentDetailsFragment=PaymentDetailsFragment.newInstance(recipient,amount);
+////        getSupportFragmentManager().beginTransaction().replace(R.id.frame,paymentDetailsFragment).commit();
+//    }
+//
+//   // @Override
+//    public void onClickNext(final Member recipient, int amount) {
 //        final String otp = RandomOTPGenerator.generate(Integer.parseInt(participant.getUid()),6);
 //        FirebaseDatabase.getInstance().getReference()
 //                .child(FirebaseConfig.EVENTS_DB)
@@ -334,5 +332,5 @@ public class CheckoutActivity extends AppCompatActivity
 //                        getSupportFragmentManager().beginTransaction().replace(R.id.frame,otpConfirmationFragment).commit();
 //                    }
 //                });
-    }
+//    }
 }
