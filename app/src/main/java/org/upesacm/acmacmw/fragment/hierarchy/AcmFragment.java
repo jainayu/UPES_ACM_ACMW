@@ -35,9 +35,10 @@ public class AcmFragment extends android.support.v4.app.Fragment implements Valu
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFirebaseDatabase= FirebaseDatabase.getInstance();
-        mDatabaseReference=mFirebaseDatabase.getReference().child("Heirarchy");
-        heirarchyAdapter = new HeirarchyAdapter(acmheirarchyModels);//empty list intially
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference().child("Heirarchy");
+        heirarchyAdapter = new HeirarchyAdapter(acmheirarchyModels);
+        //empty list intially
     }
 
     @Nullable
@@ -45,16 +46,16 @@ public class AcmFragment extends android.support.v4.app.Fragment implements Valu
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_acm, container, false);
-        mRecyclerView=view.findViewById(R.id.acm_office_bearer);
-        mProgressBar=view.findViewById(R.id.progress_bar_heirarchy);
+        mRecyclerView = view.findViewById(R.id.acm_office_bearer);
+        mProgressBar = view.findViewById(R.id.progress_bar_heirarchy);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(heirarchyAdapter);
-        acmheirarchyModels=new ArrayList<>();
-        if(mDatabaseReference!=null&&acmheirarchyModels.isEmpty()) {
+        acmheirarchyModels = new ArrayList<>();
+        if (mDatabaseReference != null && acmheirarchyModels.isEmpty()) {
             mDatabaseReference.addValueEventListener(this);
         }
         if (acmheirarchyModels != null && heirarchyAdapter != null) {
-                heirarchyAdapter.setHeirarchyModels(acmheirarchyModels);
+            heirarchyAdapter.setHeirarchyModels(acmheirarchyModels);
         }
         return view;
 

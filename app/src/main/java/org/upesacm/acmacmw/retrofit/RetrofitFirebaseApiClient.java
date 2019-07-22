@@ -4,7 +4,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitFirebaseApiClient {
-    public static final String BASE_URL="https://acmapp-testdb.firebaseio.com/";
+    public static final String BASE_URL="https://acm-app-demo.firebaseio.com/";
     private static RetrofitFirebaseApiClient apiClient = null;
     private Retrofit retrofit = null;
     private HomePageClient homePageClient = null;

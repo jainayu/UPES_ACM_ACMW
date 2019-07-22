@@ -125,8 +125,8 @@ public class CheckoutActivity extends AppCompatActivity {
                                                 final TextInputEditText name,email,whatsapp,contact,year,branch;
                                                 name=findViewById(R.id.name);
                                                 email=findViewById(R.id.email);
-                                                whatsapp=findViewById(R.id.whatsapp);
-                                                contact=findViewById(R.id.contact);
+                                                whatsapp=findViewById(R.id.whatsapp_bottomsheet);
+                                                contact=findViewById(R.id.contact_bottomsheet);
                                                 year=findViewById(R.id.year);
                                                 branch=findViewById(R.id.branch);
                                                 proceedButton.setOnClickListener(new View.OnClickListener() {
