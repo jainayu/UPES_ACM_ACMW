@@ -222,6 +222,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     public void onLoginDialogFragmentInteraction(int resultCode) {
         switch (resultCode) {
             case LoginFragment.LOGIN_SUCCESSFUL: {
+
                 Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
                 this.finish();
                 break;

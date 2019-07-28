@@ -1,5 +1,6 @@
 package org.upesacm.acmacmw.activity;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,6 +11,8 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,7 +24,9 @@ import org.upesacm.acmacmw.fragment.registration.MemberRegistrationFragment;
 import org.upesacm.acmacmw.fragment.registration.SapIdFragment;
 import org.upesacm.acmacmw.fragment.registration.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.registration.TrialMemberOTPVerificationFragment;
+import org.upesacm.acmacmw.model.EmailMsg;
 import org.upesacm.acmacmw.model.Member;
+import org.upesacm.acmacmw.model.MembershipFee;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.model.TrialMember;
 import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
@@ -54,11 +59,25 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     private FrameLayout frameLayout;
     private Bundle tempStorage = new Bundle();
     private int signUpType;
+    MembershipFee membershipFee;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_registration);
         frameLayout = findViewById(R.id.frame_layout_member_registration_activity);
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.MEMBERSHIP_FEE)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        membershipFee = dataSnapshot.getValue(MembershipFee.class);
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        //database error
+                    }
+                });
+
         Bundle args = savedInstanceState;
         if(args == null)
             args = getIntent().getExtras();
@@ -72,7 +91,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                             Log.i(TAG,"ondatachange member reg acitivity");
                             boolean open = dataSnapshot.getValue(Boolean.class);
                             Log.i(TAG,open+"");
-
                             if(open) {
                                 setCurrentFragment(SapIdFragment.newInstance(), false);
                             } else {
@@ -197,40 +215,81 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
     @Override
     public void onRegistrationDataAvailable(int resultCode, final NewMember newMember) {
-        Order order = new Order.Builder()
-                .setOrderId(newMember.getSapId()+System.currentTimeMillis())
-                .setAmount("1.00")
-                .setCustomerId(newMember.getSapId())
-                .setEmail(newMember.getEmail())
-                .setMobileNo(newMember.getPhoneNo())
-                .build();
-        PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
+
         tempStorage.putParcelable(NEW_MEMBER_KEY,newMember);
-//        tempStorage.putParcelable(NEW_MEMBER_KEY,newMember);
-//        FirebaseDatabase.getInstance().getReference()
-//                .child(FirebaseConfig.REGISTRATION_OTP_RECIPIENT)
-//                .addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-////                        Map<String,String> recipientMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, String>>() {});
-////                        List<String> recipientSaps = new ArrayList<>(recipientMap.values());
-////                        setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),false);
-//                        //TODO: Implement the Logic for calculating the amount to be paid by the user
-//                        Order order = new Order.Builder()
-//                                .setOrderId(newMember.getSapId()+System.currentTimeMillis())
-//                                .setAmount("1.00")
-//                                .setCustomerId(newMember.getSapId())
-//                                .setEmail(newMember.getEmail())
-//                                .setMobileNo(newMember.getPhoneNo())
-//                                .build();
-//                        PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//                        databaseError.toException().printStackTrace();
-//                    }
-//                });
+
+        if(newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)){
+            Order order = new Order.Builder()
+                    .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                    .setAmount(membershipFee.getPremiumFee())//Amount to be paid is fee
+                    .setCustomerId(newMember.getSapId())
+                    .setEmail(newMember.getEmail())
+                    .setMobileNo(newMember.getPhoneNo())
+                    .build();
+            PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
+        }
+        if(newMember.getMembershipType().equals(membershipFee.ONE_YEAR_TYPE)){
+            Order order = new Order.Builder()
+                    .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                    .setAmount(membershipFee.getOneYearFee())//Amount to be paid is fee
+                    .setCustomerId(newMember.getSapId())
+                    .setEmail(newMember.getEmail())
+                    .setMobileNo(newMember.getPhoneNo())
+                    .build();
+            PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
+        }
+        if(newMember.getMembershipType().equals(membershipFee.TWO_YEAR_TYPE)){
+            Order order = new Order.Builder()
+                    .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                    .setAmount(membershipFee.getTwoYearFee())//Amount to be paid is fee
+                    .setCustomerId(newMember.getSapId())
+                    .setEmail(newMember.getEmail())
+                    .setMobileNo(newMember.getPhoneNo())
+                    .build();
+            PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
+
+        }
+
+       /* FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseConfig.REGISTRATION_OTP_RECIPIENT)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                        Map<String,String> recipientMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, String>>() {});
+//                        List<String> recipientSaps = new ArrayList<>(recipientMap.values());
+//                        setCurrentFragment(RecipientSelectFragment.newInstance(recipientSaps),false);
+                        FirebaseDatabase.getInstance().getReference()
+                                .child("membership_fee")
+                                .child(newMember.getMembershipType())
+                                .addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        String fee = dataSnapshot.getValue(String.class);
+                                        Toast.makeText(getApplicationContext(), fee, Toast.LENGTH_SHORT).show();
+
+                                        Order order = new Order.Builder()
+                                                .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                                                .setAmount(fee)
+                                                .setCustomerId(newMember.getSapId())
+                                                .setEmail(newMember.getEmail())
+                                                .setMobileNo(newMember.getPhoneNo())
+                                                .build();
+                                        PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });*//*
+                        //TODO: Implement the Logic for calculating the amount to be paid by the user
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        databaseError.toException().printStackTrace();
+                    }
+                });*/
     }
 
 //    @Override
@@ -423,12 +482,65 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPaytmTransactionComplete(boolean success, String errorMsg) {
+    public void onPaytmTransactionComplete(boolean success, final String errorMsg) {
         if(success) {
             NewMember newMember = tempStorage.getParcelable(NEW_MEMBER_KEY);
-            Member member = new Member.Builder(newMember).build();
+            final Member member = new Member.Builder(newMember).build();
             makeToast("Transaction Successful.");
             //TODO: save the member into the acmmembers database
+
+            //create a new entry in the acm members database
+            FirebaseDatabase.getInstance().getReference()
+                    .child(FirebaseConfig.ACM_ACMW_MEMBERS)
+                    .child(newMember.getSapId())
+                    .setValue(member)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                SessionManager.getInstance(MemberRegistrationActivity.this).createMemberSession(member);
+                                //Obtain the mail to be sent from the database and send it
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child(FirebaseConfig.EMAIL_MSG)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                EmailMsg message = dataSnapshot.getValue(EmailMsg.class);
+                                                String memberDetails =
+                                                        "<b>Name</b>      : " + member.getName() + "<br />"
+                                                                + "<b>SAP ID</b>    : " + member.getSap() + "<br />"
+                                                                + "<b>ACM ID</b>    : " + member.getMemberId() + "<br />"
+                                                                + "<b>Password</b>  : " + member.getPassword() + "<br />" +
+                                                                "(Please set your own password from the app)" + "<br />"
+                                                                + "<b>Branch</b>    : " + member.getBranch() + "<br />"
+                                                                + "<b>Year</b>      : " + member.getYear() + "<br />"
+                                                                + "<b>Contact</b>   : " + member.getContact() + "<br />"
+                                                                + "<b>WhatsApp</b>  : " + member.getWhatsappNo() + "<br />"
+                                                                + "<b>DOB</b>       : " + member.getDob() + "<br />"
+                                                                + "<b>Address</b>   : " + member.getCurrentAdd() + "<br />";
+                                                if (message != null) {
+                                                    String mailBody = message.getBody() + "<br /><br />" + memberDetails + "<br />" + message.getSenderDetails();
+                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
+                                                            message.getSubject(),
+                                                            mailBody);
+                                                } else
+                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
+                                                            "ACM Member Details", memberDetails);
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                MemberRegistrationActivity.this.finish();
+                                startActivity(new Intent(getApplicationContext(), ThankYouActivity.class));
+
+                            }
+                        }
+                    });
+
+
         } else {
             makeToast("Transaction failed : "+errorMsg);
             //TODO: Display the appropirate error message

@@ -4,6 +4,8 @@ public interface FirebaseConfig {
     String ACM_ACMW_MEMBERS = "acm_acmw_members";
     String UNCONFIRMED_MEMBERS = "unconfirmed_members";
     String REGISTRATIONS_OPEN = "registrations_open";
+    String  MEMBERSHIP_FEE = "membership_fee";
+    String THANKS = "thank_you";
 
     String MEMBER_OTP = "otp";
     String EMAIL_MSG = "email_msg";

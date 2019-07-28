@@ -219,6 +219,7 @@ public class UserProfileFragment extends Fragment implements
 
 
             try {
+
                 imageBitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 int nh = (int) ( imageBitmap.getHeight() * (1024.0 / imageBitmap.getWidth()) );
