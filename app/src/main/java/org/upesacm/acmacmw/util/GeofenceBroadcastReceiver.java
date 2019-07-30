@@ -26,9 +26,7 @@ import java.util.List;
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     Context context;
     private static final String TAG = GeofenceBroadcastReceiver.class.getSimpleName();
-    Intent broadcastIntent = new Intent();
-    int status, position, i;
-    List<HeirarchyModel> heirarchyModels = new ArrayList<>();
+    int status;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -43,61 +41,45 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             String errorMsg = GeofenceBroadcastReceiver.getErrorString(geofencingEvent.getErrorCode());
             return;
         }
-        FirebaseDatabase.getInstance().getReference()
-                .child("Heirarchy")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                            HeirarchyModel heirarchyModel = dataSnapshot1.getValue(HeirarchyModel.class);
-                            heirarchyModels.add(heirarchyModel);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
         Member logedInMember = SessionManager.getInstance(context).getLoggedInMember();
-        String sapID = logedInMember.getSap();
-
-        for(i=0; i<heirarchyModels.size();++i){
-            if (Long.toString(heirarchyModels.get(i).getSapId()).equals(sapID)){
-                position = 1;
-                break;
-            }
-        }
-
         int geoFenceTransition = geofencingEvent.getGeofenceTransition();
 
         if(geoFenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER){
-
             //Available In campus
             status = 1;
-            FirebaseDatabase.getInstance().getReference()
-                    .child("Heirarchy")
-                    .child(Integer.toString(position))
-                    .child("availableInCampus")
-                    .setValue(status);
-
         }
         else if(geoFenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT){
             //Not Available in Campus
-
             status = 0;
-            FirebaseDatabase.getInstance().getReference()
-                    .child("Heirarchy")
-                    .child(Integer.toString(position))
-                    .child("availableInCampus")
-                    .setValue(status);
         }
 
-        /*
-        this is commented because i have implemented
-        all the methods of GeofenceTransitionsJobIntentService
-        */
+        if(logedInMember!=null){
+            FirebaseDatabase.getInstance().getReference()
+                    .child("Heirarchy")
+                    .orderByChild("sapId")
+                    .equalTo(Integer.parseInt(logedInMember.getSap()))
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot user:dataSnapshot.getChildren())
+                            {
+                                if(user.exists()){
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child("Heirarchy")
+                                            .child(user.getKey())
+                                            .child("availableInCampus")
+                                            .setValue(status);
+                                }
+                            }
 
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+        }
         //GeofenceTransitionsJobIntentService.enqueueWork(context, intent);
     }
 

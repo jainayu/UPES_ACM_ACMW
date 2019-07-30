@@ -78,21 +78,12 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     private FrameLayout frameLayout;
     private int selectedOptId;
     List<HeirarchyModel> heirarchyModels = new ArrayList<>();
-//no more need of these variables commented, for future requirement...
-//    private final String KEY_GEOFENCE_LAT = null;
-//    private final String KEY_GEOFENCE_LON = null;
-//    private Circle geoFenceLimits;
-//    private GoogleApiClient googleApiClient;
-//    private Location lastLocation;
-//    private FusedLocationProviderClient fusedLocationClient;
-//    private LocationCallback locationCallback;
 
     private enum PendingGeofenceTask {
         ADD, REMOVE, NONE
     }
     private PendingGeofenceTask pendingGeofenceTask = PendingGeofenceTask.NONE;
-    //LatLng latLng =new LatLng(30.416659,77.968216);
-    LatLng latLng =new LatLng(27.544076,76.608656);
+    LatLng latLng =new LatLng(30.416659,77.968216);
     private static final int REQ_PERMISSION = 100;
     private static final String GEOFENCE_REQ_ID = "UPES Geofence";
     private static final float GEOFENCE_RADIUS = 300.0f; // in meters
@@ -101,6 +92,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     private ArrayList<Geofence> geofenceList;
 
     public ProfileDetailsActivity() {
+
     }
 
 
@@ -111,23 +103,6 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         frameLayout = findViewById(R.id.frame_layout_activity_profile);
 
         geofenceList = new ArrayList<>();
-        FirebaseDatabase.getInstance().getReference()
-                .child("Heirarchy")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                            HeirarchyModel heirarchyModel = dataSnapshot1.getValue(HeirarchyModel.class);
-                            heirarchyModels.add(heirarchyModel);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
         Bundle args;
         args = getIntent().getExtras();
         if(args==null)
@@ -302,19 +277,35 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
 
                 Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
                 Member logedInMember = SessionManager.getInstance(this).getLoggedInMember();
-                String sapID = logedInMember.getSap();
-                for(HeirarchyModel heirarchyModel: heirarchyModels){
-                    String hSapID = Long.toString(heirarchyModel.getSapId());
-                    if (hSapID.equals(sapID)){
-                        //askPermission();
-                        geoFencePendingIntent = null;
-                        geofencingClient = LocationServices.getGeofencingClient(this);
-                        populateGeofenceList();
-                        startGeofence();
-                        break;
-                    }
-                }
-                //this.finish();
+//                String sapID = logedInMember.getSap();
+                FirebaseDatabase.getInstance().getReference()
+                        .child("Heirarchy")
+                        .orderByChild("sapId")
+                        .equalTo(Integer.parseInt(logedInMember.getSap()))
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot user:dataSnapshot.getChildren())
+                                {
+                                    if(user.exists()){
+
+                                        geoFencePendingIntent = null;
+                                        geofencingClient = LocationServices.getGeofencingClient(ProfileDetailsActivity.this);
+                                        populateGeofenceList();
+                                        startGeofence();
+                                        break;
+
+                                    }
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                this.finish();
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
@@ -493,7 +484,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     if(task.isSuccessful()){
         updateGeofencesAdded(getGeofencesAdded());
         Toast.makeText(this, "Geofence Set", LENGTH_LONG).show();
-        //this.finish();
+        this.finish();
     }
     else {
         String error = GeofenceTransitionsJobIntentService.getErrorString(task.getException());

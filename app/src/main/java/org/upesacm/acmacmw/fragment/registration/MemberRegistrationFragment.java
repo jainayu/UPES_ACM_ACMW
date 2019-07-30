@@ -122,7 +122,7 @@ public class MemberRegistrationFragment extends Fragment implements
        textViewPolicy.setPaintFlags(textViewPolicy.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
        premiumRadioButton = view.findViewById(R.id.radio_button_premium);
        oneYearRadioButton = view.findViewById(R.id.radio_button_1_year);
-       twoYearsRadioButton = view.findViewById(R.id.radio_button_2_year);
+       twoYearsRadioButton = view.findViewById(R.id.radio_button_2_years);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("membership_fee");
@@ -309,7 +309,7 @@ public class MemberRegistrationFragment extends Fragment implements
                 membershipType = membershipFee.ONE_YEAR_TYPE;
                 break;
             }
-            case R.id.radio_button_2_year : {
+            case R.id.radio_button_2_years : {
                 membershipType = membershipFee.TWO_YEAR_TYPE;
                 break;
             }

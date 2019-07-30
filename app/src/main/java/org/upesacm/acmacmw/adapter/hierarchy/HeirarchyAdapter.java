@@ -51,7 +51,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             Typeface regular = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_regular.ttf");
             final Typeface bold = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_bold.ttf");
             holder.name.setText(heirarchyModels.get(position).getName());
-            holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle_green_24dp, 0);
+            holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
             if(heirarchyModels.get(position).getAvailableInCampus() == 1){
                 holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle_green_24dp, 0);
             }
