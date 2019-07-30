@@ -82,7 +82,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCXxwrNbE8aKgfPlVZX2SfGeIRnjc9KVEo"/>
+            android:value="API Key To Be Entered"/>
         <receiver
             android:name=".util.GeofenceBroadcastReceiver"
             android:enabled="true"
