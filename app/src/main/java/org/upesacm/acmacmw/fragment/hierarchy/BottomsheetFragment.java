@@ -8,9 +8,9 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialogFragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.telephony.PhoneNumberUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,13 +60,13 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {  // Inflating view for bottom sheet
         View v = inflater.inflate(R.layout.heirarchy_bottomsheet, container, false);
 
-        Name_bottomsheet = (TextView) v.findViewById(R.id.name_bottomsheet);
-        Profile_bottomsheet = (ImageView) v.findViewById(R.id.profile_bottomsheet);
-        Current_project = (TextView) v.findViewById(R.id.current_project);
-        Whatsapp = (ImageView) v.findViewById(R.id.whatsapp_bottomsheet);
-        Linkedin = (ImageView) v.findViewById(R.id.linkedin_bottomsheet);
-        Contact = (ImageView) v.findViewById(R.id.contact_bottomsheet);
-        Github = (ImageView) v.findViewById(R.id.github_bottomsheet);
+        Name_bottomsheet = v.findViewById(R.id.name_bottomsheet);
+        Profile_bottomsheet = v.findViewById(R.id.profile_bottomsheet);
+        Current_project = v.findViewById(R.id.current_project);
+        Whatsapp = v.findViewById(R.id.whatsapp_bottomsheet);
+        Linkedin = v.findViewById(R.id.linkedin_bottomsheet);
+        Contact = v.findViewById(R.id.contact_bottomsheet);
+        Github = v.findViewById(R.id.github_bottomsheet);
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);

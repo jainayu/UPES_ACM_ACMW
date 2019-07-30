@@ -1,10 +1,11 @@
 package org.upesacm.acmacmw.fragment.hierarchy;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,7 @@ import org.upesacm.acmacmw.model.HeirarchyModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AcmFragment extends android.support.v4.app.Fragment implements ValueEventListener {
+public class AcmFragment extends Fragment implements ValueEventListener {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
     RecyclerView mRecyclerView;

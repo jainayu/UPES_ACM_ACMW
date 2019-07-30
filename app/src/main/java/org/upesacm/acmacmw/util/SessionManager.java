@@ -3,8 +3,8 @@ package org.upesacm.acmacmw.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -111,9 +111,7 @@ public class SessionManager  {
 
     //this function will be called each time any operation is requested from the session manager
     private boolean isSharedPreferencesSet() {
-        if(preferences != null)
-            return true;
-        return false;
+        return preferences != null;
     }
 
     /* ************* Methods to interact with SessionManager after it is created *****************/

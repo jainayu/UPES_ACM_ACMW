@@ -2,9 +2,6 @@ package org.upesacm.acmacmw.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.upesacm.acmacmw.util.MemberIDGenerator;
 
@@ -46,7 +43,7 @@ public class Member implements Parcelable {
         currentAdd = in.readString();
         recepientSap = in.readString();
         profilePicture=in.readString();
-        boolean array[]=new boolean[1];
+        boolean[] array = new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
 

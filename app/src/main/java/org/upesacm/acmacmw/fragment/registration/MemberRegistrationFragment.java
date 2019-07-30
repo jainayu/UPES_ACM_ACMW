@@ -7,10 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +95,7 @@ public class MemberRegistrationFragment extends Fragment implements
         Bundle bundle = getArguments();
         sapId = bundle.getString(MemberRegistrationFragment.NEW_MEMBER_SAP_KEY);
         if(sapId == null)
-            sapId = new String();
+            sapId = "";
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -122,7 +122,7 @@ public class MemberRegistrationFragment extends Fragment implements
        textViewPolicy.setPaintFlags(textViewPolicy.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
        premiumRadioButton = view.findViewById(R.id.radio_button_premium);
        oneYearRadioButton = view.findViewById(R.id.radio_button_1_year);
-       twoYearsRadioButton = view.findViewById(R.id.radio_button_2_years);
+       twoYearsRadioButton = view.findViewById(R.id.radio_button_2_year);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("membership_fee");
@@ -309,7 +309,7 @@ public class MemberRegistrationFragment extends Fragment implements
                 membershipType = membershipFee.ONE_YEAR_TYPE;
                 break;
             }
-            case R.id.radio_button_2_years : {
+            case R.id.radio_button_2_year : {
                 membershipType = membershipFee.TWO_YEAR_TYPE;
                 break;
             }
