@@ -108,4 +108,5 @@ indulging, you may apply for an yearly membership.\n\nFollowing is your Google S
     <string name="contact_us_member_2_name">Amey Pownikar</string>
     <string name="key_user_selected_home_page_fragment">user selected homepage fragment</string>
     <string name="title_activity_leaderboard">LeaderboardActivity</string>
+    <string name="position" />
 </resources>
