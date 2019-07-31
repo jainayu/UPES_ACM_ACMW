@@ -45,14 +45,14 @@ public class HierarchyFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_hierarchy, container, false);
         TabLayout tabLayout = view.findViewById(R.id.tablayout);
         TextView textViewAvailable = view.findViewById(R.id.text_view_hierarchy_available);
-        TextView textViewNoAvailabe = view.findViewById(R.id.text_view_hierarchy_not_available);
+//        TextView textViewNoAvailabe = view.findViewById(R.id.text_view_hierarchy_not_available);
         toolbar = view.findViewById(R.id.toolbar_frag_hierarchy);
         toolbar.setTitle("Our Team");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         Typeface regular = Typeface.createFromAsset(getContext().getAssets(), "Fonts/product_sans_regular.ttf");
         textViewAvailable.setTypeface(regular);
-        textViewNoAvailabe.setTypeface(regular);
+//        textViewNoAvailabe.setTypeface(regular);
         viewPager = view.findViewById(R.id.pager);
         mPagerAdapter = new PagerAdapter(this.getChildFragmentManager());
         viewPager.setAdapter(mPagerAdapter);

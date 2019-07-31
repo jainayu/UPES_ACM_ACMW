@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:background="@drawable/hierarchy_bottom_sheet"
     android:padding="20dp"
-    app:cardCornerRadius="20dp"
     app:cardUseCompatPadding="true">
 
 
@@ -93,7 +92,7 @@
                 android:layout_width="0dp"
                 android:layout_height="70dp"
                 android:layout_marginStart="26dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="14dp"
@@ -147,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="34dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/outline_assignment_black_24dp" />

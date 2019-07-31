@@ -25,6 +25,8 @@ import org.upesacm.acmacmw.model.HeirarchyModel;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.HeirarchyViewHolder> {
     private static final String TAG = "HeirarchyAdapter";
     private List<HeirarchyModel> heirarchyModels;
@@ -40,7 +42,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
     @Override
     public HeirarchyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.heirarchy_holder, parent, false);
+                .inflate(R.layout.heirarchy_holder_v3, parent, false);
         HeirarchyViewHolder heirarchyViewHolder = new HeirarchyViewHolder(view);
         return heirarchyViewHolder;
     }
@@ -52,12 +54,15 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             Typeface regular = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_regular.ttf");
             final Typeface bold = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_bold.ttf");
             holder.name.setText(heirarchyModels.get(position).getName());
-            holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
+//            holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
             if (heirarchyModels.get(position).getAvailableInCampus() == 1) {
-                holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle_green_24dp, 0);
-            } else if (heirarchyModels.get(position).getAvailableInCampus() == 0) {
-                holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
+                holder.availableincampus.setImageResource(R.drawable.ic_available_in_campus);
+//               holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle_green_24dp, 0);
             }
+            /*else if (heirarchyModels.get(position).getAvailableInCampus() == 0) {
+                holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
+                holder.availableincampus.setImageResource(R.drawable.ic_cancel_grey_24dp);
+            }*/
 
             if (heirarchyModels.get(position).getAcm_acmw().equals("ACM") || heirarchyModels.get(position).getAcm_acmw().equals("ACMW")) {
                 holder.position.setText(heirarchyModels.get(position).getPostion());
@@ -151,6 +156,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
         TextView name;
         TextView position;
         TextView about;
+        CircleImageView availableincampus;
         //        ImageView whatsapp;
 //        ImageView linkedin;
 //        ImageView contact;
@@ -165,6 +171,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             position = itemView.findViewById(R.id.position);
             about = itemView.findViewById(R.id.about);
             cardView = itemView.findViewById(R.id.CardView);
+            availableincampus = itemView.findViewById(R.id.availableincampus);
 //            whatsapp = itemView.findViewById(R.id.image_view_hierarchy_whatsapp);
 //            linkedin = itemView.findViewById(R.id.linkedin);
 //            contact = itemView.findViewById(R.id.contact);
