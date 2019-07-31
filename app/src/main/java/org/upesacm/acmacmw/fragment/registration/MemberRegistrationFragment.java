@@ -385,7 +385,7 @@ public class MemberRegistrationFragment extends Fragment implements
         return null;
     }
 
-    void resetRegistrationPage() {
+    private void resetRegistrationPage() {
         /*
         editTextEmail.setText("");
         editTextName.setText("");
@@ -397,7 +397,6 @@ public class MemberRegistrationFragment extends Fragment implements
         textViewDob.setText("");
         editTextCurrentAddress.setText("");
         */
-
         contentHolder.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
     }
