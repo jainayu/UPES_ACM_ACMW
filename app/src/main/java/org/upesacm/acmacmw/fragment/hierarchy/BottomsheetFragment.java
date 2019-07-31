@@ -8,10 +8,11 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialogFragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.telephony.PhoneNumberUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,18 +41,20 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
     static String Name;
     static String Image;
     static long getWhatsappNo;
+    static String CurrentProj;
     static String LinkedinUrl;
     static long ContactNo;
     static String GithubUrl;
 
 
-    public BottomsheetFragment GetData(String name, String image, long whatsappno, String linkedinUrl, long contactNo) {
+    public BottomsheetFragment GetData(String name, String image, long whatsappno, String linkedinUrl, long contactNo, String githubUrl,String currentProj) {
         Name = name;
         Image = image;
         getWhatsappNo = whatsappno;
         LinkedinUrl = linkedinUrl;
         ContactNo = contactNo;
-        GithubUrl = "githubUrlGoesHere";
+        GithubUrl = githubUrl;
+        CurrentProj = currentProj;
         return null;
     }
 
@@ -74,6 +77,8 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
             final Typeface bold = Typeface.createFromAsset(getContext().getAssets(), "Fonts/product_sans_bold.ttf");
             Name_bottomsheet.setTypeface(bold);
             Name_bottomsheet.setText(Name);
+            Current_project.setText(CurrentProj);
+            Current_project.setMovementMethod(new ScrollingMovementMethod());
             if (Image.equals("")) {
                 Profile_bottomsheet.setImageResource(R.drawable.acm);
             } else {
@@ -124,6 +129,19 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
                 getContext().startActivity(callIntent);
             }
         });
-        // GITGUB CLICK LISTENER GOES HERE
+        Github.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String temp = GithubUrl;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(temp));
+                final PackageManager packageManager = getContext().getPackageManager();
+                final List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                if (list.isEmpty()) {
+                    intent = new Intent(Intent.ACTION_VIEW, Uri.parse("Github://you"));
+                }
+                getContext().startActivity(intent);
+            }
+        });
+
     }
 }

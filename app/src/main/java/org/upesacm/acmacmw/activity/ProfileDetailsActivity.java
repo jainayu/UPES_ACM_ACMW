@@ -1,14 +1,25 @@
 package org.upesacm.acmacmw.activity;
 
+import android.Manifest;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -16,10 +27,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.main.ProfileFragment;
@@ -31,9 +50,17 @@ import org.upesacm.acmacmw.fragment.profile.MyEventsFragment;
 import org.upesacm.acmacmw.fragment.profile.PasswordChangeDialogFragment;
 import org.upesacm.acmacmw.fragment.profile.UserProfileFragment;
 import org.upesacm.acmacmw.model.Event;
+import org.upesacm.acmacmw.model.HeirarchyModel;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.FirebaseConfig;
+import org.upesacm.acmacmw.util.GeofenceBroadcastReceiver;
+import org.upesacm.acmacmw.util.GeofenceTransitionsJobIntentService;
 import org.upesacm.acmacmw.util.SessionManager;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 public class ProfileDetailsActivity extends AppCompatActivity implements
         UserProfileFragment.FragmentInteractionListener,
@@ -41,16 +68,39 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         PasswordChangeDialogFragment.PasswordChangeListener,
         LoginFragment.InteractionListener ,
         MyEventDetailFragment.FragmentInteractionListener,
-        ForgotPasswordFragment.InteractionListener {
+        ForgotPasswordFragment.InteractionListener,
+        OnCompleteListener<Void>{
     public static final String SELECTED_OPT_KEY = "selected opt key";
-
+    private static final String TAG = "ProfileDetailsActivity";
     private FrameLayout frameLayout;
     private int selectedOptId;
+    List<HeirarchyModel> heirarchyModels = new ArrayList<>();
+    AlertDialog.Builder alertDialogue;
+    private enum PendingGeofenceTask {
+        ADD, REMOVE, NONE
+    }
+    private PendingGeofenceTask pendingGeofenceTask = PendingGeofenceTask.NONE;
+    LatLng latLng =new LatLng(30.416659,77.968216);
+    private static final int REQ_PERMISSION = 100;
+    private static final String GEOFENCE_REQ_ID = "UPES Geofence";
+    private static final float GEOFENCE_RADIUS = 300.0f; // in meters
+    private GeofencingClient geofencingClient;
+    private PendingIntent geoFencePendingIntent;
+    boolean permission;
+    private ArrayList<Geofence> geofenceList;
+
+    public ProfileDetailsActivity() {
+
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         frameLayout = findViewById(R.id.frame_layout_activity_profile);
+        geofenceList = new ArrayList<>();
+        alertDialogue = new AlertDialog.Builder(this);
         Bundle args;
         args = getIntent().getExtras();
         if(args==null)
@@ -72,7 +122,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                     setCurrentFragment(UserProfileFragment.newInstance(),false);
                 else if(SessionManager.getInstance(this).getSessionID() == SessionManager.GUEST_SESSION_ID) {
                     Toast.makeText(this,"Please sign in as ACM member",Toast.LENGTH_SHORT).show();
-                    this.finish();;
+                    this.finish();
                 } else
                     requestUserAuthentication();
                 break;
@@ -86,7 +136,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                     setCurrentFragment(MyEventsFragment.newInstance(),false);
                 else if(SessionManager.getInstance(this).getSessionID() == SessionManager.GUEST_SESSION_ID) {
                     Toast.makeText(this,"Please sign in as ACM member",Toast.LENGTH_SHORT).show();
-                    this.finish();;
+                    this.finish();
                 } else
                     requestUserAuthentication();
                 break;
@@ -215,15 +265,67 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         else
             msg="unexpected resultcode";
 
-        Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
+        Toast.makeText(this,msg, LENGTH_LONG).show();
     }
 
     @Override
     public void onLoginDialogFragmentInteraction(int resultCode) {
         switch (resultCode) {
             case LoginFragment.LOGIN_SUCCESSFUL: {
-                Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
-                this.finish();
+                Member logedInMember = SessionManager.getInstance(this).getLoggedInMember();
+
+                LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+                boolean gps_enabled = false;
+                boolean network_enabled = false;
+                try {
+                    gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                } catch (Exception e) {
+                }
+                try {
+                    network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                } catch (Exception e) {
+                }
+
+                if (!gps_enabled && !network_enabled) {
+                    //notifying user
+                    alertDialogue.setTitle("GPS Not Available")
+                            .setMessage("Please enable location to proceed further.")
+                            .setPositiveButton("Open Setting", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                                }
+                            })
+                            .show();
+
+                } else {
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("Heirarchy")
+                            .orderByChild("sapId")
+                            .equalTo(Integer.parseInt(logedInMember.getSap()))
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot user : dataSnapshot.getChildren()) {
+                                        if (user.exists()) {
+                                            geoFencePendingIntent = null;
+                                            geofencingClient = LocationServices.getGeofencingClient(ProfileDetailsActivity.this);
+                                            populateGeofenceList();
+                                            startGeofence();
+                                            break;
+                                        }
+                                    }
+                                    endActivity();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                    Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
+                }
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
@@ -263,6 +365,11 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         }
     }
 
+    private void endActivity() {
+        Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
+        this.finish();
+    }
+
     @Override
     public void onClickRegister(Event event) {
 
@@ -284,5 +391,146 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                 }
             }
         });
+    }
+
+    private void populateGeofenceList() {
+        geofenceList.add(new Geofence.Builder()
+                    .setRequestId(GEOFENCE_REQ_ID)
+                    .setCircularRegion(
+                            latLng.latitude,
+                            latLng.longitude,
+                            GEOFENCE_RADIUS
+                    )
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                            Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build());
+
+    }
+    // Start Geofence creation process
+    private void startGeofence() {
+        Log.i(TAG, "startGeofence()");
+        if(!checkPermission()) {
+            pendingGeofenceTask = PendingGeofenceTask.ADD;
+            askPermission();
+            return;
+        }
+        addGeofence();
+    }
+
+    // Create a Geofence Request
+    private GeofencingRequest createGeofenceRequest() {
+        Log.d(TAG, "createGeofenceRequest");
+        return new GeofencingRequest.Builder()
+                .setInitialTrigger( GeofencingRequest.INITIAL_TRIGGER_ENTER )
+                .addGeofences(geofenceList)
+                .build();
+
+    }
+
+    // Add the created GeofenceRequest to the device's monitoring list
+    private void addGeofence() {
+        Log.d(TAG, "addGeofence");
+        if (!checkPermission()) {
+            Toast.makeText(this, "Permission Denied,\nPlease go to " +
+                    "settings and provide the permission to access your location ", LENGTH_LONG).show();
+            return;
+        }
+        geofencingClient.addGeofences(
+                createGeofenceRequest(),
+                createGeofencePendingIntent())
+                .addOnCompleteListener(this);
+    }
+
+    private PendingIntent createGeofencePendingIntent() {
+        Log.d(TAG, "createGeofencePendingIntent");
+        if ( geoFencePendingIntent != null ) {
+            return geoFencePendingIntent;
+        }
+
+        Intent intent = new Intent( this, GeofenceBroadcastReceiver.class);
+        return PendingIntent.getBroadcast(this,0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+
+
+    // Check for permission to access Location
+    private boolean checkPermission() {
+        Log.d(TAG, "checkPermission()");
+        // Ask for permission if it wasn't granted yet
+        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED;
+    }
+
+    // Asks for permission
+    private void askPermission() {
+        Log.d(TAG, "askPermission()");
+        ActivityCompat.requestPermissions(
+                this,
+                new String[] { Manifest.permission.ACCESS_FINE_LOCATION },
+                REQ_PERMISSION
+        );
+    }
+
+    // Verify user's response of the permission requested
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult()");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_PERMISSION) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //Permission granted
+                performPendingGeofenceTask();
+            } else {
+                // Permission denied
+                permissionsDenied();
+            }
+        }
+    }
+
+    // App cannot work without the permissions
+    private void permissionsDenied() {
+        Log.w(TAG, "permissionsDenied()");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(!checkPermission()) {
+            askPermission();
+        }else{
+            performPendingGeofenceTask();
+        }
+    }
+
+    @Override
+    public void onComplete(@NonNull Task<Void> task) {
+    if(task.isSuccessful()){
+        updateGeofencesAdded(getGeofencesAdded());
+        //Toast.makeText(this, "Geofence Set", LENGTH_LONG).show();
+        Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
+    }
+    else {
+        String error = GeofenceTransitionsJobIntentService.getErrorString(task.getException());
+        Toast.makeText(this, error, LENGTH_LONG).show();
+    }
+
+    }
+
+    private boolean getGeofencesAdded() {
+        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+                GEOFENCE_REQ_ID, false);
+    }
+    private void updateGeofencesAdded(boolean added) {
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .edit()
+                .putBoolean(GEOFENCE_REQ_ID, added)
+                .apply();
+    }
+    private void performPendingGeofenceTask() {
+        if (pendingGeofenceTask == PendingGeofenceTask.ADD) {
+            addGeofence();
+        }
     }
 }

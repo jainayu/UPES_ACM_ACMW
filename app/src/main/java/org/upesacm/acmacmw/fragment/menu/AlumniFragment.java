@@ -1,7 +1,6 @@
 package org.upesacm.acmacmw.fragment.menu;
 
 import android.annotation.SuppressLint;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,10 +8,10 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,19 +130,19 @@ public class AlumniFragment extends Fragment {
         }
 
         public void setName(String Name) {
-            TextView post_name = (TextView) itemView.findViewById(R.id.textViewName);
+            TextView post_name = itemView.findViewById(R.id.textViewName);
             post_name.setText(Name);
             Typeface regular = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
             post_name.setTypeface(regular);
         }
 
         public void setPosition(String Position) {
-            TextView post_position = (TextView) itemView.findViewById(R.id.textViewDesignation);
+            TextView post_position = itemView.findViewById(R.id.textViewDesignation);
             post_position.setText(Position);
         }
 
         public void setSession(String Session) {
-            TextView post_session = (TextView) itemView.findViewById(R.id.textViewSession);
+            TextView post_session = itemView.findViewById(R.id.textViewSession);
             post_session.setText(Session);
         }
 

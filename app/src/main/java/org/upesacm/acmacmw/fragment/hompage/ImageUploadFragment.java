@@ -7,13 +7,12 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -144,7 +143,7 @@ public class ImageUploadFragment extends Fragment implements
         Calendar calendar = Calendar.getInstance();
         yearId = "Y" + calendar.get(Calendar.YEAR);
         monthId = "M" + calendar.get(Calendar.MONTH);
-        postId = "ACM" + Calendar.getInstance().getTimeInMillis() + ownerSapId.substring(3, ownerSapId.length());
+        postId = "ACM" + Calendar.getInstance().getTimeInMillis() + ownerSapId.substring(3);
         day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
 
         String hour = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
@@ -221,7 +220,7 @@ public class ImageUploadFragment extends Fragment implements
                                 .setYearId(yearId)
                                 .setMonthId(monthId)
                                 .setPostId(postId)
-                                .setImageUrl(uri.toString())
+                                .setImageUrl(uri)
                                 .setCaption(caption.getText().toString())
                                 .setDay(day)
                                 .setTime(time)
@@ -256,12 +255,12 @@ public class ImageUploadFragment extends Fragment implements
     public void showProgress(boolean show) {
         if (show) {
             caption.setVisibility(View.INVISIBLE);
-            upload.setVisibility(View.INVISIBLE);
+            //upload.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
             textViewUpload.setVisibility(View.VISIBLE);
         } else {
             caption.setVisibility(View.VISIBLE);
-            upload.setVisibility(View.VISIBLE);
+            //upload.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
             textViewUpload.setVisibility((View.INVISIBLE));
         }
