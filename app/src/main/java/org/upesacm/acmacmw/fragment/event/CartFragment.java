@@ -1,15 +1,13 @@
 package org.upesacm.acmacmw.fragment.event;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +18,6 @@ import android.widget.Toast;
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.activity.CheckoutActivity;
 import org.upesacm.acmacmw.adapter.CartAdapter;
-import org.upesacm.acmacmw.adapter.EventsRecyclerViewAdapter;
-import org.upesacm.acmacmw.fragment.main.EventsListFragment;
 import org.upesacm.acmacmw.util.Cart;
 
 public class CartFragment extends Fragment {

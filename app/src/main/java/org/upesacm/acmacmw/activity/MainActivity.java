@@ -2,16 +2,17 @@ package org.upesacm.acmacmw.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 
@@ -21,12 +22,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.upesacm.acmacmw.R;
-import org.upesacm.acmacmw.adapter.hierarchy.HeirarchyAdapter;
 import org.upesacm.acmacmw.fragment.event.CartFragment;
 import org.upesacm.acmacmw.fragment.main.HomePageFragment;
 import org.upesacm.acmacmw.fragment.hompage.SponsorsFragment;
@@ -45,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements
         ProfileFragment.OnFragmentInteractionListener,
         HomePageFragment.FragmentInteractionListener {
     public static final String TAG = "MainActivity";
-    public static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
+    public static final String BASE_URL="https://acm-app-demo.firebaseio.com/";
     public static final String EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY = "event activity current fragment key";
     private static final int POSTS_FRAGMENT_ID = 1;
     private static final int EVENTS_FRAGMENT_ID = 2;
@@ -93,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements
                                 // If sign in fails, display a message to the user.
                                 Log.w("tag", "signInAnonymously:failure", task.getException());
                                 Snackbar.make(constraintLayout, "Authentication failed.",
-                                        Toast.LENGTH_LONG).show();
+                                        Snackbar.LENGTH_LONG).show();
                             }
                         }
                     });

@@ -42,7 +42,7 @@ public class NewMember implements Parcelable{
         whatsappNo = in.readString();
         otp = in.readString();
 
-        boolean array[]=new boolean[1];
+        boolean[] array = new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
 

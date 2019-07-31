@@ -7,9 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +20,20 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.menu.PolicyFragment;
+import org.upesacm.acmacmw.model.MembershipFee;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
@@ -42,13 +51,17 @@ public class MemberRegistrationFragment extends Fragment implements
 
     EditText editTextName,editTextContact,editTextEmail,
             editTextYear,editTextBranch,editTextWhatsappNo,editTextCurrentAddress;
-    TextView textViewDob, textViewPolicy,textViewSap;
+    TextView textViewDob, textViewPolicy;
+    EditText editTextViewSap;
     RadioGroup radioGroupMembership;
+    RadioButton premiumRadioButton, oneYearRadioButton, twoYearsRadioButton;
     Button buttonRegister;
    // Button buttonVerifyOTP;
     View contentHolder;
     ProgressBar progressBar;
-
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseReference;
+    MembershipFee membershipFee;
     NewMember newMember;
     private String sapId;
     RegistrationResultListener resultListener;
@@ -82,7 +95,7 @@ public class MemberRegistrationFragment extends Fragment implements
         Bundle bundle = getArguments();
         sapId = bundle.getString(MemberRegistrationFragment.NEW_MEMBER_SAP_KEY);
         if(sapId == null)
-            sapId = new String();
+            sapId = "";
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,7 +110,7 @@ public class MemberRegistrationFragment extends Fragment implements
        contentHolder=view.findViewById(R.id.scroll_bar_container);
        progressBar=view.findViewById(R.id.progress_bar_registration);
        editTextName=view.findViewById(R.id.editText_name);
-       textViewSap =view.findViewById(R.id.editText_sap);
+       editTextViewSap =view.findViewById(R.id.editText_sap);
        editTextEmail=view.findViewById(R.id.editText_email);
        editTextContact=view.findViewById(R.id.editText_contact);
        editTextYear=view.findViewById(R.id.editText_year);
@@ -107,8 +120,82 @@ public class MemberRegistrationFragment extends Fragment implements
        editTextCurrentAddress = view.findViewById(R.id.editText_hosteladd);
        textViewPolicy = view.findViewById(R.id.textView_Policy);
        textViewPolicy.setPaintFlags(textViewPolicy.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+       premiumRadioButton = view.findViewById(R.id.radio_button_premium);
+       oneYearRadioButton = view.findViewById(R.id.radio_button_1_year);
+       twoYearsRadioButton = view.findViewById(R.id.radio_button_2_years);
 
-       textViewSap.setText(sapId);
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference().child("membership_fee");
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                membershipFee = dataSnapshot.getValue(MembershipFee.class);
+                premiumRadioButton.setText(membershipFee.getPremiumMsg());
+                oneYearRadioButton.setText(membershipFee.getOneYearMsg());
+                twoYearsRadioButton.setText(membershipFee.getTwoYearsMsg());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //premiumRadioButton.setText();
+
+/*
+       FirebaseDatabase.getInstance().getReference()
+                .child("membership_fee")
+                .child("Premium")
+                .addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        premiumRadioButton.setText("Premium (\u20B9"+ dataSnapshot.getValue(String.class) +" for 4 Years + 1 Year International)");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("membership_fee")
+                .child("One Year")
+                .addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        oneYearRadioButton.setText("1 year membership(\u20B9"+ dataSnapshot.getValue(String.class)+")");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+        FirebaseDatabase.getInstance().getReference()
+                .child("membership_fee")
+                .child("Two Years")
+                .addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        twoYearsRadioButton.setText("2 year membership (\u20B9"+dataSnapshot.getValue(String.class)+")");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });*/
+       editTextViewSap.setText(sapId);
+       if(editTextViewSap.getText()!=null){
+           editTextViewSap.setFocusable(false);
+       }
+
        textViewDob.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
@@ -206,7 +293,7 @@ public class MemberRegistrationFragment extends Fragment implements
 
 
     public NewMember createNewMember() {
-        String sap= textViewSap.getText().toString().trim();
+        String sap= editTextViewSap.getText().toString().trim();
         String name=editTextName.getText().toString().trim();
         String email=editTextEmail.getText().toString().trim();
         String contact=editTextContact.getText().toString().trim();
@@ -215,18 +302,19 @@ public class MemberRegistrationFragment extends Fragment implements
         String year=editTextYear.getText().toString().trim();
         boolean premium=(radioGroupMembership.getCheckedRadioButtonId()==R.id.radio_button_premium);
         String[] membershipTypes = getResources().getStringArray(R.array.membership_type);
+
         String membershipType;
         switch(radioGroupMembership.getCheckedRadioButtonId()) {
             case R.id.radio_button_1_year : {
-                membershipType = membershipTypes[0];
+                membershipType = membershipFee.ONE_YEAR_TYPE;
                 break;
             }
-            case R.id.radio_button_2_year : {
-                membershipType = membershipTypes[1];
+            case R.id.radio_button_2_years : {
+                membershipType = membershipFee.TWO_YEAR_TYPE;
                 break;
             }
             case R.id.radio_button_premium : {
-                membershipType = membershipTypes[2];
+                membershipType = membershipFee.PREMIUM_TYPE;
                 break;
             }
             default : {
@@ -300,7 +388,7 @@ public class MemberRegistrationFragment extends Fragment implements
     void resetRegistrationPage() {
         editTextEmail.setText("");
         editTextName.setText("");
-        textViewSap.setText("");
+        editTextViewSap.setText("");
         editTextBranch.setText("");
         editTextContact.setText("");
         editTextWhatsappNo.setText("");
@@ -316,7 +404,7 @@ public class MemberRegistrationFragment extends Fragment implements
         if(newMember!=null) {
             editTextEmail.setText(newMember.getEmail());
             editTextName.setText(newMember.getFullName());
-            textViewSap.setText(newMember.getSapId());
+            editTextViewSap.setText(newMember.getSapId());
             editTextBranch.setText(newMember.getBranch());
             editTextContact.setText(newMember.getPhoneNo());
             editTextWhatsappNo.setText(newMember.getWhatsappNo());

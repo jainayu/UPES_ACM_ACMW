@@ -13,7 +13,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -58,7 +58,7 @@ public class UploadService {
     public void openImageCaptureDialog() {
         final CharSequence[] items = {"Take Photo", "Choose from Library",
                 "Cancel"};
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
@@ -235,7 +235,7 @@ public class UploadService {
     retryPopUp() {
         final CharSequence[] items = {"Retry",
                 "Cancel"};
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
         builder.setTitle("Uploading Fail!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override

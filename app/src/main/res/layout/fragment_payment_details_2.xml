@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.payment.PaymentDetailsFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--tools:context=".fragment.payment.PaymentDetailsFragment"-->
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_frag_payment_details"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></android.support.v7.widget.Toolbar>
+            android:layout_height="wrap_content"/>
 
         <ProgressBar
             android:id="@+id/progress_bar_frag_payment_details"
@@ -21,9 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:visibility="gone" />
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view_frag_payment_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
                               \nNOTE : If amount is zero you dont have to pay anything, you have been registered with us."
                 android:padding="8dp"/>
 
-            <android.support.v7.widget.CardView xmlns:card_layout="http://schemas.android.com/apk/res-auto"
+            <androidx.cardview.widget.CardView xmlns:card_layout="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/card_view_frag_recipient_details_recip_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -214,7 +214,7 @@
                         android:textColor="@android:color/white"
                         android:visibility="visible" />
                 </LinearLayout>
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
-</android.support.design.widget.CoordinatorLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
