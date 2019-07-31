@@ -5,12 +5,16 @@ public class HeirarchyModel {
     private String about;
     private int availableInCampus;
     private long contact;
+    private String github;
     private String image;
+    private String keyword;
     private String linkedin;
     private String postion;
     private long whatsapp;
     private String acm_acmw;
     private long sapId;
+    private String currentproject;
+
     public long getSapId() {
         return sapId;
     }
@@ -51,6 +55,10 @@ public class HeirarchyModel {
         this.contact = contact;
     }
 
+    public String getGithub() { return github; }
+
+    public void setGithub(String github) { this.github = github; }
+
     public String getImage() {
         return image;
     }
@@ -58,6 +66,10 @@ public class HeirarchyModel {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public String getKeyword() { return keyword; }
+
+    public void setKeyword(String keyword) { this.keyword = keyword; }
 
     public String getLinkedin() {
         return linkedin;
@@ -92,6 +104,11 @@ public class HeirarchyModel {
         this.acm_acmw = acm_acmw;
     }
 
+    public String getCurrentproject() {
+        return currentproject;
+    }
 
-
+    public void setCurrentproject(String currentproject) {
+        this.currentproject = currentproject;
+    }
 }

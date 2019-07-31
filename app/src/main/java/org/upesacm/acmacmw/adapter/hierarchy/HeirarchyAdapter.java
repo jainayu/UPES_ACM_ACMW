@@ -2,11 +2,6 @@ package org.upesacm.acmacmw.adapter.hierarchy;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.upesacm.acmacmw.R;
 import org.upesacm.acmacmw.fragment.hierarchy.BottomsheetFragment;
@@ -52,10 +53,9 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             final Typeface bold = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_bold.ttf");
             holder.name.setText(heirarchyModels.get(position).getName());
             holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
-            if(heirarchyModels.get(position).getAvailableInCampus() == 1){
+            if (heirarchyModels.get(position).getAvailableInCampus() == 1) {
                 holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle_green_24dp, 0);
-            }
-            else if (heirarchyModels.get(position).getAvailableInCampus() == 0){
+            } else if (heirarchyModels.get(position).getAvailableInCampus() == 0) {
                 holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
             }
 
@@ -63,9 +63,9 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
                 holder.position.setText(heirarchyModels.get(position).getPostion());
                 holder.position.setTextSize(20);
             }
-            else{
+            /*else{
                 holder.position.setVisibility(View.GONE);
-            }
+            }*/
 
             holder.position.setTypeface(bold);
             holder.about.setText(heirarchyModels.get(position).getAbout());
@@ -96,13 +96,16 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
                     // passing Data in BottomSheetFragment class
                     bottomsheetFragment.GetData(heirarchyModels.get(position).getName(), heirarchyModels.get(position).getImage(),
                             heirarchyModels.get(position).getWhatsapp(), heirarchyModels.get(position).getLinkedin(),
-                            heirarchyModels.get(position).getContact());
+                            heirarchyModels.get(position).getContact(), heirarchyModels.get(position).getGithub(),
+                            heirarchyModels.get(position).getCurrentproject());
 
                     BottomSheetDialogFragment bottomSheetDialogFragment = new BottomsheetFragment();
                     bottomSheetDialogFragment.show(((FragmentActivity) context).getSupportFragmentManager(), bottomSheetDialogFragment.getTag());   // initiating Bottomsheet
 
                 }
             });
+
+            holder.setIsRecyclable(false);
 
 //            holder.whatsapp.setOnClickListener(new View.OnClickListener() {
 //                @Override
@@ -151,7 +154,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
         //        ImageView whatsapp;
 //        ImageView linkedin;
 //        ImageView contact;
-       // ImageView availabeInCampus;
+        // ImageView availabeInCampus;
         TextView id_firebase;
         CardView cardView;
 

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.telephony.PhoneNumberUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,18 +41,20 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
     static String Name;
     static String Image;
     static long getWhatsappNo;
+    static String CurrentProj;
     static String LinkedinUrl;
     static long ContactNo;
     static String GithubUrl;
 
 
-    public BottomsheetFragment GetData(String name, String image, long whatsappno, String linkedinUrl, long contactNo) {
+    public BottomsheetFragment GetData(String name, String image, long whatsappno, String linkedinUrl, long contactNo, String githubUrl,String currentProj) {
         Name = name;
         Image = image;
         getWhatsappNo = whatsappno;
         LinkedinUrl = linkedinUrl;
         ContactNo = contactNo;
-        GithubUrl = "githubUrlGoesHere";
+        GithubUrl = githubUrl;
+        CurrentProj = currentProj;
         return null;
     }
 
@@ -60,13 +63,13 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {  // Inflating view for bottom sheet
         View v = inflater.inflate(R.layout.heirarchy_bottomsheet, container, false);
 
-        Name_bottomsheet = v.findViewById(R.id.name_bottomsheet);
-        Profile_bottomsheet = v.findViewById(R.id.profile_bottomsheet);
-        Current_project = v.findViewById(R.id.current_project);
-        Whatsapp = v.findViewById(R.id.whatsapp_bottomsheet);
-        Linkedin = v.findViewById(R.id.linkedin_bottomsheet);
-        Contact = v.findViewById(R.id.contact_bottomsheet);
-        Github = v.findViewById(R.id.github_bottomsheet);
+        Name_bottomsheet = (TextView) v.findViewById(R.id.name_bottomsheet);
+        Profile_bottomsheet = (ImageView) v.findViewById(R.id.profile_bottomsheet);
+        Current_project = (TextView) v.findViewById(R.id.current_project);
+        Whatsapp = (ImageView) v.findViewById(R.id.whatsapp_bottomsheet);
+        Linkedin = (ImageView) v.findViewById(R.id.linkedin_bottomsheet);
+        Contact = (ImageView) v.findViewById(R.id.contact_bottomsheet);
+        Github = (ImageView) v.findViewById(R.id.github_bottomsheet);
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
@@ -74,6 +77,8 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
             final Typeface bold = Typeface.createFromAsset(getContext().getAssets(), "Fonts/product_sans_bold.ttf");
             Name_bottomsheet.setTypeface(bold);
             Name_bottomsheet.setText(Name);
+            Current_project.setText(CurrentProj);
+            Current_project.setMovementMethod(new ScrollingMovementMethod());
             if (Image.equals("")) {
                 Profile_bottomsheet.setImageResource(R.drawable.acm);
             } else {
@@ -124,6 +129,19 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
                 getContext().startActivity(callIntent);
             }
         });
-        // GITGUB CLICK LISTENER GOES HERE
+        Github.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String temp = GithubUrl;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(temp));
+                final PackageManager packageManager = getContext().getPackageManager();
+                final List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                if (list.isEmpty()) {
+                    intent = new Intent(Intent.ACTION_VIEW, Uri.parse("Github://you"));
+                }
+                getContext().startActivity(intent);
+            }
+        });
+
     }
 }
