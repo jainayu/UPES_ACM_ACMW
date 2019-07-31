@@ -68,8 +68,8 @@ final public class PaytmUtil {
     }
 
     private static void beginTransaction(final Context context,PaytmOrder paytmOrder) {
-        //PaytmPGService paytmPGService = PaytmPGService.getProductionService();
-        PaytmPGService paytmPGService = PaytmPGService.getStagingService();
+        PaytmPGService paytmPGService = PaytmPGService.getProductionService();
+        //PaytmPGService paytmPGService = PaytmPGService.getStagingService();
         paytmPGService.initialize(paytmOrder,null);
         paytmPGService.startPaymentTransaction(context, true, true, new PaytmPaymentTransactionCallback() {
             @Override
