@@ -68,19 +68,12 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
                 holder.position.setText(heirarchyModels.get(position).getPostion());
                 holder.position.setTextSize(20);
             }
-            /*else{
+            else{
                 holder.position.setVisibility(View.GONE);
-            }*/
+            }
 
             holder.position.setTypeface(bold);
             holder.about.setText(heirarchyModels.get(position).getAbout());
-
-           /* if (heirarchyModels.get(position).getAvailableInCampus() == 0) {
-                holder.availabeInCampus.setImageResource(R.drawable.ic_cancel_grey_24dp);
-            } else if (heirarchyModels.get(position).getAvailableInCampus() == 1) {
-                holder.availabeInCampus.setImageResource(R.drawable.ic_check_circle_green_24dp);
-            }
-            holder.availabeInCampus.setVisibility(View.GONE);*/
 
             RequestOptions requestOptions = new RequestOptions();
             requestOptions.diskCacheStrategy(DiskCacheStrategy.RESOURCE);
