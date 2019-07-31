@@ -273,6 +273,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         switch (resultCode) {
             case LoginFragment.LOGIN_SUCCESSFUL: {
                 Member logedInMember = SessionManager.getInstance(this).getLoggedInMember();
+
                 LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
                 boolean gps_enabled = false;
                 boolean network_enabled = false;
