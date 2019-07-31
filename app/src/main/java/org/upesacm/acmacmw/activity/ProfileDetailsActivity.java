@@ -3,6 +3,7 @@ package org.upesacm.acmacmw.activity;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.annotation.NonNull;
@@ -14,8 +15,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -72,7 +75,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     private FrameLayout frameLayout;
     private int selectedOptId;
     List<HeirarchyModel> heirarchyModels = new ArrayList<>();
-
+    AlertDialog.Builder alertDialogue;
     private enum PendingGeofenceTask {
         ADD, REMOVE, NONE
     }
@@ -97,6 +100,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_profile);
         frameLayout = findViewById(R.id.frame_layout_activity_profile);
         geofenceList = new ArrayList<>();
+        alertDialogue = new AlertDialog.Builder(this);
         Bundle args;
         args = getIntent().getExtras();
         if(args==null)
@@ -269,32 +273,58 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         switch (resultCode) {
             case LoginFragment.LOGIN_SUCCESSFUL: {
                 Member logedInMember = SessionManager.getInstance(this).getLoggedInMember();
-                FirebaseDatabase.getInstance().getReference()
-                        .child("Heirarchy")
-                        .orderByChild("sapId")
-                        .equalTo(Integer.parseInt(logedInMember.getSap()))
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for (DataSnapshot user:dataSnapshot.getChildren())
-                                {
-                                    if(user.exists()){
-                                        geoFencePendingIntent = null;
-                                        geofencingClient = LocationServices.getGeofencingClient(ProfileDetailsActivity.this);
-                                        populateGeofenceList();
-                                        startGeofence();
-                                        break;
-                                    }
+                LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+                boolean gps_enabled = false;
+                boolean network_enabled = false;
+                try {
+                    gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                } catch (Exception e) {
+                }
+                try {
+                    network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                } catch (Exception e) {
+                }
+
+                if (!gps_enabled && !network_enabled) {
+                    //notifying user
+                    alertDialogue.setTitle("GPS Not Available")
+                            .setMessage("Please enable location to proceed further.")
+                            .setPositiveButton("Open Setting", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                                 }
-                                endActivity();
-                            }
+                            })
+                            .show();
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                } else {
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("Heirarchy")
+                            .orderByChild("sapId")
+                            .equalTo(Integer.parseInt(logedInMember.getSap()))
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot user : dataSnapshot.getChildren()) {
+                                        if (user.exists()) {
+                                            geoFencePendingIntent = null;
+                                            geofencingClient = LocationServices.getGeofencingClient(ProfileDetailsActivity.this);
+                                            populateGeofenceList();
+                                            startGeofence();
+                                            break;
+                                        }
+                                    }
+                                    endActivity();
+                                }
 
-                            }
-                        });
-                Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                    Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
+                }
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
