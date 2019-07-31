@@ -14,7 +14,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -25,14 +24,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -74,7 +69,6 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         OnCompleteListener<Void>{
     public static final String SELECTED_OPT_KEY = "selected opt key";
     private static final String TAG = "ProfileDetailsActivity";
-
     private FrameLayout frameLayout;
     private int selectedOptId;
     List<HeirarchyModel> heirarchyModels = new ArrayList<>();
@@ -89,6 +83,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     private static final float GEOFENCE_RADIUS = 300.0f; // in meters
     private GeofencingClient geofencingClient;
     private PendingIntent geoFencePendingIntent;
+    boolean permission;
     private ArrayList<Geofence> geofenceList;
 
     public ProfileDetailsActivity() {
@@ -101,7 +96,6 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         frameLayout = findViewById(R.id.frame_layout_activity_profile);
-
         geofenceList = new ArrayList<>();
         Bundle args;
         args = getIntent().getExtras();
@@ -274,10 +268,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     public void onLoginDialogFragmentInteraction(int resultCode) {
         switch (resultCode) {
             case LoginFragment.LOGIN_SUCCESSFUL: {
-
-                Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
                 Member logedInMember = SessionManager.getInstance(this).getLoggedInMember();
-//                String sapID = logedInMember.getSap();
                 FirebaseDatabase.getInstance().getReference()
                         .child("Heirarchy")
                         .orderByChild("sapId")
@@ -288,16 +279,14 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                                 for (DataSnapshot user:dataSnapshot.getChildren())
                                 {
                                     if(user.exists()){
-
                                         geoFencePendingIntent = null;
                                         geofencingClient = LocationServices.getGeofencingClient(ProfileDetailsActivity.this);
                                         populateGeofenceList();
                                         startGeofence();
                                         break;
-
                                     }
                                 }
-
+                                endActivity();
                             }
 
                             @Override
@@ -305,7 +294,7 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
 
                             }
                         });
-                this.finish();
+                Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
                 break;
             }
             case LoginFragment.SIGNUP_PRESSED: {
@@ -343,6 +332,11 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                 break;
             }
         }
+    }
+
+    private void endActivity() {
+        Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
+        this.finish();
     }
 
     @Override
@@ -407,8 +401,8 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     private void addGeofence() {
         Log.d(TAG, "addGeofence");
         if (!checkPermission()) {
-            Toast.makeText(this, "Permission Denied, Please go to " +
-                    "settings and provide the location permission", LENGTH_LONG).show();
+            Toast.makeText(this, "Permission Denied,\nPlease go to " +
+                    "settings and provide the permission to access your location ", LENGTH_LONG).show();
             return;
         }
         geofencingClient.addGeofences(
@@ -433,8 +427,8 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     private boolean checkPermission() {
         Log.d(TAG, "checkPermission()");
         // Ask for permission if it wasn't granted yet
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED;
     }
 
     // Asks for permission
@@ -483,8 +477,8 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
     public void onComplete(@NonNull Task<Void> task) {
     if(task.isSuccessful()){
         updateGeofencesAdded(getGeofencesAdded());
-        Toast.makeText(this, "Geofence Set", LENGTH_LONG).show();
-        this.finish();
+        //Toast.makeText(this, "Geofence Set", LENGTH_LONG).show();
+        Toast.makeText(this,"Login Successful",Toast.LENGTH_SHORT).show();
     }
     else {
         String error = GeofenceTransitionsJobIntentService.getErrorString(task.getException());

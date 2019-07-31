@@ -3,7 +3,6 @@ package org.upesacm.acmacmw.util;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -17,11 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.upesacm.acmacmw.model.HeirarchyModel;
 import org.upesacm.acmacmw.model.Member;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     Context context;
