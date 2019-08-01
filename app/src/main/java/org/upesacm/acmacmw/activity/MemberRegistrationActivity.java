@@ -510,26 +510,39 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 EmailMsg message = dataSnapshot.getValue(EmailMsg.class);
-                                                String memberDetails =
-                                                        "<b>Name</b>      : " + member.getName() + "<br />"
-                                                                + "<b>SAP ID</b>    : " + member.getSap() + "<br />"
-                                                                + "<b>ACM ID</b>    : " + member.getMemberId() + "<br />"
-                                                                + "<b>Password</b>  : " + member.getPassword() + "<br />" +
-                                                                "(Please set your own password from the app)" + "<br />"
-                                                                + "<b>Branch</b>    : " + member.getBranch() + "<br />"
-                                                                + "<b>Year</b>      : " + member.getYear() + "<br />"
-                                                                + "<b>Contact</b>   : " + member.getContact() + "<br />"
-                                                                + "<b>WhatsApp</b>  : " + member.getWhatsappNo() + "<br />"
-                                                                + "<b>DOB</b>       : " + member.getDob() + "<br />"
-                                                                + "<b>Address</b>   : " + member.getCurrentAdd() + "<br />";
+//                                                String memberDetails =
+//                                                        "<b>Name</b>      : " + member.getName() + "<br />"
+//                                                                + "<b>SAP ID</b>    : " + member.getSap() + "<br />"
+//                                                                + "<b>ACM ID</b>    : " + member.getMemberId() + "<br />"
+//                                                                + "<b>Password</b>  : " + member.getPassword() + "<br />" +
+//                                                                "(Please set your own password from the app)" + "<br />"
+//                                                                + "<b>Branch</b>    : " + member.getBranch() + "<br />"
+//                                                                + "<b>Year</b>      : " + member.getYear() + "<br />"
+//                                                                + "<b>Contact</b>   : " + member.getContact() + "<br />"
+//                                                                + "<b>WhatsApp</b>  : " + member.getWhatsappNo() + "<br />"
+//                                                                + "<b>DOB</b>       : " + member.getDob() + "<br />"
+//                                                                + "<b>Address</b>   : " + member.getCurrentAdd() + "<br />";
                                                 if (message != null) {
-                                                    String mailBody = message.getBody() + "<br /><br />" + memberDetails + "<br />" + message.getSenderDetails();
-                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
-                                                            message.getSubject(),
-                                                            mailBody);
-                                                } else
-                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
-                                                            "ACM Member Details", memberDetails);
+                                                    //String mailBody = message.getBody() + "<br /><br />" + memberDetails + "<br />" + message.getSenderDetails();
+                                                    String usernamePlaceHolder= "&username";
+                                                    String passwordPlaceHolder= "&password";
+                                                    StringBuilder mailBody = new StringBuilder(message.getBody());
+                                                    try {
+                                                        int unholderI = mailBody.indexOf(usernamePlaceHolder);
+                                                        int passholderI = mailBody.indexOf(passwordPlaceHolder);
+                                                        mailBody.replace(unholderI, unholderI+usernamePlaceHolder.length(), member.getSap());
+                                                        mailBody.replace(passholderI, passholderI+passwordPlaceHolder.length(), member.getPassword());
+                                                        Log.i(TAG,"mail body : "+mailBody.toString());
+                                                        sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
+                                                                message.getSubject(),
+                                                                mailBody.toString());
+                                                    }catch(Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+//                                                else
+////                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
+////                                                            "ACM Member Details", memberDetails);
                                             }
 
                                             @Override
