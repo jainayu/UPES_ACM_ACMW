@@ -1,13 +1,18 @@
 package org.upesacm.acmacmw.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -214,7 +219,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
     @Override
     public void onRegistrationDataAvailable(int resultCode, final NewMember newMember) {
-
         tempStorage.putParcelable(NEW_MEMBER_KEY,newMember);
 
         if(newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)){
@@ -486,8 +490,9 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
             NewMember newMember = tempStorage.getParcelable(NEW_MEMBER_KEY);
             final Member member = new Member.Builder(newMember).build();
             makeToast("Transaction Successful.");
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setMessage("Please wait...").show();
             //TODO: save the member into the acmmembers database
-
             //create a new entry in the acm members database
             FirebaseDatabase.getInstance().getReference()
                     .child(FirebaseConfig.ACM_ACMW_MEMBERS)
@@ -534,7 +539,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                         });
                                 MemberRegistrationActivity.this.finish();
                                 startActivity(new Intent(getApplicationContext(), ThankYouActivity.class));
-
                             }
                         }
                     });
