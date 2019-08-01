@@ -28,6 +28,7 @@ public class NewMember implements Parcelable{
     private String dob;
     private String currentAddress;
     private String membershipType;
+    private String timestamp;
 
 
 
@@ -41,7 +42,7 @@ public class NewMember implements Parcelable{
         phoneNo = in.readString();
         whatsappNo = in.readString();
         otp = in.readString();
-
+        timestamp = in.readString();
         boolean[] array = new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
@@ -49,6 +50,7 @@ public class NewMember implements Parcelable{
         recipientSap=in.readString();
         dob = in.readString();
         currentAddress = in.readString();
+
     }
 
 
@@ -57,6 +59,13 @@ public class NewMember implements Parcelable{
 
     public NewMember() {
 
+    }
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getRecipientSap() {
@@ -130,6 +139,7 @@ public class NewMember implements Parcelable{
         parcel.writeString(recipientSap);
         parcel.writeString(dob);
         parcel.writeString(currentAddress);
+        parcel.writeString(String.valueOf(timestamp));
 
     }
 
@@ -148,6 +158,7 @@ public class NewMember implements Parcelable{
         String dob;
         String currentAddress;
         String membershipType;
+        private String timestamp;
 
         public Builder() {
             //default
@@ -167,6 +178,7 @@ public class NewMember implements Parcelable{
             this.dob = newMember.getDob();
             this.currentAddress = newMember.getCurrentAddress();
             this.membershipType = newMember.getMembershipType();
+            this.timestamp = newMember.getTimestamp();
         }
         public NewMember build() {
             NewMember newMember=new NewMember();
@@ -184,6 +196,7 @@ public class NewMember implements Parcelable{
             newMember.dob = this.dob;
             newMember.currentAddress = this.currentAddress;
             newMember.membershipType = this.membershipType;
+            newMember.timestamp = this.timestamp;
             return newMember;
         }
 
@@ -249,6 +262,10 @@ public class NewMember implements Parcelable{
 
         public Builder setMembershipType(String membershipType) {
             this.membershipType = membershipType;
+            return this;
+        }
+        public Builder setTimeStamp(String timeStamp) {
+            this.timestamp = timeStamp;
             return this;
         }
     }

@@ -37,7 +37,9 @@ import org.upesacm.acmacmw.model.MembershipFee;
 import org.upesacm.acmacmw.model.NewMember;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 
@@ -361,6 +363,7 @@ public class MemberRegistrationFragment extends Fragment implements
                                             .setCurrentAddress(currentAdd)
                                             .setWhatsappNo(whatsapp)
                                             .setMembershipType(membershipType)
+                                            .setTimeStamp(new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date()))
                                             .build();
                                     return newMember;
                                 } else
@@ -401,7 +404,7 @@ public class MemberRegistrationFragment extends Fragment implements
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    void setRegistrationPage(NewMember newMember) {
+    private void setRegistrationPage(NewMember newMember) {
         if(newMember!=null) {
             editTextEmail.setText(newMember.getEmail());
             editTextName.setText(newMember.getFullName());
