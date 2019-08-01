@@ -47,6 +47,15 @@
                     android:orientation="vertical"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="294dp">
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/availibilty"
+                        android:layout_gravity="end"
+                        android:text="Available in campus"
+                        android:textColor="#757575"
+                        android:padding="2dp"
+                        android:switchPadding="4dp"/>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/linearLayout4"
@@ -383,6 +392,7 @@
                             app:layout_constraintStart_toEndOf="@+id/text_view_profile_tag_address"
                             app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -453,6 +463,7 @@
                 app:layout_constraintEnd_toEndOf="@+id/image_view_profile_pic"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/image_view_profile_pic" />
+
 
             <TextView
                 android:id="@+id/fab_profile_logout"

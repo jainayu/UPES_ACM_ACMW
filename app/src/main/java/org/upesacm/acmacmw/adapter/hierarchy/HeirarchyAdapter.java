@@ -40,7 +40,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
     @Override
     public HeirarchyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.heirarchy_holder, parent, false);
+                .inflate(R.layout.heirarchy_holder_v3, parent, false);
         HeirarchyViewHolder heirarchyViewHolder = new HeirarchyViewHolder(view);
         return heirarchyViewHolder;
     }
@@ -52,11 +52,10 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             Typeface regular = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_regular.ttf");
             final Typeface bold = Typeface.createFromAsset(context.getAssets(), "Fonts/product_sans_bold.ttf");
             holder.name.setText(heirarchyModels.get(position).getName());
-            holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
             if (heirarchyModels.get(position).getAvailableInCampus() == 1) {
-                holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle_green_24dp, 0);
-            } else if (heirarchyModels.get(position).getAvailableInCampus() == 0) {
-                holder.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_grey_24dp, 0);
+                holder.availableincampus.setImageResource(R.drawable.ic_available_in_campus);
+            }else if (heirarchyModels.get(position).getAvailableInCampus() == 0){
+                holder.availableincampus.setVisibility(View.GONE);
             }
 
             if (heirarchyModels.get(position).getAcm_acmw().equals("ACM") || heirarchyModels.get(position).getAcm_acmw().equals("ACMW")) {
@@ -65,6 +64,7 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             }
             else{
                 holder.position.setVisibility(View.GONE);
+                holder.name.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             }
 
             holder.position.setTypeface(bold);
@@ -144,11 +144,11 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
         TextView name;
         TextView position;
         TextView about;
+        ImageView availableincampus;
         //        ImageView whatsapp;
 //        ImageView linkedin;
 //        ImageView contact;
         // ImageView availabeInCampus;
-        TextView id_firebase;
         CardView cardView;
 
         public HeirarchyViewHolder(View itemView) {
@@ -158,11 +158,10 @@ public class HeirarchyAdapter extends RecyclerView.Adapter<HeirarchyAdapter.Heir
             position = itemView.findViewById(R.id.position);
             about = itemView.findViewById(R.id.about);
             cardView = itemView.findViewById(R.id.CardView);
+            availableincampus = itemView.findViewById(R.id.availableincampus);
 //            whatsapp = itemView.findViewById(R.id.image_view_hierarchy_whatsapp);
 //            linkedin = itemView.findViewById(R.id.linkedin);
 //            contact = itemView.findViewById(R.id.contact);
-
-            //availabeInCampus = itemView.findViewById(R.id.availabe_in_campus);
         }
     }
 
