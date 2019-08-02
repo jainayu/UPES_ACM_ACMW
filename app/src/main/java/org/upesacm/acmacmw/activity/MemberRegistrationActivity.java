@@ -1,6 +1,5 @@
 package org.upesacm.acmacmw.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -9,10 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -224,7 +220,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
         if(newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)){
             Order order = new Order.Builder()
                     .setOrderId(newMember.getSapId()+System.currentTimeMillis())
-                    .setAmount(membershipFee.getPremiumFee())//Amount to be paid is fee
+                    .setAmount("1")//membershipFee.getPremiumFee())//Amount to be paid is fee
                     .setCustomerId(newMember.getSapId())
                     .setEmail(newMember.getEmail())
                     .setMobileNo(newMember.getPhoneNo())
@@ -485,10 +481,12 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPaytmTransactionComplete(boolean success, final String errorMsg) {
+    public void onPaytmTransactionComplete(boolean success, final String errorMsg, String txnId) {
         if(success) {
             NewMember newMember = tempStorage.getParcelable(NEW_MEMBER_KEY);
-            final Member member = new Member.Builder(newMember).build();
+            final Member member = new Member.Builder(newMember)
+                                        .setTransactionID(txnId)
+                                        .build();
             makeToast("Transaction Successful.");
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setMessage("Please wait...").show();
