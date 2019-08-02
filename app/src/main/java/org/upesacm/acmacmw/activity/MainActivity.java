@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements
         ProfileFragment.OnFragmentInteractionListener,
         HomePageFragment.FragmentInteractionListener {
     public static final String TAG = "MainActivity";
-    public static final String BASE_URL="https://acm-app-demo.firebaseio.com/";
+    public static final String BASE_URL="https://acm-acmw-app-6aa17.firebaseio.com/";
     public static final String EVENT_ACTIVITY_CURRENT_FRAGMENT_KEY = "event activity current fragment key";
     private static final int POSTS_FRAGMENT_ID = 1;
     private static final int EVENTS_FRAGMENT_ID = 2;
