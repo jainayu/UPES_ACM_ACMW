@@ -26,6 +26,7 @@ public class Member implements Parcelable {
     private String membershipType;
     private String profilePicture;
     private String timestamp;
+    private String transactionID;
 
     Member() {}
 
@@ -48,6 +49,7 @@ public class Member implements Parcelable {
         in.readBooleanArray(array);
         premium = array[0];
         timestamp = in.readString();
+        transactionID = in.readString();
 
     }
 
@@ -129,6 +131,10 @@ public class Member implements Parcelable {
     public Boolean isPremium() {
         return premium;
     }
+    
+    public String gettransactionID() {
+        return transactionID;
+    }
 
     @Override
     public int describeContents() {
@@ -152,6 +158,7 @@ public class Member implements Parcelable {
         parcel.writeString(profilePicture);
         parcel.writeBooleanArray(new boolean[]{premium});
         parcel.writeString(timestamp);
+        parcel.writeString(transactionID);
     }
 
     public static class Builder {
@@ -172,6 +179,7 @@ public class Member implements Parcelable {
         private String profilePicture;
         private String timestamp;
         private List<String> eventsList;
+        private String transactionID;
 
         public Builder() {
             //default constructor
@@ -194,6 +202,7 @@ public class Member implements Parcelable {
             this.membershipType = member.getMembershipType();
             this.profilePicture = member.getProfilePicture();
             this.timestamp = member.getTimestamp();
+            this.transactionID = member.gettransactionID();
         }
 
         public Builder(NewMember newMember) {
@@ -233,6 +242,7 @@ public class Member implements Parcelable {
             member.membershipType = membershipType;
             member.profilePicture=profilePicture;
             member.timestamp = timestamp;
+            member.transactionID = transactionID;
             return member;
         }
 
@@ -320,6 +330,11 @@ public class Member implements Parcelable {
         }
         public Builder setTimeStamp(String timeStamp) {
             this.timestamp = timeStamp;
+            return this;
+        }
+
+        public Builder setTransactionID(String transactionID) {
+            this.transactionID = transactionID;
             return this;
         }
     }
