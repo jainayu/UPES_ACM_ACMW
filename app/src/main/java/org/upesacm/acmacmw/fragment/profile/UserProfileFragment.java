@@ -13,19 +13,29 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.activity.ProfileDetailsActivity;
 import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.retrofit.RetrofitFirebaseApiClient;
 import org.upesacm.acmacmw.retrofit.RetrofitHostingerApiClient;
@@ -78,6 +88,7 @@ public class UserProfileFragment extends Fragment implements
     ProgressBar progressBarUserProfile;
     TextView fabEdit;
     TextView fabLogout;
+    Switch availablity;
 
     Member member;
 
@@ -132,6 +143,8 @@ public class UserProfileFragment extends Fragment implements
         progressBarUserProfile=view.findViewById(R.id.progress_bar_user_profile);
         fabEdit = view.findViewById(R.id.fab_profile_edit);
         fabLogout = view.findViewById(R.id.fab_profile_logout);
+        availablity = view.findViewById(R.id.availibilty);
+        availablity.setVisibility(View.GONE);
         progressBarUserProfile.setVisibility(View.GONE);
 
         fabEdit.setOnClickListener(this);
@@ -187,8 +200,85 @@ public class UserProfileFragment extends Fragment implements
         textViewAddress.setText(member.getCurrentAdd());
         textViewEmail.setText(member.getEmail());
 
+        FirebaseDatabase.getInstance().getReference()
+                .child("Heirarchy")
+                .orderByChild("sapId")
+                .equalTo(Integer.parseInt(member.getSap()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot user : dataSnapshot.getChildren()) {
+                            if (user.exists()) {
+                                availablity.setVisibility(View.VISIBLE);
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("Heirarchy")
+                                        .child(user.getKey())
+                                        .child("availableInCampus")
+                                        .addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.getValue(Integer.class)==1){
+                                                    availablity.setChecked(true);
+                                                }
+                                                else {
+                                                    availablity.setChecked(false);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                break;
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        availablity.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    setAvailable(1);
+                }else {
+                    setAvailable(0);
+                }
+            }
+        });
         Typeface regular = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
         textViewName.setTypeface(regular);
+    }
+
+    private void setAvailable(final int status){
+        FirebaseDatabase.getInstance().getReference()
+                .child("Heirarchy")
+                .orderByChild("sapId")
+                .equalTo(Integer.parseInt(member.getSap()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot user : dataSnapshot.getChildren()) {
+                            if (user.exists()) {
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("Heirarchy")
+                                        .child(user.getKey())
+                                        .child("availableInCampus")
+                                        .setValue(status);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     @Override

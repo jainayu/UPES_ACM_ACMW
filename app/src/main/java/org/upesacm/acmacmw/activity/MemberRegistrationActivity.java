@@ -1,13 +1,18 @@
 package org.upesacm.acmacmw.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -214,7 +219,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
     @Override
     public void onRegistrationDataAvailable(int resultCode, final NewMember newMember) {
-
         tempStorage.putParcelable(NEW_MEMBER_KEY,newMember);
 
         if(newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)){
@@ -486,8 +490,9 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
             NewMember newMember = tempStorage.getParcelable(NEW_MEMBER_KEY);
             final Member member = new Member.Builder(newMember).build();
             makeToast("Transaction Successful.");
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setMessage("Please wait...").show();
             //TODO: save the member into the acmmembers database
-
             //create a new entry in the acm members database
             FirebaseDatabase.getInstance().getReference()
                     .child(FirebaseConfig.ACM_ACMW_MEMBERS)
@@ -505,26 +510,39 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 EmailMsg message = dataSnapshot.getValue(EmailMsg.class);
-                                                String memberDetails =
-                                                        "<b>Name</b>      : " + member.getName() + "<br />"
-                                                                + "<b>SAP ID</b>    : " + member.getSap() + "<br />"
-                                                                + "<b>ACM ID</b>    : " + member.getMemberId() + "<br />"
-                                                                + "<b>Password</b>  : " + member.getPassword() + "<br />" +
-                                                                "(Please set your own password from the app)" + "<br />"
-                                                                + "<b>Branch</b>    : " + member.getBranch() + "<br />"
-                                                                + "<b>Year</b>      : " + member.getYear() + "<br />"
-                                                                + "<b>Contact</b>   : " + member.getContact() + "<br />"
-                                                                + "<b>WhatsApp</b>  : " + member.getWhatsappNo() + "<br />"
-                                                                + "<b>DOB</b>       : " + member.getDob() + "<br />"
-                                                                + "<b>Address</b>   : " + member.getCurrentAdd() + "<br />";
+//                                                String memberDetails =
+//                                                        "<b>Name</b>      : " + member.getName() + "<br />"
+//                                                                + "<b>SAP ID</b>    : " + member.getSap() + "<br />"
+//                                                                + "<b>ACM ID</b>    : " + member.getMemberId() + "<br />"
+//                                                                + "<b>Password</b>  : " + member.getPassword() + "<br />" +
+//                                                                "(Please set your own password from the app)" + "<br />"
+//                                                                + "<b>Branch</b>    : " + member.getBranch() + "<br />"
+//                                                                + "<b>Year</b>      : " + member.getYear() + "<br />"
+//                                                                + "<b>Contact</b>   : " + member.getContact() + "<br />"
+//                                                                + "<b>WhatsApp</b>  : " + member.getWhatsappNo() + "<br />"
+//                                                                + "<b>DOB</b>       : " + member.getDob() + "<br />"
+//                                                                + "<b>Address</b>   : " + member.getCurrentAdd() + "<br />";
                                                 if (message != null) {
-                                                    String mailBody = message.getBody() + "<br /><br />" + memberDetails + "<br />" + message.getSenderDetails();
-                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
-                                                            message.getSubject(),
-                                                            mailBody);
-                                                } else
-                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
-                                                            "ACM Member Details", memberDetails);
+                                                    //String mailBody = message.getBody() + "<br /><br />" + memberDetails + "<br />" + message.getSenderDetails();
+                                                    String usernamePlaceHolder= "&username";
+                                                    String passwordPlaceHolder= "&password";
+                                                    StringBuilder mailBody = new StringBuilder(message.getBody());
+                                                    try {
+                                                        int unholderI = mailBody.indexOf(usernamePlaceHolder);
+                                                        int passholderI = mailBody.indexOf(passwordPlaceHolder);
+                                                        mailBody.replace(unholderI, unholderI+usernamePlaceHolder.length(), member.getSap());
+                                                        mailBody.replace(passholderI, passholderI+passwordPlaceHolder.length(), member.getPassword());
+                                                        Log.i(TAG,"mail body : "+mailBody.toString());
+                                                        sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
+                                                                message.getSubject(),
+                                                                mailBody.toString());
+                                                    }catch(Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+//                                                else
+////                                                    sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
+////                                                            "ACM Member Details", memberDetails);
                                             }
 
                                             @Override
@@ -534,7 +552,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                                         });
                                 MemberRegistrationActivity.this.finish();
                                 startActivity(new Intent(getApplicationContext(), ThankYouActivity.class));
-
                             }
                         }
                     });

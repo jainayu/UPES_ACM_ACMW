@@ -25,6 +25,7 @@ public class Member implements Parcelable {
     private Boolean premium;
     private String membershipType;
     private String profilePicture;
+    private String timestamp;
 
     Member() {}
 
@@ -46,6 +47,7 @@ public class Member implements Parcelable {
         boolean[] array = new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
+        timestamp = in.readString();
 
     }
 
@@ -60,6 +62,13 @@ public class Member implements Parcelable {
             return new Member[size];
         }
     };
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public String getProfilePicture() {
         return profilePicture;
@@ -142,6 +151,7 @@ public class Member implements Parcelable {
         parcel.writeString(recepientSap);
         parcel.writeString(profilePicture);
         parcel.writeBooleanArray(new boolean[]{premium});
+        parcel.writeString(timestamp);
     }
 
     public static class Builder {
@@ -160,6 +170,7 @@ public class Member implements Parcelable {
         private Boolean premium;
         private String membershipType;
         private String profilePicture;
+        private String timestamp;
         private List<String> eventsList;
 
         public Builder() {
@@ -182,6 +193,7 @@ public class Member implements Parcelable {
             this.premium = member.isPremium();
             this.membershipType = member.getMembershipType();
             this.profilePicture = member.getProfilePicture();
+            this.timestamp = member.getTimestamp();
         }
 
         public Builder(NewMember newMember) {
@@ -200,6 +212,7 @@ public class Member implements Parcelable {
             this.premium = newMember.isPremium();
             this.membershipType = newMember.getMembershipType();
             this.profilePicture = null;
+            this.timestamp = newMember.getTimestamp();
         }
 
         public Member build() {
@@ -219,6 +232,7 @@ public class Member implements Parcelable {
             member.premium = premium;
             member.membershipType = membershipType;
             member.profilePicture=profilePicture;
+            member.timestamp = timestamp;
             return member;
         }
 
@@ -302,6 +316,10 @@ public class Member implements Parcelable {
                 eventsList = new ArrayList<>();
             }
             this.eventsList = new ArrayList(eventsList);
+            return this;
+        }
+        public Builder setTimeStamp(String timeStamp) {
+            this.timestamp = timeStamp;
             return this;
         }
     }
