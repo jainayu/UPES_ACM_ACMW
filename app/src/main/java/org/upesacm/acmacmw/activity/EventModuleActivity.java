@@ -340,7 +340,7 @@ public class EventModuleActivity extends AppCompatActivity implements
 //    }
 
     @Override
-    public void onPaytmTransactionComplete(boolean success, String errorMsg) {
+    public void onPaytmTransactionComplete(boolean success, String errorMsg, String txnId) {
         if(success) {
             Toast.makeText(this,"Payment Successful",Toast.LENGTH_SHORT).show();
         } else {
