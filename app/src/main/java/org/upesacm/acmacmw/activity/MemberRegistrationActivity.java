@@ -220,7 +220,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
         if(newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)){
             Order order = new Order.Builder()
                     .setOrderId(newMember.getSapId()+System.currentTimeMillis())
-                    .setAmount("1")//membershipFee.getPremiumFee())//Amount to be paid is fee
+                    .setAmount(membershipFee.getPremiumFee())//Amount to be paid is fee
                     .setCustomerId(newMember.getSapId())
                     .setEmail(newMember.getEmail())
                     .setMobileNo(newMember.getPhoneNo())
