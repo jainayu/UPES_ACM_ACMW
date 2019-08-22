@@ -1,6 +1,6 @@
 package org.upesacm.acmacmw.util.paytm;
 
-public interface Config { 
+public interface Config {
     //String MID = "AhAtHR42568584040750";// test
     String MID = "fkYEFw75244860344291";
     String CHANNEL_ID = "WAP";

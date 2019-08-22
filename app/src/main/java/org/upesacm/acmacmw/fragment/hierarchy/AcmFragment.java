@@ -33,6 +33,8 @@ public class AcmFragment extends Fragment implements ValueEventListener {
     ProgressBar mProgressBar;
     List<HeirarchyModel> acmheirarchyModels = new ArrayList<>();
     HeirarchyAdapter heirarchyAdapter;
+    Bundle args = new Bundle();
+
 
 
     @Override
@@ -43,6 +45,7 @@ public class AcmFragment extends Fragment implements ValueEventListener {
         heirarchyAdapter = new HeirarchyAdapter(acmheirarchyModels);
         //empty list intially
     }
+
 
     @Nullable
 
@@ -63,7 +66,6 @@ public class AcmFragment extends Fragment implements ValueEventListener {
         return view;
 
     }
-
 
 
     @Override
@@ -96,6 +98,7 @@ public class AcmFragment extends Fragment implements ValueEventListener {
             HeirarchyModel heirarchyModel = dataSnapshot1.getValue(HeirarchyModel.class);
             if (heirarchyModel.getAcm_acmw().equals("ACM")) {
                 acmheirarchyModels.add(heirarchyModel);
+
             }
             if (acmheirarchyModels != null && heirarchyAdapter != null) {
                 heirarchyAdapter.setHeirarchyModels(acmheirarchyModels);
