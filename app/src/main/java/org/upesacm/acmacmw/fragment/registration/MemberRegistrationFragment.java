@@ -363,7 +363,8 @@ public class MemberRegistrationFragment extends Fragment implements
                                             .setCurrentAddress(currentAdd)
                                             .setWhatsappNo(whatsapp)
                                             .setMembershipType(membershipType)
-                                            .setTimeStamp(new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date()))
+                                            .setTimeStamp(System.currentTimeMillis()+"")
+//                                            .setTimeStamp(new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date()))
                                             .build();
                                     return newMember;
                                 } else

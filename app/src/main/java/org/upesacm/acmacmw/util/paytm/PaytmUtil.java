@@ -68,8 +68,8 @@ final public class PaytmUtil {
     }
 
     private static void beginTransaction(final Context context,PaytmOrder paytmOrder) {
-        PaytmPGService paytmPGService = PaytmPGService.getProductionService();
-        //PaytmPGService paytmPGService = PaytmPGService.getStagingService();
+        PaytmPGService paytmPGService = Config.PRODUCTION?PaytmPGService.getProductionService():
+                PaytmPGService.getStagingService();
         paytmPGService.initialize(paytmOrder,null);
         paytmPGService.startPaymentTransaction(context, true, true, new PaytmPaymentTransactionCallback() {
             @Override
@@ -141,10 +141,10 @@ final public class PaytmUtil {
                                     Log.i(TAG,"status : "+model.getSTATUS());
                                     if (model.getSTATUS().equals("TXN_SUCCESS")) {
                                         Log.i(TAG,"valid");
-                                        traCallback.onPaytmTransactionComplete(true,null);
+                                        traCallback.onPaytmTransactionComplete(true,null,inResponse.getString("TXNID"));
                                     } else {
                                         Log.i(TAG,"not valid");
-                                        traCallback.onPaytmTransactionComplete(false,model.getRESPMSG());
+                                        traCallback.onPaytmTransactionComplete(false,model.getRESPMSG(),inResponse.getString("TXNID"));
                                     }
                                 }
                             } else {
@@ -160,12 +160,12 @@ final public class PaytmUtil {
                     public void onFailure(Call<VerifyTxnResultModel> call, Throwable t) {
                         Log.i(TAG,"FAilure");
                         t.printStackTrace();
-                        traCallback.onPaytmTransactionComplete(false,"Network error");
+                        traCallback.onPaytmTransactionComplete(false,"Network error", null);
                     }
                 });
     }
 
     public interface TransactionCallback {
-        void onPaytmTransactionComplete(boolean success,@Nullable String errorMsg);
+        void onPaytmTransactionComplete(boolean success, @Nullable String errorMsg, String txnId);
     }
 }
