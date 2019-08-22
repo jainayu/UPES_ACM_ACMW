@@ -11,6 +11,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -75,7 +80,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         membershipFee = dataSnapshot.getValue(MembershipFee.class);
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         //database error
@@ -194,7 +198,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 //    }
     @Override
     public void onSAPIDAvailable(final String sapId) {
-        //Check if the SAP ID is alread registered in the ACM database
+                //Check if the SAP ID is alread registered in the ACM database
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseConfig.ACM_ACMW_MEMBERS)
                 .child(sapId)
@@ -203,7 +207,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Member acmMember = dataSnapshot.getValue(Member.class);
                         if (acmMember == null) {
-                            setCurrentFragment(MemberRegistrationFragment.newInstance(sapId), false);
+                            setCurrentFragment(MemberRegistrationFragment.newInstance(sapId),false);
                         } else {
                             makeToast("Already an ACM Member");
                         }
@@ -224,8 +228,8 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
         if (newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)) {
             Order order = new Order.Builder()
-                    .setOrderId(newMember.getSapId() + System.currentTimeMillis())
-                    .setAmount(membershipFee.getPremiumFee())//Amount to be paid is fee
+                    .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                    .setAmount("1")//membershipFee.getPremiumFee())//Amount to be paid is fee
                     .setCustomerId(newMember.getSapId())
                     .setEmail(newMember.getEmail())
                     .setMobileNo(newMember.getPhoneNo())
@@ -407,39 +411,40 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
     @Override
     public void onGoogleSignIn(final String sap, GoogleSignInAccount account) {
-        if (account != null) {
+        if(account!=null) {
             final TrialMember newTrialMember = new TrialMember.Builder(String.valueOf(Calendar.getInstance().getTimeInMillis()))
                     .setEmail(account.getEmail())
                     .setName(account.getDisplayName())
                     .setSap(sap)
-                    .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap), 6))
+                    .setOtp(RandomOTPGenerator.generate(Integer.parseInt(sap),6))
                     .build();
-            RetrofitFirebaseApiClient.getInstance().getHomePageClient().getTrialMember(sap, Config.AUTH_TOKEN)
+            RetrofitFirebaseApiClient.getInstance().getHomePageClient().getTrialMember(sap,Config.AUTH_TOKEN)
                     .enqueue(new Callback<TrialMember>() {
                         @Override
                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
                             final TrialMember trialMember;
-                            if (!(response.body() == null)) {
+                            if(!(response.body()==null)) {
                                 trialMember = new TrialMember.Builder(response.body().getCreationTimeStamp())
                                         .setEmail(newTrialMember.getEmail())
                                         .setName(newTrialMember.getName())
                                         .setSap(newTrialMember.getSap())
                                         .setOtp(newTrialMember.getOtp())
                                         .build();
-                            } else {
+                            }
+                            else {
                                 trialMember = newTrialMember;
                             }
-                            RetrofitFirebaseApiClient.getInstance().getHomePageClient().createTrialMember(sap, trialMember, Config.AUTH_TOKEN)
+                            RetrofitFirebaseApiClient.getInstance().getHomePageClient().createTrialMember(sap,trialMember, Config.AUTH_TOKEN)
                                     .enqueue(new Callback<TrialMember>() {
                                         @Override
                                         public void onResponse(Call<TrialMember> call, Response<TrialMember> response) {
-                                            System.out.println("createTrialMember response : " + response.message());
-                                            String mailBody = getString(R.string.guest_user_sign_in_msg_header) + "\n\n" +
-                                                    getString(R.string.guest_user_sign_in_msg_body) + " " + trialMember.getOtp();
-                                            OTPSender sender = new OTPSender();
-                                            sender.execute(mailBody, trialMember.getSap() + "@" + getString(R.string.upes_domain), "ACM");
+                                            System.out.println("createTrialMember response : "+response.message());
+                                            String mailBody = getString(R.string.guest_user_sign_in_msg_header)+"\n\n"+
+                                                    getString(R.string.guest_user_sign_in_msg_body)+" "+trialMember.getOtp();
+                                            OTPSender sender=new OTPSender();
+                                            sender.execute(mailBody,trialMember.getSap()+"@"+ getString(R.string.upes_domain),"ACM");
 
-                                            setCurrentFragment(TrialMemberOTPVerificationFragment.newInstance(trialMember), true);
+                                            setCurrentFragment(TrialMemberOTPVerificationFragment.newInstance(trialMember),true);
                                         }
 
                                         @Override
@@ -457,15 +462,15 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                         }
                     });
 
-        } else {
-            Log.d(TAG, "onGoogleSignIn: NULL ");
+        }
+        else {
             Toast.makeText(MemberRegistrationActivity.this, "unable to sign in", Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
     public void onTrialOTPVerificationResult(TrialMember trialMember, int code) {
-        if (code == TrialMemberOTPVerificationFragment.SUCCESSFUL_VERIFICATION) {
+        if(code == TrialMemberOTPVerificationFragment.SUCCESSFUL_VERIFICATION) {
             //Create the Guest Session Here
             SessionManager.getInstance(this).createGuestSession(trialMember);
 
@@ -473,19 +478,20 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                     .child(trialMember.getSap())
                     .setValue(trialMember);
 
-            System.out.println("inside home activity onTrialMemberStateChange" + trialMember);
-            System.out.println(trialMember.getName() + trialMember.getEmail());
+            System.out.println("inside home activity onTrialMemberStateChange"+trialMember);
+            System.out.println(trialMember.getName()+trialMember.getEmail());
             Toast.makeText(this, "Signed in as Guest", Toast.LENGTH_LONG).show();
             onBackPressed();
-        } else {
-            Toast.makeText(this, "Maximum tries exceeded", Toast.LENGTH_LONG);
+        }
+        else {
+            Toast.makeText(this,"Maximum tries exceeded",Toast.LENGTH_LONG);
         }
         this.finish();
     }
 
     @Override
-    public void onPaytmTransactionComplete(boolean success, final String errorMsg) {
-        if (success) {
+    public void onPaytmTransactionComplete(boolean success, final String errorMsg, String txnId) {
+        if(success) {
             NewMember newMember = tempStorage.getParcelable(NEW_MEMBER_KEY);
             final Member member = new Member.Builder(newMember).build();
             makeToast("Transaction Successful.");
@@ -523,19 +529,19 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 //                                                                + "<b>Address</b>   : " + member.getCurrentAdd() + "<br />";
                                                 if (message != null) {
                                                     //String mailBody = message.getBody() + "<br /><br />" + memberDetails + "<br />" + message.getSenderDetails();
-                                                    String usernamePlaceHolder = "&username";
-                                                    String passwordPlaceHolder = "&password";
+                                                    String usernamePlaceHolder= "&username";
+                                                    String passwordPlaceHolder= "&password";
                                                     StringBuilder mailBody = new StringBuilder(message.getBody());
                                                     try {
                                                         int unholderI = mailBody.indexOf(usernamePlaceHolder);
                                                         int passholderI = mailBody.indexOf(passwordPlaceHolder);
-                                                        mailBody.replace(unholderI, unholderI + usernamePlaceHolder.length(), member.getSap());
-                                                        mailBody.replace(passholderI, passholderI + passwordPlaceHolder.length(), member.getPassword());
-                                                        Log.i(TAG, "mail body : " + mailBody.toString());
+                                                        mailBody.replace(unholderI, unholderI+usernamePlaceHolder.length(), member.getSap());
+                                                        mailBody.replace(passholderI, passholderI+passwordPlaceHolder.length(), member.getPassword());
+                                                        Log.i(TAG,"mail body : "+mailBody.toString());
                                                         sendIDCard(member.getSap() + "@" + getString(R.string.upes_domain),
                                                                 message.getSubject(),
                                                                 mailBody.toString());
-                                                    } catch (Exception e) {
+                                                    }catch(Exception e) {
                                                         e.printStackTrace();
                                                     }
                                                 }
@@ -557,7 +563,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
 
         } else {
-            makeToast("Transaction failed : " + errorMsg);
+            makeToast("Transaction failed : "+errorMsg);
             //TODO: Display the appropirate error message
         }
     }

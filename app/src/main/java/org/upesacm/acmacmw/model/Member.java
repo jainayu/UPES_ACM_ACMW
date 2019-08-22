@@ -26,8 +26,8 @@ public class Member implements Parcelable {
     private String membershipType;
     private String profilePicture;
     private String registrationTime;
-    private long timestamp;
-
+    private String timestamp;
+    private String transactionID;
 
     Member() {}
 
@@ -50,7 +50,9 @@ public class Member implements Parcelable {
         boolean[] array = new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
-        timestamp = in.readLong();
+       // timestamp = in.readLong();
+        timestamp = in.readString();
+        transactionID = in.readString();
 
     }
 
@@ -127,11 +129,15 @@ public class Member implements Parcelable {
         return premium;
     }
 
+    public String gettransactionID() {
+        return transactionID;
+    }
+
     public String getRegistrationTime(){
         return registrationTime;
     }
 
-    public long getTimestamp(){
+    public String getTimestamp(){
         return timestamp;
     }
 
@@ -157,7 +163,9 @@ public class Member implements Parcelable {
         parcel.writeString(profilePicture);
         parcel.writeString(registrationTime);
         parcel.writeBooleanArray(new boolean[]{premium});
-        parcel.writeLong(timestamp);
+      //  parcel.writeLong(timestamp);
+        parcel.writeString(timestamp);
+        parcel.writeString(transactionID);
     }
 
     public static class Builder {
@@ -177,8 +185,9 @@ public class Member implements Parcelable {
         private String membershipType;
         private String profilePicture;
         private String registrationTime;
-        private long timestamp;
+        private String timestamp;
         private List<String> eventsList;
+        private String transactionID;
 
         public Builder() {
             //default constructor
@@ -202,6 +211,7 @@ public class Member implements Parcelable {
             this.membershipType = member.getMembershipType();
             this.profilePicture = member.getProfilePicture();
             this.timestamp = member.getTimestamp();
+            this.transactionID = member.gettransactionID();
         }
 
         public Builder(NewMember newMember) {
@@ -240,6 +250,7 @@ public class Member implements Parcelable {
             member.membershipType = membershipType;
             member.profilePicture=profilePicture;
             member.timestamp = timestamp;
+            member.transactionID = transactionID;
             return member;
         }
 
@@ -332,8 +343,13 @@ public class Member implements Parcelable {
             this.registrationTime = registrationTime;
             return this;
         }
-        public Builder setTimestamp(long timestamp){
+        public Builder setTimestamp(String timestamp){
             this.timestamp = timestamp;
+            return this;
+        }
+
+        public Builder setTransactionID(String transactionID) {
+            this.transactionID = transactionID;
             return this;
         }
     }
