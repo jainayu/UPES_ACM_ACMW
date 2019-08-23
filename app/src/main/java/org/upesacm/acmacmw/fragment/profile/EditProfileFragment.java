@@ -218,6 +218,8 @@ public class EditProfileFragment extends Fragment
                                     .setBranch(branch)
                                     .setWhatsappNo(whatsapp)
                                     .setDob(dob)
+                                    .setRegistrationTime(member.getRegistrationTime())
+                                    .setTimestamp(member.getTimestamp())
                                     .setCurrentAdd(address)
                                     .setPremium(member.isPremium())
                                     .setMembershipType(member.getMembershipType())

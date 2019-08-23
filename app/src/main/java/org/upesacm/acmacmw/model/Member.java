@@ -25,6 +25,7 @@ public class Member implements Parcelable {
     private Boolean premium;
     private String membershipType;
     private String profilePicture;
+    private String registrationTime;
     private String timestamp;
     private String transactionID;
 
@@ -44,10 +45,12 @@ public class Member implements Parcelable {
         dob = in.readString();
         currentAdd = in.readString();
         recepientSap = in.readString();
+        registrationTime = in.readString();
         profilePicture=in.readString();
         boolean[] array = new boolean[1];
         in.readBooleanArray(array);
         premium = array[0];
+       // timestamp = in.readLong();
         timestamp = in.readString();
         transactionID = in.readString();
 
@@ -64,13 +67,6 @@ public class Member implements Parcelable {
             return new Member[size];
         }
     };
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
 
     public String getProfilePicture() {
         return profilePicture;
@@ -95,6 +91,7 @@ public class Member implements Parcelable {
     public String getSap() {
         return sap;
     }
+
     public String getMemberId() {
         return memberId;
     }
@@ -131,9 +128,17 @@ public class Member implements Parcelable {
     public Boolean isPremium() {
         return premium;
     }
-    
+
     public String gettransactionID() {
         return transactionID;
+    }
+
+    public String getRegistrationTime(){
+        return registrationTime;
+    }
+
+    public String getTimestamp(){
+        return timestamp;
     }
 
     @Override
@@ -156,7 +161,9 @@ public class Member implements Parcelable {
         parcel.writeString(currentAdd);
         parcel.writeString(recepientSap);
         parcel.writeString(profilePicture);
+        parcel.writeString(registrationTime);
         parcel.writeBooleanArray(new boolean[]{premium});
+      //  parcel.writeLong(timestamp);
         parcel.writeString(timestamp);
         parcel.writeString(transactionID);
     }
@@ -177,6 +184,7 @@ public class Member implements Parcelable {
         private Boolean premium;
         private String membershipType;
         private String profilePicture;
+        private String registrationTime;
         private String timestamp;
         private List<String> eventsList;
         private String transactionID;
@@ -199,6 +207,7 @@ public class Member implements Parcelable {
             this.currentAdd = member.getCurrentAdd();
             this.recepientSap = member.getRecepientSap();
             this.premium = member.isPremium();
+            this.registrationTime = member.getRegistrationTime();
             this.membershipType = member.getMembershipType();
             this.profilePicture = member.getProfilePicture();
             this.timestamp = member.getTimestamp();
@@ -219,9 +228,7 @@ public class Member implements Parcelable {
             this.currentAdd = newMember.getCurrentAddress();
             this.recepientSap = newMember.getRecipientSap();
             this.premium = newMember.isPremium();
-            this.membershipType = newMember.getMembershipType();
             this.profilePicture = null;
-            this.timestamp = newMember.getTimestamp();
         }
 
         public Member build() {
@@ -239,6 +246,7 @@ public class Member implements Parcelable {
             member.currentAdd=currentAdd;
             member.recepientSap = recepientSap;
             member.premium = premium;
+            member.registrationTime = registrationTime;
             member.membershipType = membershipType;
             member.profilePicture=profilePicture;
             member.timestamp = timestamp;
@@ -311,6 +319,8 @@ public class Member implements Parcelable {
             return this;
         }
 
+
+
         public Builder setPremium(Boolean premium) {
             this.premium = premium;
             return this;
@@ -328,8 +338,13 @@ public class Member implements Parcelable {
             this.eventsList = new ArrayList(eventsList);
             return this;
         }
-        public Builder setTimeStamp(String timeStamp) {
-            this.timestamp = timeStamp;
+
+        public Builder setRegistrationTime(String registrationTime) {
+            this.registrationTime = registrationTime;
+            return this;
+        }
+        public Builder setTimestamp(String timestamp){
+            this.timestamp = timestamp;
             return this;
         }
 
