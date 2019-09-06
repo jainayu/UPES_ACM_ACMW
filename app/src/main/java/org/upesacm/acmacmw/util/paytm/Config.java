@@ -1,7 +1,7 @@
 package org.upesacm.acmacmw.util.paytm;
 
 public interface Config {
-    boolean PRODUCTION = false;
+    boolean PRODUCTION = true;
 
     String MID = PRODUCTION?"fkYEFw75244860344291":"AhAtHR42568584040750";
 
