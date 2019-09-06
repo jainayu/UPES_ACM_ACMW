@@ -388,9 +388,11 @@ public class ProfileDetailsActivity extends AppCompatActivity implements
                 {
                     progressDialog.dismiss();
                     Toast.makeText(ProfileDetailsActivity.this, "Password Changed Successfully,Login Now", Toast.LENGTH_SHORT).show();
+                    setCurrentFragment(LoginFragment.newInstance(), false);
                 }
             }
         });
+
     }
 
     private void populateGeofenceList() {

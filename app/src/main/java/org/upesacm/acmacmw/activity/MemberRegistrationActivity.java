@@ -561,7 +561,6 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                         }
                     });
 
-
         } else {
             makeToast("Transaction failed : "+errorMsg);
             //TODO: Display the appropirate error message
