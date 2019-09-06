@@ -96,10 +96,7 @@ public class BottomsheetFragment extends BottomSheetDialogFragment {
         Whatsapp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("smsto:" + getWhatsappNo);
-                Intent i = new Intent(Intent.ACTION_SENDTO, uri);
-                i.setPackage("com.whatsapp");
-                getContext().startActivity(i);
+
                 Intent sendIntent = new Intent("android.intent.action.MAIN");
                 sendIntent.setComponent(new ComponentName("com.whatsapp", "com.whatsapp.Conversation"));
                 sendIntent.putExtra("jid", PhoneNumberUtils.stripSeparators("91" + getWhatsappNo) + "@s.whatsapp.net");//phone number without "+" prefix

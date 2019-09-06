@@ -120,7 +120,6 @@ public class Member implements Parcelable {
         return recepientSap;
     }
 
-
     public String getMembershipType() {
         return membershipType;
     }
@@ -163,7 +162,7 @@ public class Member implements Parcelable {
         parcel.writeString(profilePicture);
         parcel.writeString(registrationTime);
         parcel.writeBooleanArray(new boolean[]{premium});
-      //  parcel.writeLong(timestamp);
+        //parcel.writeLong(timestamp);
         parcel.writeString(timestamp);
         parcel.writeString(transactionID);
     }

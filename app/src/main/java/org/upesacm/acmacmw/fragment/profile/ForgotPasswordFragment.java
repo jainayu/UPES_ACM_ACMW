@@ -79,10 +79,11 @@ public class ForgotPasswordFragment extends DialogFragment {
                                 {
                                     otp=RandomOTPGenerator.generate(Integer.parseInt(sapid),6);
                                     String mailBody="Hello "+member.getName()+",<br/>You can change your password from App by using this OTP.<br/>Your OTP is <b>"+otp+"</b>";
-                                    String recepientMail=member.getEmail();
+                                    String recepientMail= member.getEmail();
                                     String subject="ACM Change Password";
                                     OTPSender otpSender =new OTPSender();
                                     otpSender.execute(mailBody,recepientMail,subject);
+
                                     editTextSapid.setVisibility(View.GONE);
                                     buttonSendMail.setVisibility(View.GONE);
                                     editTextPassword.setVisibility(View.VISIBLE);

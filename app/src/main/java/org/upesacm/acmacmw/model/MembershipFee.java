@@ -22,13 +22,14 @@ public class MembershipFee {
         setTwoYearsMsg();
     }*/
 
-    public String getPremiumFee() {
-        return premiumFee;
-    }
+
 
     public void setPremiumFee(String premiumFee) {
         this.premiumFee = premiumFee;
         setPremiumMsg();
+    }
+    public String getPremiumFee() {
+        return premiumFee;
     }
 
     public String getOneYearFee() {
