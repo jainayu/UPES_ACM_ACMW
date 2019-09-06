@@ -1,6 +1,9 @@
 package org.upesacm.acmacmw.model;
 
-public class HeirarchyModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class HeirarchyModel  {
     private String name;
     private String about;
     private int availableInCampus;
@@ -14,6 +17,12 @@ public class HeirarchyModel {
     private String acm_acmw;
     private long sapId;
     private String currentproject;
+
+
+    public HeirarchyModel() {
+    }
+
+
 
     public long getSapId() {
         return sapId;
@@ -111,4 +120,7 @@ public class HeirarchyModel {
     public void setCurrentproject(String currentproject) {
         this.currentproject = currentproject;
     }
+
+
+
 }

@@ -4,7 +4,7 @@ package org.upesacm.acmacmw.fragment.registration;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +12,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -37,6 +40,7 @@ public class GoogleSignInFragment extends Fragment
     GoogleSignInClient signInClient;
     String sap;
     private GoogleSignInListener listener;
+
     public GoogleSignInFragment() {
         // Required empty public constructor
     }
@@ -47,13 +51,12 @@ public class GoogleSignInFragment extends Fragment
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof GoogleSignInListener) {
-            listener = (GoogleSignInListener)context;
+        if (context instanceof GoogleSignInListener) {
+            listener = (GoogleSignInListener) context;
             super.onAttach(context);
-        }
-        else
-            throw new IllegalStateException(context.toString()+
-                " must implement GoogleSignInListener");
+        } else
+            throw new IllegalStateException(context.toString() +
+                    " must implement GoogleSignInListener");
     }
 
     @Override
@@ -65,10 +68,11 @@ public class GoogleSignInFragment extends Fragment
         signInButton = view.findViewById(R.id.button_google_sign_in);
 
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
-        signInClient = GoogleSignIn.getClient(getContext(),signInOptions);
+        signInClient = GoogleSignIn.getClient(getContext(), signInOptions);
         signInButton.setOnClickListener(this);
         return view;
     }
@@ -80,21 +84,19 @@ public class GoogleSignInFragment extends Fragment
 
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
-        if(view.getId() == R.id.button_google_sign_in) {
+        if (view.getId() == R.id.button_google_sign_in) {
             sap = editTextSap.getText().toString();
-            boolean isSapValid= Pattern.compile("5000[\\d]{5}").matcher(sap).matches();
-            if(isSapValid) {
-                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
-                if(account == null) {
+            boolean isSapValid = Pattern.compile("5000[\\d]{5}").matcher(sap).matches();
+            if (isSapValid) {
+                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+                if (account == null) {
                     Intent signInIntent = signInClient.getSignInIntent();
-                    startActivityForResult(signInIntent,RC_SIGN_IN);
+                    startActivityForResult(signInIntent, RC_SIGN_IN);
+                } else {
+                    listener.onGoogleSignIn(sap, account);
                 }
-                else {
-                    listener.onGoogleSignIn(sap,account);
-                }
-            }
-            else {
-                Toast.makeText(getContext(),"Please Enter Valid SAP ID",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Please Enter Valid SAP ID", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -102,21 +104,22 @@ public class GoogleSignInFragment extends Fragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         System.out.println("on activity result : google sign in");
-        if(requestCode == RC_SIGN_IN) {
+        if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> completedTask = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-                System.out.println("onGoogleSign in result"+account);
-                listener.onGoogleSignIn(sap,account);
+                Log.d("TAG", "onActivityResult: IN" + (account == null));
+                System.out.println("onGoogleSign in result" + account);
+                listener.onGoogleSignIn(sap, account);
             } catch (ApiException e) {
-               e.printStackTrace();
-               System.out.println("status : "+CommonStatusCodes.getStatusCodeString(e.getStatusCode()));
-               listener.onGoogleSignIn(null,null);
+                e.printStackTrace();
+                System.out.println("status : " + CommonStatusCodes.getStatusCodeString(e.getStatusCode()));
+                listener.onGoogleSignIn(null, null);
             }
         }
     }
 
     public interface GoogleSignInListener {
-        void onGoogleSignIn(String sap,GoogleSignInAccount account);
+        void onGoogleSignIn(String sap, GoogleSignInAccount account);
     }
 }

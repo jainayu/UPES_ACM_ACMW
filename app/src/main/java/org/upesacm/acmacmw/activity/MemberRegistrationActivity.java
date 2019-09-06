@@ -1,8 +1,14 @@
 package org.upesacm.acmacmw.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.FrameLayout;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,9 +26,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.upesacm.acmacmw.R;
+import org.upesacm.acmacmw.fragment.registration.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.registration.MemberRegistrationFragment;
 import org.upesacm.acmacmw.fragment.registration.SapIdFragment;
-import org.upesacm.acmacmw.fragment.registration.GoogleSignInFragment;
 import org.upesacm.acmacmw.fragment.registration.TrialMemberOTPVerificationFragment;
 import org.upesacm.acmacmw.model.EmailMsg;
 import org.upesacm.acmacmw.model.Member;
@@ -35,8 +41,8 @@ import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.OTPSender;
 import org.upesacm.acmacmw.util.RandomOTPGenerator;
 import org.upesacm.acmacmw.util.SessionManager;
-import org.upesacm.acmacmw.util.paytm.model.Order;
 import org.upesacm.acmacmw.util.paytm.PaytmUtil;
+import org.upesacm.acmacmw.util.paytm.model.Order;
 
 import java.util.Calendar;
 
@@ -59,7 +65,9 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     private FrameLayout frameLayout;
     private Bundle tempStorage = new Bundle();
     private int signUpType;
+    Intent intent;
     MembershipFee membershipFee;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,25 +87,26 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                 });
 
         Bundle args = savedInstanceState;
-        if(args == null)
+        if (args == null)
             args = getIntent().getExtras();
         signUpType = args.getInt(MemberRegistrationActivity.SIGN_UP_TYPE_KEY);
-        if(signUpType == MemberRegistrationActivity.MEMBER_SIGN_UP) {
+        if (signUpType == MemberRegistrationActivity.MEMBER_SIGN_UP) {
             FirebaseDatabase.getInstance().getReference()
                     .child(FirebaseConfig.REGISTRATIONS_OPEN)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Log.i(TAG,"ondatachange member reg acitivity");
+                            Log.i(TAG, "ondatachange member reg acitivity");
                             boolean open = dataSnapshot.getValue(Boolean.class);
-                            Log.i(TAG,open+"");
-                            if(open) {
+                            Log.i(TAG, open + "");
+                            if (open) {
                                 setCurrentFragment(SapIdFragment.newInstance(), false);
                             } else {
-                                Toast.makeText(MemberRegistrationActivity.this,"Registrations closed",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MemberRegistrationActivity.this, "Registrations closed", Toast.LENGTH_SHORT).show();
                                 MemberRegistrationActivity.this.finish();
                             }
                         }
+
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -109,23 +118,23 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     }
 
     void makeToast(String msg) {
-        Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
     void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(frameLayout.getId(),fragment);
-        if(addToBackStack)
+        ft.replace(frameLayout.getId(), fragment);
+        if (addToBackStack)
             ft.addToBackStack(null);
         ft.commit();
     }
 
-    private void sendIDCard(String recipientEmail,String subject,String mailBody) {
-        OTPSender sender=new OTPSender();
-        sender.execute(mailBody,recipientEmail,subject);
+    private void sendIDCard(String recipientEmail, String subject, String mailBody) {
+        OTPSender sender = new OTPSender();
+        sender.execute(mailBody, recipientEmail, subject);
     }
 
-//    @Override
+    //    @Override
 //    public void onSAPIDAvailable(final String sapId) {
 //        //Check if the SAP ID is alread registered in the ACM database
 //        FirebaseDatabase.getInstance().getReference()
@@ -215,21 +224,21 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
 
     @Override
     public void onRegistrationDataAvailable(int resultCode, final NewMember newMember) {
-        tempStorage.putParcelable(NEW_MEMBER_KEY,newMember);
+        tempStorage.putParcelable(NEW_MEMBER_KEY, newMember);
 
-        if(newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)){
+        if (newMember.getMembershipType().equals(membershipFee.PREMIUM_TYPE)) {
             Order order = new Order.Builder()
                     .setOrderId(newMember.getSapId()+System.currentTimeMillis())
-                    .setAmount("1")//membershipFee.getPremiumFee())//Amount to be paid is fee
+                    .setAmount(membershipFee.getPremiumFee())//Amount to be paid is fee
                     .setCustomerId(newMember.getSapId())
                     .setEmail(newMember.getEmail())
                     .setMobileNo(newMember.getPhoneNo())
                     .build();
             PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
         }
-        if(newMember.getMembershipType().equals(membershipFee.ONE_YEAR_TYPE)){
+        if (newMember.getMembershipType().equals(membershipFee.ONE_YEAR_TYPE)) {
             Order order = new Order.Builder()
-                    .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                    .setOrderId(newMember.getSapId() + System.currentTimeMillis())
                     .setAmount(membershipFee.getOneYearFee())//Amount to be paid is fee
                     .setCustomerId(newMember.getSapId())
                     .setEmail(newMember.getEmail())
@@ -237,9 +246,9 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
                     .build();
             PaytmUtil.initializePayment(MemberRegistrationActivity.this, order, MemberRegistrationActivity.this);
         }
-        if(newMember.getMembershipType().equals(membershipFee.TWO_YEAR_TYPE)){
+        if (newMember.getMembershipType().equals(membershipFee.TWO_YEAR_TYPE)) {
             Order order = new Order.Builder()
-                    .setOrderId(newMember.getSapId()+System.currentTimeMillis())
+                    .setOrderId(newMember.getSapId() + System.currentTimeMillis())
                     .setAmount(membershipFee.getTwoYearFee())//Amount to be paid is fee
                     .setCustomerId(newMember.getSapId())
                     .setEmail(newMember.getEmail())
@@ -484,9 +493,7 @@ public class MemberRegistrationActivity extends AppCompatActivity implements
     public void onPaytmTransactionComplete(boolean success, final String errorMsg, String txnId) {
         if(success) {
             NewMember newMember = tempStorage.getParcelable(NEW_MEMBER_KEY);
-            final Member member = new Member.Builder(newMember)
-                                        .setTransactionID(txnId)
-                                        .build();
+            final Member member = new Member.Builder(newMember).build();
             makeToast("Transaction Successful.");
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setMessage("Please wait...").show();

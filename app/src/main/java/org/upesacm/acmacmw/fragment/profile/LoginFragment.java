@@ -3,10 +3,6 @@ package org.upesacm.acmacmw.fragment.profile;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +10,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +26,7 @@ import org.upesacm.acmacmw.model.Member;
 import org.upesacm.acmacmw.util.FirebaseConfig;
 import org.upesacm.acmacmw.util.SessionManager;
 
-public class LoginFragment extends Fragment implements View.OnClickListener{
+public class LoginFragment extends Fragment implements View.OnClickListener {
     public static final String TAG = "LoginFragment";
     public static final int LOGIN_SUCCESSFUL = 1;
     public static final int SIGNUP_PRESSED = 2;
@@ -40,10 +41,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     EditText editTextPassword;
     Button buttonLogin;
     Button buttonSignup;
-    Button buttonGuestSignUp;TextView forgotPassword;
+    Button buttonGuestSignUp;
+    TextView forgotPassword;
     Toolbar toolbar;
-    
-    private String username,password;
+
+    private String username, password;
     InteractionListener interactionListener;
 
     //MainActivity homeActivity;
@@ -53,45 +55,44 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onAttach(Context context) {
-        if(context instanceof InteractionListener) {
-            interactionListener = (InteractionListener)context;
+        if (context instanceof InteractionListener) {
+            interactionListener = (InteractionListener) context;
             super.onAttach(context);
-        }
-
-        else
-            throw new IllegalStateException(context.toString()+
-                          " must implement OnLoginResultListener");
+        } else
+            throw new IllegalStateException(context.toString() +
+                    " must implement OnLoginResultListener");
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_login,null);
-        editTextUsername=view.findViewById(R.id.edit_text_username);
-        editTextPassword=view.findViewById(R.id.editText_password);
-        buttonLogin=view.findViewById(R.id.button_login);
-        buttonSignup=view.findViewById(R.id.button_signup);
-        buttonGuestSignUp=view.findViewById(R.id.button_guest_sign_up);
-        forgotPassword=view.findViewById(R.id.forgot);
+        View view = inflater.inflate(R.layout.fragment_login, null);
+        editTextUsername = view.findViewById(R.id.edit_text_username);
+        editTextPassword = view.findViewById(R.id.editText_password);
+        buttonLogin = view.findViewById(R.id.button_login);
+        buttonSignup = view.findViewById(R.id.button_signup);
+        buttonGuestSignUp = view.findViewById(R.id.button_guest_sign_up);
+        forgotPassword = view.findViewById(R.id.forgot);
         toolbar = view.findViewById(R.id.toolbar_frag_login);
-        TextView logincred =view.findViewById(R.id.text_view_login_credentials);
-        Typeface type = Typeface.createFromAsset(getContext().getAssets(),"Fonts/product_sans_regular.ttf");
+        TextView logincred = view.findViewById(R.id.text_view_login_credentials);
+        Typeface type = Typeface.createFromAsset(getContext().getAssets(), "Fonts/product_sans_regular.ttf");
         logincred.setTypeface(type);
         forgotPassword.setOnClickListener(this);
         buttonSignup.setOnClickListener(this);
         buttonLogin.setOnClickListener(this);
         buttonGuestSignUp.setOnClickListener(this);
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         return view;
     }
 
     @Override
     public void onClick(View view) {
-        if(view.getId()==R.id.button_login) {
-            username=editTextUsername.getText().toString().trim();
-            password=editTextPassword.getText().toString().trim();
-            if(username.equals("")) {
+        if (view.getId() == R.id.button_login) {
+            username = editTextUsername.getText().toString().trim();
+            password = editTextPassword.getText().toString().trim();
+            if (username.equals("")) {
                 interactionListener.onLoginDialogFragmentInteraction(LOGIN_FAILED);
                 return;
             }
@@ -102,17 +103,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Member member = dataSnapshot.getValue(Member.class);
-                            if(member!=null) {
-                                Log.i(TAG,"name : "+member.getName());
-                                if(member.getPassword().equals(password)) {
+                            if (member != null) {
+                                Log.i(TAG, "name : " + member.getName());
+                                if (member.getPassword().equals(password)) {
                                     SessionManager.getInstance(LoginFragment.this.getContext()).createMemberSession(member);
                                     interactionListener.onLoginDialogFragmentInteraction(LOGIN_SUCCESSFUL);
-                                }
-                                else {
+                                } else {
                                     interactionListener.onLoginDialogFragmentInteraction(LOGIN_FAILED);
                                 }
-                            }
-                            else {
+                            } else {
                                 interactionListener.onLoginDialogFragmentInteraction(LOGIN_FAILED);
                             }
                         }
@@ -122,21 +121,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                             interactionListener.onLoginDialogFragmentInteraction(NETWORK_ERROR);
                         }
                     });
-        }
-        else if(view.getId()==R.id.button_signup){
+        } else if (view.getId() == R.id.button_signup) {
             interactionListener.onLoginDialogFragmentInteraction(SIGNUP_PRESSED);
-        }
-        else if(view.getId() == R.id.button_guest_sign_up){
+        } else if (view.getId() == R.id.button_guest_sign_up) {
             interactionListener.onLoginDialogFragmentInteraction(GUEST_SIGNUP_PRESSED);
-        }
-        else if(view.getId()==R.id.forgot)
-        {
+        } else if (view.getId() == R.id.forgot) {
             interactionListener.onLoginDialogFragmentInteraction(FORGOT_PASSWORD);
-        }
-        else {
+        } else {
             interactionListener.onLoginDialogFragmentInteraction(CANCELLED);
         }
     }
+
     public String getPassword() {
         return password;
     }

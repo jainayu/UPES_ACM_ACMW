@@ -171,6 +171,13 @@ public class HomePageFragment extends Fragment
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState: called");
+        super.onSaveInstanceState(outState);
+
+    }
+
+    @Override
     public void onDestroyView() {
         postsReference.removeEventListener(this);
 
@@ -201,12 +208,14 @@ public class HomePageFragment extends Fragment
         viewAlive = false;
     }
 
+
     @Override
     public void onDetach() {
         super.onDetach();
     }
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy: Called");
         postsReference = null;
         recyclerViewAdapter = null;
         super.onDestroy();

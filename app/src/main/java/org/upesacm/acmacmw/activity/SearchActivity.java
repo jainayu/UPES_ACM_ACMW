@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -34,6 +35,7 @@ public class SearchActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Intent intent;
     private String keyword;
+    public TextView NoResult;
 
     List<HeirarchyModel> searchHeirarchyModels = new ArrayList<>();
     private static CharSequence Sequence;
@@ -64,6 +66,7 @@ public class SearchActivity extends AppCompatActivity {
         recyclerView.setAdapter(heirarchyAdapter);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar2);
         intent = getIntent();
+        NoResult = (TextView) findViewById(R.id.noResult);
         Sequence = intent.getStringExtra("FILTER").toLowerCase();
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -102,6 +105,10 @@ public class SearchActivity extends AppCompatActivity {
                 heirarchyAdapter.setHeirarchyModels(searchHeirarchyModels);
                 mProgressBar.setVisibility(View.GONE);
             }
+        }
+        if(searchHeirarchyModels.isEmpty()){
+            NoResult.setText("No Result for '"+Sequence+"'");
+            NoResult.setVisibility(View.VISIBLE);
         }
     }
 
