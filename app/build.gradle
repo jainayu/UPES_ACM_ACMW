@@ -8,8 +8,8 @@ android {
         applicationId "org.upesacm.acmacmw"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 21
-        versionName "3.4"
+        versionCode 22
+        versionName "3.5.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
